@@ -42,6 +42,8 @@ _FEATURE_DTYPES = {
     "assigner_prior_cves": "float", "assigner_kev_count": "float", "assigner_kev_12m": "float",
     "assigner_kev_rate_smooth": "float", "n_vendors_mentioned": "int",
     "vendor_kev_count_max": "float", "vendor_kev_12m_max": "float",
+    "assigner_cve_share": "float", "assigner_kev_share": "float", "assigner_kev_12m_share": "float",
+    "vendor_kev_share_max": "float", "vendor_kev_12m_share_max": "float",
 }
 _FEAT_BASE = {"cve_id": "str", "snapshot_month": "str", "published": "date"}
 _BIN = ["epss_missing", "exploitdb", "metasploit", "nuclei", "poc_github", "any_exploit"]
@@ -83,6 +85,8 @@ TEXT_FEATURES = ["kev_text_score", "nearest_kev_sim",
                  "txt_path_traversal", "txt_sqli", "txt_priv_esc", "txt_memory", "txt_edge_device",
                  "txt_enterprise", "txt_browser", "txt_wordpress", "txt_xss"]
 FEATURE_GROUPS_V2 = {**FEATURE_GROUPS, "text": TEXT_FEATURES}
+# scale-free candidates added at step 3e (built by src/features/build.py; shares of everything known by the history cutoff)
+SHARE_FEATURES = ["assigner_cve_share", "assigner_kev_share", "assigner_kev_12m_share", "vendor_kev_share_max", "vendor_kev_12m_share_max"]
 V2_FEATURES = V1_FEATURES + TEXT_FEATURES  # legacy v2 set (includes raw epss), kept so v2/v3 stay reproducible
 
 # ---- v4: drift-robust feature set (step 3d) -------------------------------------------------
@@ -99,14 +103,29 @@ def _rank_name(f: str) -> str:
     return f + "_pctrank"
 
 
-V4_FEATURES = [_rank_name(f) if f in PSI_REPLACED else f for f in V2_FEATURES if f not in RAW_REMOVED]
-ALLOWED_FEATURES = V4_FEATURES  # what a model may use from now on; V1/V2 lists stay for reproducing old results
+V4_FEATURES = [_rank_name(f) if f in PSI_REPLACED else f for f in V2_FEATURES if f not in RAW_REMOVED]  # legacy (step 3d)
+
+# ---- v5 (step 3e): the LAST feature-set change. For each scale-sensitive feature the transformation (raw / within-pool percentile
+# rank / scale-free share) with the lowest PSI between the pooled replicas and the 2026 scoreboard was chosen, ties to raw, never by
+# hits. src/features/drift_fix.py recomputes the choice; tests/test_drift_fix.py asserts it still matches this record.
+V5_TRANSFORMS = {
+    "days_to_cutoff": "days_to_cutoff",                       # raw (PSI 1.03; its rank is 2.33)
+    "assigner_prior_cves": "assigner_prior_cves_pctrank",     # rank (0.86 vs raw 1.89 vs share 2.34)
+    "assigner_kev_count": "assigner_kev_share",               # share (0.66 vs raw 1.17 vs rank 2.66)
+    "assigner_kev_12m": "assigner_kev_12m_share",             # share (0.39 vs raw 0.78 vs rank 2.77)
+    "assigner_kev_rate_smooth": "assigner_kev_rate_smooth_pctrank",  # rank (0.45 vs raw 0.74)
+    "vendor_kev_count_max": "vendor_kev_count_max",           # raw (0.09)
+    "vendor_kev_12m_max": "vendor_kev_12m_max",               # raw (0.23)
+}
+V5_FEATURES = [V5_TRANSFORMS.get(f, f) for f in V2_FEATURES if f not in RAW_REMOVED]
+ALLOWED_FEATURES = V5_FEATURES  # what a model may use from now on; V1/V2/V4 lists stay for reproducing old results
 # the only allowed column names that contain "kev": history features computed with the fixed
 # prior-December-31 cutoff (see CONTRACT.md)
 HISTORY_KEV_FEATURES = {"assigner_kev_count", "assigner_kev_12m", "assigner_kev_rate_smooth",
                         "vendor_kev_count_max", "vendor_kev_12m_max",
                         "kev_text_score", "nearest_kev_sim",
-                        "assigner_kev_count_pctrank", "assigner_kev_12m_pctrank", "assigner_kev_rate_smooth_pctrank"}
+                        "assigner_kev_count_pctrank", "assigner_kev_12m_pctrank", "assigner_kev_rate_smooth_pctrank",
+                        "assigner_kev_share", "assigner_kev_12m_share", "vendor_kev_share_max", "vendor_kev_12m_share_max"}
 BANNED_NAMES = [r"nvd_status", r"n_affected_cpes", r"n_references", r"cvss", r"cwe",
                 r"affected", r"reference", r"kev", r"description", r"last_modified"]
 MONOTONE_UP = ["epss", "epss_rank_in_month", "exploitdb", "metasploit", "nuclei", "poc_github",

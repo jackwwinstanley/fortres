@@ -21,14 +21,14 @@ import pandas as pd
 from sklearn.metrics import average_precision_score
 
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import ALLOWED_FEATURES, PSI_REPLACED, TEXT_FEATURES, V2_FEATURES, check_feature_list
+from src.common.schema import PSI_REPLACED, TEXT_FEATURES, V2_FEATURES, V4_FEATURES, check_feature_list
 from src.common.scoring import clustered_paired_bootstrap_hits, paired_bootstrap_hits, rank_order
 from src.features import drift_fix as dfx
 from src.models import stress_v2 as st
 from src.models import train_v1 as v1
 from src.models.train_v2 import FEATURES_V2
 
-FEATURES_V4 = list(ALLOWED_FEATURES)
+FEATURES_V4 = list(V4_FEATURES)  # legacy step-3d set; the current set is schema.ALLOWED_FEATURES
 DIRS = st.DIRS
 BAG_SEEDS = list(range(20))
 ABL_SEEDS = list(range(1, 11))
@@ -83,7 +83,7 @@ def fmt_ci(t):
 
 # ---- main -------------------------------------------------------------------------------------
 def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
-    assert not check_feature_list(FEATURES_V4), check_feature_list(FEATURES_V4)
+    assert not check_feature_list(FEATURES_V4, allowed=V4_FEATURES), check_feature_list(FEATURES_V4, allowed=V4_FEATURES)
     assert "epss" not in FEATURES_V4
     data, sb, sb2, ctx = st.prepare(out_dir, data_dir)
     kev = pd.read_csv(data_dir / "known_exploited.csv", usecols=["cve_id", "vendor", "date_added"]) \
@@ -206,7 +206,7 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
     mech.to_csv(out_dir / "v4_mechanism.csv", index=False)
 
     # leakage audit
-    leak_items, leak_tabs = st.leakage_audit(data, data_dir, features=FEATURES_V4)
+    leak_items, leak_tabs = st.leakage_audit(data, data_dir, features=FEATURES_V4, allowed=V4_FEATURES)
     leakage_found = any(f for _, _, f in leak_items)
 
     # ---- final model: both replicas, pooled-AP selection, 20-seed bag

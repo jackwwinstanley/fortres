@@ -13,7 +13,7 @@ categories, which makes counts such as days_to_cutoff look unstable for the wron
 import numpy as np
 import pandas as pd
 
-from src.common.schema import PSI_REPLACED, RAW_REMOVED, TEXT_FEATURES, V2_FEATURES, V4_FEATURES  # noqa: F401
+from src.common.schema import PSI_REPLACED, RAW_REMOVED, TEXT_FEATURES, V2_FEATURES, V4_FEATURES, V5_FEATURES  # noqa: F401
 
 PSI_LARGE = 0.25
 BINARY = {"epss_missing", "exploitdb", "metasploit", "nuclei", "poc_github", "any_exploit"} | \
@@ -81,3 +81,52 @@ def to_v4(X: pd.DataFrame, replaced) -> pd.DataFrame:
 def v4_feature_names(replaced) -> list[str]:
     """V2 order, minus raw epss, with replaced features renamed to *_pctrank."""
     return [rank_name(f) if f in replaced else f for f in V2_FEATURES if f not in REMOVED]
+
+
+# ---- step 3e: pick the transformation of each scale-sensitive feature by PSI alone ------------------
+SENSITIVE = ["days_to_cutoff", "assigner_prior_cves", "assigner_kev_count", "assigner_kev_12m", "assigner_kev_rate_smooth",
+             "vendor_kev_count_max", "vendor_kev_12m_max"]
+SHARE_OF = {"assigner_prior_cves": "assigner_cve_share", "assigner_kev_count": "assigner_kev_share",
+            "assigner_kev_12m": "assigner_kev_12m_share", "vendor_kev_count_max": "vendor_kev_share_max",
+            "vendor_kev_12m_max": "vendor_kev_12m_share_max"}  # days_to_cutoff is calendar; the smoothed rate is already scale-free
+
+
+def add_candidates(X: pd.DataFrame) -> pd.DataFrame:
+    """Add the within-pool percentile-rank candidate of every sensitive feature. X is ONE pool (a replica or the
+    scoreboard) that already holds the raw features and the share columns."""
+    out = X.copy()
+    for f in SENSITIVE:
+        out[rank_name(f)] = X[f].rank(pct=True, method="average").to_numpy()
+    return out
+
+
+def candidate_columns(f: str) -> list[tuple[str, str]]:
+    """(transform name, column) candidates for a sensitive feature, raw first (ties go to raw)."""
+    c = [("raw", f), ("rank", rank_name(f))]
+    return c + ([("share", SHARE_OF[f])] if f in SHARE_OF else [])
+
+
+def select_transforms(rep_pools: list[pd.DataFrame], sb: pd.DataFrame, tol: float = 1e-9):
+    """Rule fixed before running, based on drift only (never on hits): for each sensitive feature choose the
+    transformation with the lowest PSI between the pooled replicas and the 2026 scoreboard; ties go to raw.
+    rep_pools: one frame per replica (ranks are computed within each pool); sb: the scoreboard frame.
+    Returns (chosen {feature: column}, table of PSI for every candidate)."""
+    reps = pd.concat([add_candidates(p) for p in rep_pools], ignore_index=True)
+    sbc = add_candidates(sb)
+    rows, chosen = [], {}
+    for f in SENSITIVE:
+        best = None
+        for transform, col in candidate_columns(f):
+            p = psi_binned(reps[col], sbc[col])
+            rows.append((f, transform, col, p))
+            if best is None or p < best[1] - tol:
+                best = (col, p)
+        chosen[f] = best[0]
+    t = pd.DataFrame(rows, columns=["feature", "transform", "column", "psi"])
+    t["chosen"] = t["column"].isin(set(chosen.values()))
+    return chosen, t
+
+
+def to_v5(X: pd.DataFrame) -> pd.DataFrame:
+    """Final (step 3e) feature frame for ONE pool; X holds the V2 columns plus the share columns."""
+    return add_candidates(X)[V5_FEATURES]

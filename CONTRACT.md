@@ -88,6 +88,20 @@ Outputs: `outputs/top500_v4.csv`, `v4_report.md`, `v4_top500_contrib.parquet` (c
 Runlog hygiene: rows for `v1_*` and `v2_*` models carry notes marked "pre-drift-fix (raw epss included)" and LightGBM rows "seed0 only, not for headline"
 (notes were relabelled once at step 3d; the other columns are unchanged). New rows `v4_bag` (per direction and `pooled`) and `v4_logreg` are appended.
 
+## v5: transformations chosen by PSI alone (Person A, `python -m src.models.train_v5`) — the LAST feature-set change
+Step 3d's within-pool rank raised PSI for tie-heavy features. For each scale-sensitive feature (`days_to_cutoff`, `assigner_prior_cves`,
+`assigner_kev_count`, `assigner_kev_12m`, `assigner_kev_rate_smooth`, `vendor_kev_count_max`, `vendor_kev_12m_max`) the transformation with the lowest
+PSI between the pooled replicas and the 2026 scoreboard is used, ties to raw, never by hits: (a) raw, (b) within-pool percentile rank, (c) a scale-free share
+(`assigner_cve_share`, `assigner_kev_share`, `assigner_kev_12m_share`, `vendor_kev_share_max`, `vendor_kev_12m_share_max`: the count divided by all CVEs published /
+all KEV entries added by the history cutoff, or in the 12 months before it; zero denominators give 0). The share columns are built by `src/features/build.py` and
+stored in the `features_*.parquet` files; existing columns are unchanged. The recorded decision is `V5_TRANSFORMS` in `src/common/schema.py`;
+`tests/test_drift_fix.py` recomputes it and fails if it changes. `ALLOWED_FEATURES` is now `V5_FEATURES` (33 features: raw `epss` removed,
+`epss_rank_in_month` and `epss_missing` kept); `V1/V2/V4_FEATURES` are legacy lists for reproducing old results. The final model is a 20-seed LightGBM bag.
+Outputs: `outputs/top500_v5.csv` (primary list; replaces v4 regardless of hits), `v5_report.md`, `v5_top500_contrib.parquet` (contributions averaged over the 20 seeds),
+`headline.json` (updated: forward-direction and pooled numbers with CVE-level and event-clustered intervals, seed counts). Runlog: `v5_bag` rows (per direction and `pooled`) and
+`v5_logreg` (robustness only) are appended; `v4_*` rows are relabelled "superseded by v5". Descriptive-only analysis `python -m src.analysis.why_attacked`
+(`outputs/why_attacked_*`, `docs/figures/why_attacked_*.png`) uses today's NVD fields, is not time-safe, and feeds nothing into any model or top500 file.
+
 ### Text features must be time-safe (Person B)
 `kev_text_score` and `nearest_kev_sim` for a CVE in snapshot month *M* may only use KEV
 entries with `date_added` ≤ end of month *M* (e.g. fit/compare against the KEV set as of the

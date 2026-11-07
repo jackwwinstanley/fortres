@@ -1,33 +1,47 @@
 {
- "primary": "v4: 20-seed LightGBM bag, no raw EPSS",
- "model": "v4 LightGBM, 20-seed rank-averaged bag, no raw EPSS",
+ "primary": "v5: 20-seed LightGBM bag, drift-selected feature transformations, no raw EPSS",
  "pooled_hits_bag": 21,
- "per_direction_bag": {
-  "test2025": 12,
-  "test2024": 9
- },
  "baseline_pooled_hits": 19,
- "baseline_per_direction": {
-  "test2025": 13,
-  "test2024": 6
+ "forward_train2024_test2025": {
+  "bag_hits": 12,
+  "baseline_hits": 13,
+  "diff_cve_level_90": [
+   -6.0,
+   3.0
+  ],
+  "diff_event_clustered_90": [
+   -7.0,
+   4.0
+  ]
  },
- "diff_vs_baseline_cve_level_90": [
-  -4.0,
-  9.0
- ],
- "diff_vs_baseline_event_clustered_90": [
-  -4.0,
-  9.0
- ],
- "single_seed_pooled_hits_mean_min_max": [
-  22.1,
-  17,
-  25
- ],
- "placebo_p": 0.02,
+ "stability_train2025_test2024": {
+  "bag_hits": 9,
+  "baseline_hits": 6
+ },
+ "pooled": {
+  "diff_cve_level_90": [
+   -4.0,
+   8.0
+  ],
+  "diff_event_clustered_90": [
+   -4.0,
+   8.0
+  ]
+ },
+ "seeds": {
+  "bag_seeds": 20,
+  "single_seed_pooled_hits_mean_min_max": [
+   21.75,
+   17,
+   25
+  ],
+  "placebo": "30 real 5-seed bags vs 30 shuffled-text 5-seed bags"
+ },
+ "v5_minus_v4_pooled_hits": 0,
+ "placebo_bootstrap_p": 0.0,
  "positives": {
   "2024": 27,
   "2025": 48
  },
- "note": "LOW POWER (75 positives). Use these numbers for headlines; seed-0 rows are not for headline."
+ "note": "LOW POWER (75 positives). Use these numbers for headlines; seed-0 rows and earlier versions are not for headline."
 }

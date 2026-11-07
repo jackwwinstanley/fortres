@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import V1_FEATURES
+from src.common.schema import SHARE_FEATURES, V1_FEATURES
 
 SMOOTH = 20  # pseudo-count for the smoothed assigner KEV rate
 GENERIC_WORDS = {"inc", "corp", "corporation", "ltd", "llc", "co", "company", "gmbh", "plc",
@@ -67,7 +67,15 @@ def assigner_features(pool: pd.DataFrame, vuln: pd.DataFrame, kev: pd.DataFrame,
     a = v.set_index("cve_id")["assigner"].reindex(pool["cve_id"]).fillna("unknown").to_numpy()
     t = pd.DataFrame({"assigner": a}).join(prior, on="assigner").join(kev_n, on="assigner").join(kev_12, on="assigner")
     t = t.fillna({"prior": 0, "kev": 0, "kev12": 0})
+    total_cves = int((v["published"] <= cutoff).sum())
+    all_kev = kev.assign(date_added=pd.to_datetime(kev["date_added"]))
+    total_kev = int((all_kev["date_added"] <= cutoff).sum())
+    total_kev_12m = int(((all_kev["date_added"] <= cutoff) & (all_kev["date_added"] > cutoff - pd.DateOffset(months=12))).sum())
     out = pd.DataFrame(index=pool.index)
+    # scale-free shares of everything known by the cutoff (zero denominators give 0)
+    out["assigner_cve_share"] = t["prior"].to_numpy() / total_cves if total_cves else 0.0
+    out["assigner_kev_share"] = t["kev"].to_numpy() / total_kev if total_kev else 0.0
+    out["assigner_kev_12m_share"] = t["kev12"].to_numpy() / total_kev_12m if total_kev_12m else 0.0
     out["assigner_prior_cves"] = np.log1p(t["prior"].to_numpy())
     out["assigner_kev_count"] = np.log1p(t["kev"].to_numpy())
     out["assigner_kev_12m"] = np.log1p(t["kev12"].to_numpy())
@@ -96,7 +104,7 @@ def vendor_lexicon(kev: pd.DataFrame, cutoff):
     return lex, pd.DataFrame(dropped, columns=["vendor", "reason"])
 
 
-def vendor_features(descriptions: pd.Series, lex: pd.DataFrame) -> pd.DataFrame:
+def vendor_features(descriptions: pd.Series, lex: pd.DataFrame, total_kev: int = 0, total_kev_12m: int = 0) -> pd.DataFrame:
     """Whole-word (token-bounded) vendor mentions. 'cisco' matches 'Cisco IOS' and "Cisco's",
     but not 'ciscoworks'. Vectorised with one compiled alternation (longest vendor first)."""
     out = pd.DataFrame(index=descriptions.index)
@@ -104,6 +112,8 @@ def vendor_features(descriptions: pd.Series, lex: pd.DataFrame) -> pd.DataFrame:
         out["n_vendors_mentioned"] = 0
         out["vendor_kev_count_max"] = 0.0
         out["vendor_kev_12m_max"] = 0.0
+        out["vendor_kev_share_max"] = 0.0
+        out["vendor_kev_12m_share_max"] = 0.0
         return out
     names = sorted(lex["vendor"], key=len, reverse=True)
     pat = re.compile(r"(?<![a-z0-9])(" + "|".join(re.escape(n) for n in names) + r")(?![a-z0-9])")
@@ -113,6 +123,11 @@ def vendor_features(descriptions: pd.Series, lex: pd.DataFrame) -> pd.DataFrame:
     out["n_vendors_mentioned"] = found.map(lambda m: len(set(m)))
     out["vendor_kev_count_max"] = found.map(lambda m: max((cnt[x] for x in m), default=0.0))
     out["vendor_kev_12m_max"] = found.map(lambda m: max((c12[x] for x in m), default=0.0))
+    # scale-free: the vendor's share of all KEV entries added by the cutoff / in the 12 months before it (zero denominators give 0)
+    sh = dict(zip(lex["vendor"], lex["kev_count"] / total_kev if total_kev else 0.0 * lex["kev_count"]))
+    sh12 = dict(zip(lex["vendor"], lex["kev_12m"] / total_kev_12m if total_kev_12m else 0.0 * lex["kev_12m"]))
+    out["vendor_kev_share_max"] = found.map(lambda m: max((sh[x] for x in m), default=0.0))
+    out["vendor_kev_12m_share_max"] = found.map(lambda m: max((sh12[x] for x in m), default=0.0))
     return out
 
 
@@ -122,10 +137,13 @@ def build_features(pool: pd.DataFrame, vuln: pd.DataFrame, kev: pd.DataFrame, cu
     asg = assigner_features(pool, vuln, kev, cutoff)
     lex, dropped = vendor_lexicon(kev, cutoff)
     desc = vuln.set_index("cve_id")["description"].reindex(pool["cve_id"]).set_axis(pool.index)
-    ven = vendor_features(desc, lex)
+    kd = pd.to_datetime(kev["date_added"])
+    total_kev = int((kd <= pd.Timestamp(cutoff)).sum())
+    total_kev_12m = int(((kd <= pd.Timestamp(cutoff)) & (kd > pd.Timestamp(cutoff) - pd.DateOffset(months=12))).sum())
+    ven = vendor_features(desc, lex, total_kev, total_kev_12m)
     keep = [c for c in ["cve_id", "snapshot_month", "published", "label"] if c in pool]
     out = pd.concat([pool[keep], sig, asg, ven], axis=1)
-    return out[keep + V1_FEATURES], dropped
+    return out[keep + V1_FEATURES + SHARE_FEATURES], dropped
 
 
 def main(data_dir=DATA_DIR, out_dir=OUT_DIR):
@@ -141,7 +159,12 @@ def main(data_dir=DATA_DIR, out_dir=OUT_DIR):
     for src, dst, cutoff in jobs:
         pool = pd.read_parquet(out_dir / f"{src}.parquet")
         feats, dropped = build_features(pool, vuln, kev, cutoff)
-        feats.to_parquet(out_dir / f"{dst}.parquet", index=False)
+        old_path = out_dir / f"{dst}.parquet"
+        if old_path.exists():  # adding share columns must not change any existing column
+            old_df = pd.read_parquet(old_path)
+            same = [c for c in old_df.columns if c in feats.columns]
+            pd.testing.assert_frame_equal(old_df[same].reset_index(drop=True), feats[same].reset_index(drop=True))
+        feats.to_parquet(old_path, index=False)
         drops.append(dropped.assign(cutoff=cutoff))
         print(f"{dst}: {len(feats):,} rows, history cutoff {cutoff}, "
               f"{int((feats['n_vendors_mentioned'] > 0).sum()):,} rows mention a KEV vendor")

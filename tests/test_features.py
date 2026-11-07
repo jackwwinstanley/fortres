@@ -80,3 +80,22 @@ def test_build_is_deterministic():
     a = build_features(p, vuln(), kev(), CUT)[0]
     b = build_features(p, vuln(), kev(), CUT)[0]
     pd.testing.assert_frame_equal(a, b)
+
+
+def test_share_features_guard_zero_denominators_and_are_scale_free():
+    from src.features.build import assigner_features, vendor_features, vendor_lexicon
+    # no KEV at all before the cutoff: every share must be 0 (not NaN or inf)
+    empty_kev = pd.DataFrame({"cve_id": [], "vendor": [], "date_added": []})
+    a = assigner_features(pool(), vuln(), empty_kev, CUT)
+    assert a[["assigner_kev_share", "assigner_kev_12m_share"]].eq(0.0).all().all() and a["assigner_cve_share"].between(0, 1).all()
+    lex, _ = vendor_lexicon(empty_kev, CUT)
+    v = vendor_features(vuln().set_index("cve_id")["description"], lex, 0, 0)
+    assert v[["vendor_kev_share_max", "vendor_kev_12m_share_max"]].eq(0.0).all().all()
+    # normal case: a@x has 1 of the 2 KEV entries added by the cutoff; CVEs published by the cutoff: 3 (O1, O2, O3)
+    f = assigner_features(pool(), vuln(), kev(), CUT)
+    assert f.iloc[0]["assigner_kev_share"] == pytest.approx(1 / 2)
+    assert f.iloc[0]["assigner_cve_share"] == pytest.approx(2 / 3)
+    assert f.iloc[1]["assigner_cve_share"] == 0.0           # unseen assigner
+    lex, _ = vendor_lexicon(kev(), CUT)
+    vf = vendor_features(vuln().set_index("cve_id")["description"], lex, 2, 1)
+    assert vf.loc["P1", "vendor_kev_share_max"] == pytest.approx(1 / 2)          # "Cisco IOS": cisco has 1 of 2 KEV entries

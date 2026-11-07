@@ -4,7 +4,7 @@ import pytest
 
 from scripts.check_top500 import check
 from src.common.paths import OUT_DIR
-from src.common.schema import ALLOWED_FEATURES
+from src.common.schema import V4_FEATURES
 from src.models.train_v4 import FEATURES_V4, bag, kev_events
 
 
@@ -30,5 +30,5 @@ def test_top500_v4_format_and_contributions():
     assert check(OUT_DIR / "top500_v4.csv") == []
     ids = pd.read_csv(OUT_DIR / "top500_v4.csv")["cve_id"].tolist()
     contrib = pd.read_parquet(OUT_DIR / "v4_top500_contrib.parquet")
-    assert list(contrib.columns) == ["cve_id", *FEATURES_V4] and FEATURES_V4 == ALLOWED_FEATURES
+    assert list(contrib.columns) == ["cve_id", *FEATURES_V4] and FEATURES_V4 == V4_FEATURES
     assert contrib["cve_id"].tolist() == ids
