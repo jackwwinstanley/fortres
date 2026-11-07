@@ -14,6 +14,8 @@ so the other person can pull them. `.npy` and `emb*` files (embeddings, hundreds
 |---|---|---|---|
 | A | `outputs/replica_2024.parquet`, `outputs/replica_2025.parquet` | `cve_id` str, `published` date, `snapshot_month` str `YYYY-MM`, `epss` float (nullable), `exploitdb`/`metasploit`/`nuclei`/`poc_github` int8 0/1, `days_to_snapshot` int, `days_to_cutoff` int, `label` int8 0/1 | `snapshot_month`, `cve_id` |
 | A | `outputs/scoreboard_features.parquet` | same as replicas minus `label` (incl. `days_to_snapshot`, `days_to_cutoff` measured to 2026-11-04); 72,670 rows, `cve_id` unique | `cve_id` |
+| A | `outputs/features_replica_2024.parquet`, `features_replica_2025.parquet`, `features_scoreboard.parquet` | `cve_id`, `snapshot_month`, `published`, (`label` replicas only) + the 18 `ALLOWED_FEATURES` in `src/common/schema.py`; no description text | `cve_id` order of the source file |
+| A | `outputs/top500_v1.csv`, `v1_report.md`, `v1_importances.csv`, `v1_top500_contrib.parquet` | v1 model outputs (`cve_id`+one column per feature for contributions) | rank order |
 | B | `outputs/emb_small.npy` + `outputs/emb_ids.csv` | float32 matrix (N × d); `emb_ids.csv` has one column `cve_id`; row *i* of the matrix ↔ row *i* of the CSV. Write chunks as `emb_small_part{N}.npy`, then merge | row order = `emb_ids.csv` order |
 | B | `outputs/text_features.parquet` | `cve_id` str (unique), `kev_text_score` float, `nearest_kev_sim` float, plus int8 flag columns prefixed `txt_` | `cve_id` |
 | B (stretch) | `outputs/extracted_features.parquet` | `cve_id`, `product_type`, `auth_required`, `network_reachable`, `impact_type` (all str, nullable except `cve_id`) | `cve_id` |
@@ -33,6 +35,27 @@ For Y in {2024, 2025}:
 
 Other tracked outputs: `positive_rate_by_month.csv`, `replica_report.md`, `replica_stats.json`, `baseline_results.json`.
 
+## v1 features (Person A, `python -m src.features.build`)
+All history features use the fixed prior-December-31 cutoff H above. Description text is read only to find
+vendor mentions and is never saved.
+
+| group | feature | definition | time-safety |
+|---|---|---|---|
+| signals | `epss`, `epss_missing` | snapshot-month EPSS (NaN kept) and a 0/1 missing flag | snapshot-month value |
+| signals | `epss_rank_in_month` | percentile rank of `epss` within the same snapshot_month and the same pool, missing = 0 (absorbs the March 2025 EPSS model change) | uses only snapshot-month values |
+| flags | `exploitdb`, `metasploit`, `nuclei`, `poc_github`, `n_flags`, `any_exploit` | exploit-code flags at snapshot, count and max | snapshot-month value |
+| timing | `days_to_snapshot`, `days_to_cutoff` | days from publish to end of snapshot month; days from snapshot-month end to Nov 4 | calendar arithmetic |
+| assigner | `assigner_prior_cves` | log1p(CVEs the assigner published on or before H) | published <= H |
+| assigner | `assigner_kev_count`, `assigner_kev_12m` | log1p(KEV CVEs of that assigner added <= H; added in the 12 months ending at H) | KEV `date_added` <= H |
+| assigner | `assigner_kev_rate_smooth` | (kev_count + 20 * global_rate) / (prior_cves + 20); global_rate = KEV share of CVEs published <= H; unseen assigners get global_rate | as above |
+| vendor | `n_vendors_mentioned`, `vendor_kev_count_max`, `vendor_kev_12m_max` | whole-word (token-bounded, so `cisco` does not match `ciscoworks`) mentions in the description of vendors from the KEV `vendor` field (cleaned; vendors shorter than 4 characters and a short ambiguous-word stoplist are dropped and logged in `outputs/vendor_lexicon_dropped.csv`); max log1p KEV count (all-time <= H, last 12 months) among mentioned vendors | lexicon and counts from KEV `date_added` <= H |
+
+`src/common/schema.py` holds `ALLOWED_FEATURES`, `BANNED_NAMES` and `tests/test_feature_guard.py` fails if a
+model uses anything else. Model rules (`src/models/train_v1.py`): hyper-parameters are chosen by
+leave-one-snapshot-month-out CV on the training replica only; nothing is tuned on a test replica;
+model tie-break is score, then `epss_rank_in_month`, then `cve_id`. Ties at the cutoff are also reported as
+tie-aware expected hits (`expected_hits_at_k`).
+
 ### Text features must be time-safe (Person B)
 `kev_text_score` and `nearest_kev_sim` for a CVE in snapshot month *M* may only use KEV
 entries with `date_added` ≤ end of month *M* (e.g. fit/compare against the KEV set as of the
@@ -51,6 +74,15 @@ the script header and `README.md`. `txt_*` flags are regexes on the description 
 `cvss3_source == nvd@nist.gov` scores, `references.csv` links, NIST-filled `cwe_ids` and
 `affected_products` for new CVEs, anything from KEV added after the snapshot, any 2026 KEV
 info. These may only be used in a clearly labelled **leakage experiment**.
+
+## History-cutoff rule (all KEV-based history features)
+History features (KEV counts by assigner or vendor, KEV-based text features) are computed as of a
+**fixed cutoff: December 31 of the year BEFORE the pool year**.
+- replica 2024 -> KEV rows with `date_added` <= 2023-12-31
+- replica 2025 -> KEV rows with `date_added` <= 2024-12-31
+- 2026 scoreboard -> KEV rows with `date_added` <= 2025-12-31 (the KEV file ends there; no 2026 KEV information may ever be used)
+`nearest_kev_sim` and any other KEV-based text feature use the same prior-December-31 cutoff, and the
+text classifier is trained only on CVEs published before 2024.
 
 ## Scoring rule
 `k = round(500 * pool_size / 72670)`; `hits` = labelled positives in the top `k` by score;
