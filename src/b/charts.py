@@ -149,10 +149,12 @@ def drift(plt):
     for (y, f), color in zip(pools.items(), (GREYS[0], GREYS[2], WARN)):
         d = pd.read_parquet(OUT_DIR / f, columns=["snapshot_month", "epss"])
         m = d.groupby("snapshot_month")["epss"].median() * 100
-        mo = m.index.str[-2:].astype(int)
+        m.index = m.index.str[-2:].astype(int)
+        m = m.reindex(range(1, 10))  # missing months (2026-06) stay a gap, not a drawn line
         med[y] = m
-        ax.plot(mo, m.values, marker="o", ms=5, lw=2.2, color=color, label=y)
-        ax.annotate(y, (mo[-1], m.values[-1]), xytext=(8, 0), textcoords="offset points", color=color,
+        ax.plot(m.index, m.values, marker="o", ms=5, lw=2.2, color=color, label=y)
+        last = m.dropna()
+        ax.annotate(y, (last.index[-1], last.values[-1]), xytext=(8, 0), textcoords="offset points", color=color,
                     fontweight="bold", va="center")
     late = pd.read_parquet(OUT_DIR / pools["2026"], columns=["snapshot_month", "epss"])
     past = pd.concat([pd.read_parquet(OUT_DIR / pools[y], columns=["epss"]) for y in ("2024", "2025")])["epss"].median() * 100
