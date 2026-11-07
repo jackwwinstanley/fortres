@@ -7,3 +7,4 @@ outputs/emb*
 outputs/pool.csv
 .DS_Store
 .pytest_cache/
+outputs/b_texts.parquet

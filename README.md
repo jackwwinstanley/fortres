@@ -27,3 +27,17 @@ python scripts/check_top500.py outputs/top500_v1.csv
 
 Not used by the model: `nvd_status`, `n_affected_cpes`, `n_references`, CVSS (baseline only), `cwe_ids`, references, affected products, any 2026 KEV information.
 Results and caveats (low power: 75 positives): `outputs/v1_report.md`. Run: `python -m src.replicas && python -m src.features.build && python -m src.models.train_v1`.
+
+## Text feature columns
+### Text features (Person B, `outputs/text_features.parquet`)
+Run `python -m src.b.texts && python -m src.b.embed && python -m src.b.text_features`
+(about 2 min on a Mac; the embeddings are not committed). Then `python -m src.b.report --label ...`
+writes `outputs/b_text_report.md`.
+- Text: only `description` and `published` from `vulnerabilities.csv`. Post-attack phrases
+  ("exploited in the wild", "actively exploited", ...; `src/b/phrases.py`) are removed **before**
+  embedding with `ibm-granite/granite-embedding-30m-english`.
+- `kev_text_score`: for pool year Y, a logistic regression on embeddings is trained on CVEs published
+  before Y-01-01, labelled by KEV `date_added` <= (Y-1)-12-31.
+- `nearest_kev_sim`: max cosine similarity to KEV entries with `date_added` <= (Y-1)-12-31
+  (2023-12-31 for replica 2024, 2024-12-31 for replica 2025, 2025-12-31 for the 2026 scoreboard).
+- `txt_*`: int8 regex flags on the description (RCE, unauthenticated, edge device, ...).

@@ -1,0 +1,86 @@
+{
+ "1. original (month-end KEV cutoff, unstripped text)": {
+  "2024": {
+   "pool": 28839,
+   "positives": 27,
+   "k": 198,
+   "kev_text_score": {
+    "auc": 0.821,
+    "hits": 2
+   },
+   "nearest_kev_sim": {
+    "auc": 0.7831,
+    "hits": 4
+   }
+  },
+  "2025": {
+   "pool": 35280,
+   "positives": 48,
+   "k": 243,
+   "kev_text_score": {
+    "auc": 0.8045,
+    "hits": 0
+   },
+   "nearest_kev_sim": {
+    "auc": 0.7084,
+    "hits": 2
+   }
+  }
+ },
+ "2. year KEV cutoff, unstripped text": {
+  "2024": {
+   "pool": 28839,
+   "positives": 27,
+   "k": 198,
+   "kev_text_score": {
+    "auc": 0.821,
+    "hits": 2
+   },
+   "nearest_kev_sim": {
+    "auc": 0.7583,
+    "hits": 3
+   }
+  },
+  "2025": {
+   "pool": 35280,
+   "positives": 48,
+   "k": 243,
+   "kev_text_score": {
+    "auc": 0.8045,
+    "hits": 0
+   },
+   "nearest_kev_sim": {
+    "auc": 0.6931,
+    "hits": 2
+   }
+  }
+ },
+ "3. year KEV cutoff, phrases stripped before embedding": {
+  "2024": {
+   "pool": 28839,
+   "positives": 27,
+   "k": 198,
+   "kev_text_score": {
+    "auc": 0.8188,
+    "hits": 2
+   },
+   "nearest_kev_sim": {
+    "auc": 0.7588,
+    "hits": 3
+   }
+  },
+  "2025": {
+   "pool": 35280,
+   "positives": 48,
+   "k": 243,
+   "kev_text_score": {
+    "auc": 0.8041,
+    "hits": 2
+   },
+   "nearest_kev_sim": {
+    "auc": 0.6909,
+    "hits": 2
+   }
+  }
+ }
+}
