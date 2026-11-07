@@ -112,7 +112,7 @@ def _join(xs):
 def template(r) -> str:
     parts = []
     what = f"a {_join(r['tags'][:2])} flaw" if len(r["tags"]) else "a flaw"
-    what = what.replace("a an ", "an ").replace("a a ", "a ")
+    what = re.sub(r"^a ([aeiou])", r"an \1", what.replace("a an ", "an ").replace("a a ", "a "))
     who = f" (reported by {r['cna']})" if pd.notna(r["cna"]) and r["cna"] else ""
     parts.append(f"{what[0].upper() + what[1:]}{who}")
     if r["exploits"]:

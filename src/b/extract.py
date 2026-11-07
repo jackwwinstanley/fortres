@@ -8,14 +8,15 @@ A local Granite instruct model reads ONE description at a time and must answer w
   auth_required      yes | no | unknown
   network_reachable  yes | no | unknown
   impact_type        one of IMPACT_TYPES
-Anything outside the allowed values becomes null. The same prompt and settings are used for every pool
+Anything outside the allowed values becomes null, and guard() fixes or blanks labels the description
+contradicts (e.g. 'wordpress_plugin' when WordPress is never mentioned; 'unauthenticated' in the text forces auth_required=no). The same prompt and settings are used for every pool
 (replica 2024 / 2025 and the scoreboard). Time-safety: it reads only the description, with post-attack
 phrases already stripped (outputs/b_texts.parquet), exactly like the txt_* flags.
 
 Status: DESCRIPTIVE. The feature freeze has passed, so these columns are used to describe the blind spots
 and the top 500 (dashboard and write-up), not as model inputs.
-Which CVEs: per pool, the top N by kev_text_score plus the top N by within-month EPSS rank, plus every CVE
-in the newest top-500 list. Rows are cached in outputs/b_extract_cache.parquet, so reruns resume.
+Which CVEs: per pool, the top N by kev_text_score plus the top N by within-month EPSS rank, every CVE
+in the newest top-500 list, and every exploited replica CVE (for the descriptive blind-spot profile only). Rows are cached in outputs/b_extract_cache.parquet, so reruns resume.
 """
 import argparse
 import json
@@ -35,10 +36,29 @@ IMPACT_TYPES = ["remote_code_execution", "privilege_escalation", "authentication
 YNU = ["yes", "no", "unknown"]
 FIELDS = {"product_type": PRODUCT_TYPES, "auth_required": YNU, "network_reachable": YNU, "impact_type": IMPACT_TYPES}
 CACHE = OUT_DIR / "b_extract_cache.parquet"
-SYSTEM = ("You label software vulnerabilities. Read the description and answer with ONLY a JSON object with "
-          "exactly these keys and one allowed value each:\n"
-          + "\n".join(f'- "{k}": one of {v}' for k, v in FIELDS.items())
-          + "\nUse 'unknown' or 'other' when the description does not say. No other text.")
+SYSTEM = """You label software vulnerabilities. Read the description and answer with ONLY one JSON object.
+
+Keys and allowed values (pick exactly one each):
+"product_type":
+  network_edge_device = VPN, firewall, router, gateway, load balancer, remote-access appliance
+  web_application = any web app, CMS, PHP/Java/.NET site or admin panel (not WordPress)
+  wordpress_plugin = only if the text says WordPress
+  operating_system = Windows, Linux kernel, macOS, iOS, Android OS
+  browser = Chrome, Firefox, Safari, Edge, WebKit, V8
+  enterprise_server_software = servers and server products: FTP, mail, database, Exchange, VMware, backup, monitoring
+  iot_or_firmware = cameras, printers, IoT, embedded firmware
+  library_or_framework = a code library, package or framework
+  desktop_application = software installed on a PC (office, media player, ActiveX)
+  mobile_app = only an app for phones
+  other = none of these
+"auth_required": yes = the attacker must log in or be authenticated first; no = unauthenticated or remote attacker without login; unknown = not stated
+"network_reachable": yes = attackable over a network or the internet; no = needs local or physical access; unknown = not stated
+"impact_type": remote_code_execution, privilege_escalation, authentication_bypass, information_disclosure,
+  denial_of_service, cross_site_scripting, sql_injection, file_read_or_write, other (choose the main consequence)
+
+Example
+Description: An unauthenticated remote attacker can send a crafted request to the SSL VPN of FortiOS to execute arbitrary code.
+Answer: {"product_type": "network_edge_device", "auth_required": "no", "network_reachable": "yes", "impact_type": "remote_code_execution"}"""
 
 
 def parse(text: str) -> dict:
@@ -54,6 +74,34 @@ def parse(text: str) -> dict:
         out[k] = v if v in allowed else None
     return out
 
+# ---- consistency guard: the description must support the label (same idea as the explanation fact-checker) ----
+NEEDS = {  # product_type -> words that must appear in the description
+    "wordpress_plugin": r"wordpress|\bwp[- ]",
+    "mobile_app": r"android|\bios\b|iphone|ipad|mobile app|smartphone|phone app",
+    "browser": r"chrome|chromium|firefox|safari|webkit|\bedge\b|\bv8\b|browser",
+    "operating_system": r"windows|linux|kernel|macos|\bios\b|android|freebsd|unix|operating system",
+    "network_edge_device": r"vpn|firewall|router|gateway|load balancer|remote access|switch|access point|appliance",
+}
+WEB = r"\.php|\.asp|\.jsp|web|http|cms|admin panel|portal|site"
+UNAUTH = r"\bunauthenticated\b|without (prior )?authentication|no authentication|without logging in|unauthorized remote"
+AUTH = r"\bauthenticated (user|attacker|admin|remote)|requires authentication|post-auth|logged[- ]in|with valid credentials"
+
+
+def guard(row: dict, desc: str) -> tuple[dict, list[str]]:
+    """Fix or blank labels that the description contradicts. Returns (row, list of changes)."""
+    d, out, changes = desc.lower(), dict(row), []
+    pt = out.get("product_type")
+    if pt in NEEDS and not re.search(NEEDS[pt], d):
+        out["product_type"] = "web_application" if re.search(WEB, d) else None
+        changes.append(f"product_type {pt}->{out['product_type']}")
+    if re.search(UNAUTH, d) and out.get("auth_required") != "no":
+        changes.append(f"auth_required {out.get('auth_required')}->no")
+        out["auth_required"] = "no"
+    elif re.search(AUTH, d) and not re.search(UNAUTH, d) and out.get("auth_required") != "yes":
+        changes.append(f"auth_required {out.get('auth_required')}->yes")
+        out["auth_required"] = "yes"
+    return out, changes
+
 
 def select(n_per_score: int = 1500) -> pd.DataFrame:
     tf = pd.read_parquet(OUT_DIR / "text_features.parquet", columns=["cve_id", "kev_text_score"])
@@ -61,6 +109,10 @@ def select(n_per_score: int = 1500) -> pd.DataFrame:
     for f in ("features_replica_2024", "features_replica_2025", "features_scoreboard"):
         d = pd.read_parquet(OUT_DIR / f"{f}.parquet", columns=["cve_id", "epss_rank_in_month"]).merge(tf, on="cve_id")
         picks += [d.nlargest(n_per_score, "kev_text_score")["cve_id"], d.nlargest(n_per_score, "epss_rank_in_month")["cve_id"]]
+    # every exploited replica CVE too, for the DESCRIPTIVE blind-spot profile (labels never feed a model)
+    for y in (2024, 2025):
+        r = pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["cve_id", "label"])
+        picks.append(r.loc[r["label"] == 1, "cve_id"])
     tops = sorted(OUT_DIR.glob("top500_v*.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[-1]))
     if tops:
         picks.append(pd.read_csv(tops[-1])["cve_id"])
@@ -80,14 +132,16 @@ def run(rows: pd.DataFrame, batch: int = 16) -> pd.DataFrame:
     for i in range(0, len(rows), batch):
         chunk = rows.iloc[i:i + batch]
         prompts = [tok.apply_chat_template([{"role": "system", "content": SYSTEM},
-                                            {"role": "user", "content": d[:1500]}],
+                                            {"role": "user", "content": "Description: " + d[:1500] + "\nAnswer:"}],
                                            add_generation_prompt=True, tokenize=False)
                    for d in chunk["description"]]
         enc = tok(prompts, return_tensors="pt", padding=True).to(device)
         with torch.no_grad():
-            gen = model.generate(**enc, max_new_tokens=80, do_sample=False)
+            gen = model.generate(**enc, max_new_tokens=70, do_sample=False)
         answers = tok.batch_decode(gen[:, enc["input_ids"].shape[1]:], skip_special_tokens=True)
-        out += [{"cve_id": c, **parse(a)} for c, a in zip(chunk["cve_id"], answers)]
+        for c, a, desc in zip(chunk["cve_id"], answers, chunk["description"]):
+            row, changes = guard(parse(a), desc)
+            out.append({"cve_id": c, **row, "guard_changes": "; ".join(changes)})
         if (i // batch) % 20 == 0:
             done = i + len(chunk)
             print(f"{done:,}/{len(rows):,} in {time.time() - t0:,.0f}s "
@@ -97,7 +151,7 @@ def run(rows: pd.DataFrame, batch: int = 16) -> pd.DataFrame:
 
 def main(limit=None, n_per_score=1500):
     rows = select(n_per_score)
-    cache = pd.read_parquet(CACHE) if CACHE.exists() else pd.DataFrame(columns=["cve_id", *FIELDS])
+    cache = pd.read_parquet(CACHE) if CACHE.exists() else pd.DataFrame(columns=["cve_id", *FIELDS, "guard_changes"])
     todo = rows[~rows["cve_id"].isin(cache["cve_id"])]
     if limit:
         todo = todo.head(limit)
@@ -108,6 +162,8 @@ def main(limit=None, n_per_score=1500):
         cache = pd.concat([cache, new], ignore_index=True).drop_duplicates("cve_id", keep="last")
         cache.to_parquet(CACHE, index=False)
     out = cache[cache["cve_id"].isin(rows["cve_id"])].copy()
+    print(f"consistency guard changed {(out['guard_changes'].fillna('') != '').mean():.0%} of rows")
+    out = out.drop(columns=["guard_changes"])
     for k in FIELDS:
         out[k] = out[k].astype("string").astype(object).where(out[k].notna(), None)
     out = out.sort_values("cve_id").reset_index(drop=True)
