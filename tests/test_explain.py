@@ -13,3 +13,8 @@ def test_check_reason_flags_invented_facts():
     assert "number 2023" in check_reason("Similar to an attack in 2023.", facts)
     assert "cve CVE-2021-44228" in check_reason("Like CVE-2021-44228.", facts)
     assert "name Fortinet" in check_reason("A flaw in Fortinet gear.", facts)
+
+
+def test_check_reason_flags_unsupported_claims():
+    assert check_reason("This critical flaw should be patched.", "- CVE: CVE-2026-1")
+    assert check_reason("It is actively exploited.", "- CVE: CVE-2026-1")
