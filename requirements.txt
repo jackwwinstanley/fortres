@@ -10,3 +10,4 @@ streamlit
 plotly
 pytest
 matplotlib
+tabulate
