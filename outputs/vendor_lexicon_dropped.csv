@@ -1,0 +1,27 @@
+vendor,reason,cutoff
+arm,shorter than 4 characters,2023-12-31
+bqe,shorter than 4 characters,2023-12-31
+checkbox,ambiguous word (stoplist),2023-12-31
+cwp,shorter than 4 characters,2023-12-31
+elastic,ambiguous word (stoplist),2023-12-31
+f5,shorter than 4 characters,2023-12-31
+fxc,shorter than 4 characters,2023-12-31
+gnu,shorter than 4 characters,2023-12-31
+ibm,shorter than 4 characters,2023-12-31
+lg,shorter than 4 characters,2023-12-31
+linux,ambiguous word (stoplist),2023-12-31
+npm,shorter than 4 characters,2023-12-31
+pear,ambiguous word (stoplist),2023-12-31
+perl,ambiguous word (stoplist),2023-12-31
+php,shorter than 4 characters,2023-12-31
+plex,ambiguous word (stoplist),2023-12-31
+progress,ambiguous word (stoplist),2023-12-31
+quest,ambiguous word (stoplist),2023-12-31
+rails,ambiguous word (stoplist),2023-12-31
+sap,shorter than 4 characters,2023-12-31
+sudo,ambiguous word (stoplist),2023-12-31
+tvt,shorter than 4 characters,2023-12-31
+cleo,ambiguous word (stoplist),2024-12-31
+versa,ambiguous word (stoplist),2024-12-31
+ami,shorter than 4 characters,2025-12-31
+git,shorter than 4 characters,2025-12-31

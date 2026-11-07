@@ -47,3 +47,55 @@ def bootstrap_interval(df, score_col, k, n=1000, seed=0, label_col="label"):
         idx = np.sort(rng.integers(0, size, size))  # keeps rank order
         stats[i] = labels[idx][:k].sum()
     return float(np.percentile(stats, 5)), float(np.percentile(stats, 95))
+
+
+def rank_order(df, score_cols, ascending=False) -> pd.DataFrame:
+    """Rows in ranked order (score cols desc, then cve_id asc); public wrapper of the tie-break rule."""
+    return _ranked(df, score_cols, ascending)
+
+
+def expected_hits_at_k(df, score_cols, k, label_col="label") -> dict:
+    """Tie-aware hits. Rows with identical values in ALL score_cols form a tie group.
+    expected = positives in groups fully inside the top k
+               + (positives in the straddling group) * (slots remaining) / (group size).
+    arbitrary = hits when ties are broken by cve_id (the deterministic scorer rule).
+    tie_size = size of the group straddling the cutoff (1 if the cut falls between groups)."""
+    cols = [score_cols] if isinstance(score_cols, str) else list(score_cols)
+    r = _ranked(df, cols).reset_index(drop=True)
+    vals = r[cols]
+    prev = vals.shift()
+    differs = ((vals != prev) & ~(vals.isna() & prev.isna())).any(axis=1)
+    differs.iloc[0] = True
+    gid = differs.cumsum()
+    g = r.groupby(gid, sort=True).agg(size=(label_col, "size"), pos=(label_col, "sum"))
+    end = g["size"].cumsum()
+    start = end - g["size"]
+    inside = end <= k
+    straddle = (start < k) & (end > k)
+    expected = float(g.loc[inside, "pos"].sum())
+    tie_size, slots = 1, 0
+    if straddle.any():
+        row = g[straddle].iloc[0]
+        slots = int(k - start[straddle].iloc[0])
+        tie_size = int(row["size"])
+        expected += float(row["pos"]) * slots / tie_size
+    return {"arbitrary": int(r.head(k)[label_col].sum()), "expected": expected,
+            "tie_size": tie_size, "slots_in_tie": slots}
+
+
+def paired_bootstrap_hits(labels, rank_positions, k, n=1000, seed=0):
+    """Paired bootstrap of hits@k for several rankings of the SAME rows.
+    labels: array of 0/1 per row. rank_positions: list of arrays, position of each row in a
+    ranking (0 = best). Each resample draws rows with replacement (same draw for every ranking),
+    orders them by each ranking and counts positives in the first k. Returns array (n, n_rankings)."""
+    labels = np.asarray(labels)
+    rng = np.random.default_rng(seed)
+    size = len(labels)
+    out = np.empty((n, len(rank_positions)))
+    for i in range(n):
+        idx = rng.integers(0, size, size)
+        lab = labels[idx]
+        for j, pos in enumerate(rank_positions):
+            order = np.argsort(pos[idx], kind="stable")
+            out[i, j] = lab[order][:k].sum()
+    return out

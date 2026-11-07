@@ -43,3 +43,37 @@ def test_bootstrap_reproducible():
     a = bootstrap_interval(df, "epss", k=3, n=200, seed=7)
     b = bootstrap_interval(df, "epss", k=3, n=200, seed=7)
     assert a == b and a[0] <= a[1]
+
+
+def test_expected_hits_tie_straddle():
+    from src.common.scoring import expected_hits_at_k
+    df = pd.DataFrame({
+        "cve_id": [f"C{i}" for i in range(8)],
+        "score": [9, 5, 5, 5, 5, 1, 1, 0],
+        "label": [1, 0, 1, 1, 0, 1, 0, 0],
+    })
+    # k=3: group {9} inside (1 pos); the 4-row group at 5 straddles with 2 slots and 2 positives -> 2*2/4 = 1
+    r = expected_hits_at_k(df, "score", k=3)
+    assert r["expected"] == 2.0 and r["tie_size"] == 4 and r["slots_in_tie"] == 2
+    assert r["arbitrary"] == 2  # C0, C1, C2 -> labels 1, 0, 1
+
+
+def test_expected_hits_no_straddle_and_nan():
+    from src.common.scoring import expected_hits_at_k
+    df = pd.DataFrame({
+        "cve_id": ["a", "b", "c", "d"], "score": [3.0, 2.0, None, None], "label": [1, 0, 1, 0]})
+    r = expected_hits_at_k(df, "score", k=2)
+    assert r == {"arbitrary": 1, "expected": 1.0, "tie_size": 1, "slots_in_tie": 0}
+    r = expected_hits_at_k(df, "score", k=3)  # NaN group (c, d) straddles: 1 slot of 2, 1 positive
+    assert r["expected"] == 1.5 and r["tie_size"] == 2
+
+
+def test_paired_bootstrap_shapes_and_reproducible():
+    import numpy as np
+    from src.common.scoring import paired_bootstrap_hits
+    labels = np.array([1, 0, 0, 1, 0, 0])
+    a = np.array([0, 1, 2, 3, 4, 5])
+    b = np.array([3, 4, 5, 0, 1, 2])
+    x = paired_bootstrap_hits(labels, [a, b], k=2, n=50, seed=3)
+    y = paired_bootstrap_hits(labels, [a, b], k=2, n=50, seed=3)
+    assert x.shape == (50, 2) and (x == y).all()
