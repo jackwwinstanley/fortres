@@ -47,6 +47,14 @@ def latest_model(res: pd.DataFrame) -> str | None:
     """The model Person A marks as 'headline model' in the runlog notes; otherwise the newest model version with
     results for both test years (prefers LightGBM on ties)."""
     m = res[~res["is_baseline"]]
+    hp = OUT_DIR / "headline.json"
+    if hp.exists():  # Person A's headline file names the primary model, e.g. "v5: 20-seed LightGBM bag, ..."
+        import json
+        v = re.match(r"v(\d+)", json.loads(hp.read_text()).get("primary", ""))
+        if v:
+            for kind in ("bag", "lgbm"):
+                if f"v{v[1]}_{kind}" in set(m["version"]):
+                    return f"v{v[1]}_{kind}"
     if "headline" in m and m["headline"].any():
         h = m[m["headline"]].sort_values("timestamp")
         return h.iloc[-1]["version"]

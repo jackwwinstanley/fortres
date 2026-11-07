@@ -210,8 +210,9 @@ with tabs[3]:
         c1.metric("Spot-the-year score", f"AUC {auc:.2f}", help="0.5 = indistinguishable, 1.0 = perfectly separable")
         c1.markdown(
             "The 2026 scoreboard is **clearly different** from the practice years. The biggest change is "
-            "EPSS: the typical 2026 score is several times higher, so a fixed EPSS threshold tuned on past "
-            "years won't transfer. Ranking *within* the year is safer." if auc >= 0.75 else
+            "EPSS, and it's a mid-year step: January–May 2026 looks like past years, but from the July 2026 "
+            "snapshot the typical score is about 6× higher (62% of the list). A fixed EPSS threshold tuned on "
+            "past years won't transfer, so we rank *within* each month." if auc >= 0.75 else
             "The 2026 scoreboard looks broadly similar to the practice years.")
         colors = [WARN if v > 0.25 else ACCENT if v > 0.1 else GREYS[0] for v in shift["psi_2025_vs_2026"]]
         fig = go.Figure(go.Bar(x=shift["psi_2025_vs_2026"], y=shift["feature"], orientation="h",

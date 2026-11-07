@@ -382,7 +382,7 @@
     });
     // the difference with its range
     const yd = H * 0.72, xd = d3.scaleLinear([-6, 10], [mL, W - mR]);
-    const [lo, hi] = h.diff_vs_baseline_cve_level_90, diff = h.pooled_hits_bag - h.baseline_pooled_hits;
+    const [lo, hi] = D.diff90, diff = h.pooled_hits_bag - h.baseline_pooled_hits;
     svg.append("text").attr("class", "lbl-big").attr("x", mL).attr("y", yd - 40).text("Our edge, with its 90% uncertainty range");
     svg.append("line").attr("x1", xd(0)).attr("x2", xd(0)).attr("y1", yd - 22).attr("y2", yd + 22).attr("stroke", C.muted).attr("stroke-dasharray", "3 3");
     svg.append("text").attr("class", "lbl-mute").attr("x", xd(0)).attr("y", yd + 40).attr("text-anchor", "middle").text("no difference");

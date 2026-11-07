@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from src.b import runlog
-from src.b.charts import blind_spot_counts
+from src.b.charts import blind_spot_counts, diff90, mechanism_file
 from src.b.explain import cna_name, nearest_kev
 from src.b.text_features import FLAGS
 from src.common.paths import DATA_DIR, OUT_DIR, REPO_ROOT
@@ -52,7 +52,7 @@ def main():
     res = runlog.results()
     best = runlog.latest_model(res)
     head = json.loads((OUT_DIR / "headline.json").read_text())
-    story = {"model": runlog.model_name(best), "headline": head}
+    story = {"model": runlog.model_name(best), "headline": head, "diff90": diff90(head)}
 
     # 1. the field
     prac_n = len(P[2024]) + len(P[2025])
@@ -76,7 +76,7 @@ def main():
         "simple_caught_blind": int(b[b["group"] == "blind-spot"]["Public exploit, then EPSS"].sum()),
         "ours_caught_visible": int(b[b["group"] == "flagged"][mcol].sum()),
         "ours_caught_blind": int(b[b["group"] == "blind-spot"][mcol].sum()),
-        "ours_blind_cves": pd.read_csv(OUT_DIR / "v4_mechanism.csv").query("group == 'blind-spot' and kind == 'gained'")
+        "ours_blind_cves": pd.read_csv(mechanism_file()).query("group == 'blind-spot' and kind == 'gained'")
         [["cve_id", "kev_vendor", "test_replica"]].to_dict("records"),
     }
 

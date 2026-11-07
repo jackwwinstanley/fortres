@@ -36,8 +36,8 @@ That's a small edge, and we show the uncertainty range rather than overclaim."
 
 **1:35–1:50 · Two discoveries that protect the result** *(Aba)*
 [drift_epss.png, then leakage.png]
-"Two things we caught. One: EPSS scores in 2026 are about five times higher than in past years, so we rank within
-the year instead of trusting raw scores. Two: columns filled in after an attack would inflate our score from 21 to
+"Two things we caught. One: from July 2026, risk scores suddenly jumped about six times, so we compare each
+hole only with others from the same month instead of trusting raw scores. Two: columns filled in after an attack would inflate our score from 21 to
 29. Every exploited vulnerability is marked 'Analyzed' in today's NVD, so we banned those columns."
 
 **1:50–2:00 · Close** *(Jack)*

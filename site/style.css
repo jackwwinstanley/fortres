@@ -43,6 +43,7 @@ code { font-size: .85em; color: var(--ink-2); }
 .step p { margin: 0 0 14px; color: var(--ink-2); }
 .step .lede { font: 600 clamp(24px, 2.4vw, 34px)/1.25 var(--serif); color: var(--ink); }
 .ember { color: var(--ember-glow); }
+.step p.fine { font-size: 13px; color: var(--muted); }
 .mint { color: var(--mint-glow); }
 .mute-num { color: var(--ink); }
 

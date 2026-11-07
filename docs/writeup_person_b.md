@@ -24,11 +24,12 @@ where text and vendor history add signal the standard feeds don't have.
   differences are within seed noise.
 
 ## 3. The 2026 scoreboard is not like past years (drift)
-A classifier can tell 2025 practice CVEs from 2026 scoreboard CVEs with **ROC AUC 0.93**. The main reason is
-EPSS: the median 2026 EPSS is about **4–5× higher** (PSI 1.70 vs 2025). A threshold or raw-score split learned
-on past years would land in the wrong place, so v4 drops raw EPSS and uses within-pool ranks for every feature
-that shifted (PSI > 0.25). Assigner mix (PSI 0.66) and time-to-snapshot (0.49) also moved.
-*Figures: `drift_psi.png`, `drift_epss.png`.*
+A classifier can tell 2025 practice CVEs from 2026 scoreboard CVEs with **ROC AUC 0.93**, and EPSS is the main
+reason. The shift is a **mid-year step**: January–May 2026 looks like 2024–25 (median EPSS ~0.035%), but from the
+**July 2026 snapshot the median is ~6× higher** (0.274% vs 0.043% in 2024–25). Those July–September snapshots
+are **62%** of the 2026 list. A threshold or raw-score split learned on past years would land in the wrong place,
+so v4 drops raw EPSS and ranks it within each snapshot month. Assigner mix (PSI 0.66) and time-to-snapshot (0.49)
+also moved. *Figures: `drift_psi.png`, `drift_epss.png`.*
 
 ## 4. Leakage experiment: what cheating would look like
 Same v4 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
