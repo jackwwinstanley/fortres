@@ -130,7 +130,7 @@ with tabs[0]:
                 bars(fig, name, x, g[name].to_numpy(), color)
             fig.update_yaxes(range=[0, g[[s for s, _ in series]].to_numpy().max() * 1.3 + 1])
             col.plotly_chart(style(fig, f"Test on {y}", "", "Exploited CVEs caught"),
-                             use_container_width=True, theme="streamlit")
+                             width="stretch", theme="streamlit")
         st.caption("Blind spot = no public exploit flag and EPSS rank below what a top-k EPSS list reaches "
                    "(Person A's definition). Small numbers: 27 and 48 exploited CVEs in the two test years.")
 
@@ -161,7 +161,7 @@ with tabs[1]:
         show = [c for c in ["rank", "cve_id", "reason", "epss", "public exploit", "kev_text_score"] if c in d]
         view = d[show].assign(cve_id="https://nvd.nist.gov/vuln/detail/" + d["cve_id"])
         st.dataframe(
-            view, hide_index=True, use_container_width=True, height=520,
+            view, hide_index=True, width="stretch", height=520,
             column_config={
                 "rank": st.column_config.NumberColumn("Rank", width="small"),
                 "cve_id": st.column_config.LinkColumn(
@@ -193,7 +193,7 @@ with tabs[2]:
         title = ("Our model vs the best simple rule: a small gain overall, within the noise" if best_model
                  else "The bar to beat")
         st.plotly_chart(style(fig, title, "Test year (model trained on the other year)",
-                              "Exploited CVEs caught in the top k"), use_container_width=True, theme="streamlit")
+                              "Exploited CVEs caught in the top k"), width="stretch", theme="streamlit")
         st.caption("Error bars: 90% bootstrap range. k scales the 500 picks to each practice pool's size "
                    "(198 for 2024, 243 for 2025). With only 27 and 48 exploited CVEs, a gap of a few is within noise.")
 
@@ -219,7 +219,7 @@ with tabs[3]:
         fig.add_vline(x=0.25, line_dash="dot", line_width=1, annotation_text="large shift", annotation_position="top")
         c2.plotly_chart(style(fig, f"{shift.iloc[-1]['feature']} moved the most between 2025 and 2026",
                               "Population stability index (higher = bigger change)"),
-                        use_container_width=True, theme="streamlit")
+                        width="stretch", theme="streamlit")
 
 # ---- leakage ------------------------------------------------------------------------------------
 with tabs[4]:
@@ -241,7 +241,7 @@ with tabs[4]:
                  g["ci_lo"].to_numpy(), g["ci_hi"].to_numpy())
         fig.update_yaxes(range=[0, leak["ci_hi"].max() * 1.15 + 1])
         st.plotly_chart(style(fig, f"After-the-fact columns would inflate our results: {lk:.0f} hits instead of {h:.0f}",
-                              "", "Exploited CVEs caught in the top k"), use_container_width=True, theme="streamlit")
+                              "", "Exploited CVEs caught in the top k"), width="stretch", theme="streamlit")
         st.markdown("Why: in today's NVD data **every** exploited CVE in both practice years is marked "
                     "*Analyzed*, against about half of the others, because NVD analyses attacked CVEs first. "
                     "At the moment of prediction that field wasn't filled in yet, so a model using it would "
