@@ -1,7 +1,11 @@
 duckdb
 pandas
+pyarrow
+numpy
 scikit-learn
 lightgbm
-transformers
+sentence-transformers
 torch
 streamlit
+plotly
+pytest

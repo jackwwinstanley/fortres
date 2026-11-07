@@ -1,18 +1,22 @@
-# IBM Breach – predicting which CVEs get exploited
+# IBM "Before the Breach" – predicting which CVEs get exploited
 
-Sheridan Datathon (IBM track). Rank 2026 CVEs by likelihood of landing on CISA's KEV list.
+Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and submit
+`top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
+CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
 
-## Data
-Not committed (too large). Download from the datathon Drive folder and unzip into `data/`.
-
-## Setup
+## Run
 ```
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+# put the datathon CSVs in ./data (not committed)
+pytest -q
+python scripts/check_contract.py
+python scripts/check_top500.py outputs/top500_v1.csv
 ```
 
-## Scripts
-- `src/01_build_pool.py` – builds the 2024-01..2025-06 practice pool with 6-month forward labels and prints baseline scores.
+## Layout
+`src/common/` shared paths, schema, scoring · `src/legacy/` first practice-pool script ·
+`scripts/` validators · `tests/` · `outputs/` handoff files · `notebooks/`
 
-## Columns used (time-safe only)
-epss, exploitdb, metasploit, nuclei, poc_github, cvss3_score (baseline comparison).
+## Columns used
+TODO

@@ -2,5 +2,9 @@ data/
 data.zip
 .venv/
 __pycache__/
-.DS_Store
+*.npy
+outputs/*.parquet
+outputs/emb*
 outputs/pool.csv
+.DS_Store
+.pytest_cache/
