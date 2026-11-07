@@ -1,6 +1,6 @@
 """Expected columns/dtypes for every contract file (see CONTRACT.md).
 
-dtype codes: "str", "date", "float", "int8" (0/1), "bool_int8" is not used.
+dtype codes: "str", "date", "float", "int" (any integer), "int8" (0/1 flags and labels).
 `nullable` lists columns allowed to contain nulls; all others must be non-null.
 """
 
@@ -13,6 +13,8 @@ REPLICA_COLS = {
     "metasploit": "int8",
     "nuclei": "int8",
     "poc_github": "int8",
+    "days_to_snapshot": "int",
+    "days_to_cutoff": "int",
     "label": "int8",
 }
 FEATURE_COLS = {k: v for k, v in REPLICA_COLS.items() if k != "label"}
