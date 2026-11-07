@@ -1,0 +1,9 @@
+cohort,group,n,q25,median,q75,n_before_publication,share_within_30d,share_within_90d,share_within_365d
+published 2022-01..2025-09,all attacked,577,0.0,7.0,76.0,55,0.636049,0.767764,0.941075
+published 2022-01..2025-09,ransomware use: Known,125,0.0,7.0,44.0,11,0.688,0.784,0.984
+published 2022-01..2025-09,ransomware use: Unknown,452,0.0,7.5,88.0,44,0.621681,0.763274,0.929204
+published 2022..2024 (365-day window fully observed),all attacked,440,0.0,8.0,103.25,52,0.613636,0.725,0.922727
+published 2022..2024 (365-day window fully observed),ransomware use: Known,105,0.0,7.0,91.0,11,0.647619,0.742857,0.980952
+published 2022..2024 (365-day window fully observed),ransomware use: Unknown,335,0.0,9.0,114.0,41,0.602985,0.719403,0.904478
+published 2024-01..2025-09 only (exploit_signals cover 2024-2025),had a public exploit flag at end of publish month,112,1.0,6.5,42.75,5,0.669643,0.830357,1.0
+published 2024-01..2025-09 only (exploit_signals cover 2024-2025),no exploit flag at end of publish month,177,0.0,6.0,55.0,5,0.661017,0.813559,0.983051

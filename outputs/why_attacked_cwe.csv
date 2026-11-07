@@ -1,0 +1,85 @@
+attribute,cwe_id,n,attacked,rate,lift,ci_low,ci_high,name
+cwe_id,CWE-843,350,19,0.054286,12.156237,0.035025,0.083224,Access of Resource Using Incompatible Type ('Type Confusion')
+cwe_id,CWE-288,328,11,0.033537,7.50987,0.018827,0.059046,Authentication Bypass Using an Alternate Path or Channel
+cwe_id,CWE-306,1008,27,0.026786,5.998143,0.018473,0.038692,Missing Authentication for Critical Function
+cwe_id,CWE-693,251,6,0.023904,5.352925,0.011,0.051162,Protection Mechanism Failure
+cwe_id,CWE-502,1371,29,0.021152,4.736681,0.014767,0.030213,Deserialization of Untrusted Data
+cwe_id,CWE-73,231,4,0.017316,3.877587,0.006754,0.04367,External Control of File Name or Path
+cwe_id,CWE-78,2623,43,0.016393,3.670995,0.012193,0.022008,Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')
+cwe_id,CWE-290,311,5,0.016077,3.600172,0.006886,0.037078,Authentication Bypass by Spoofing
+cwe_id,CWE-367,356,5,0.014045,3.145094,0.006014,0.032452,Time-of-check Time-of-use (TOCTOU) Race Condition
+cwe_id,CWE-754,299,4,0.013378,2.995728,0.005214,0.033887,Improper Check for Unusual or Exceptional Conditions
+cwe_id,CWE-59,465,6,0.012903,2.889428,0.005927,0.027862,Improper Link Resolution Before File Access ('Link Following')
+cwe_id,CWE-116,233,3,0.012876,2.883228,0.004388,0.037165,Improper Encoding or Escaping of Output
+cwe_id,CWE-94,2562,31,0.0121,2.709544,0.008537,0.017123,Improper Control of Generation of Code ('Code Injection')
+cwe_id,CWE-416,3499,36,0.010289,2.303945,0.007441,0.01421,Use After Free
+cwe_id,CWE-287,1410,14,0.009929,2.223425,0.005924,0.016598,Improper Authentication
+cwe_id,CWE-863,1525,15,0.009836,2.202597,0.00597,0.016166,Incorrect Authorization
+cwe_id,CWE-77,1858,18,0.009688,2.169404,0.006137,0.015262,Improper Neutralization of Special Elements used in a Command ('Command Injection')
+cwe_id,CWE-798,760,7,0.009211,2.062519,0.004469,0.018889,Use of Hard-coded Credentials
+cwe_id,CWE-707,219,2,0.009132,2.045029,0.002508,0.032681,Improper Neutralization
+cwe_id,CWE-122,1399,12,0.008578,1.920778,0.004913,0.014933,Heap-based Buffer Overflow
+cwe_id,CWE-611,470,4,0.008511,1.905793,0.003314,0.021676,Improper Restriction of XML External Entity Reference
+cwe_id,CWE-295,472,4,0.008475,1.897718,0.0033,0.021585,Improper Certificate Validation
+cwe_id,CWE-190,1008,8,0.007937,1.777228,0.004027,0.015583,Integer Overflow or Wraparound
+cwe_id,CWE-22,3413,27,0.007911,1.7715,0.005443,0.011486,Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')
+cwe_id,CWE-20,2778,21,0.007559,1.69278,0.00495,0.011529,Improper Input Validation
+cwe_id,CWE-787,7174,54,0.007527,1.685567,0.005774,0.009808,Out-of-bounds Write
+cwe_id,CWE-345,267,2,0.007491,1.677383,0.002057,0.026896,Insufficient Verification of Data Authenticity
+cwe_id,CWE-908,418,3,0.007177,1.607158,0.002444,0.020886,Use of Uninitialized Resource
+cwe_id,CWE-119,1798,9,0.005006,1.120899,0.002636,0.009486,Improper Restriction of Operations within the Bounds of a Memory Buffer
+cwe_id,CWE-121,2023,10,0.004943,1.106924,0.002687,0.009076,Stack-based Buffer Overflow
+cwe_id,CWE-284,2537,12,0.00473,1.059191,0.002708,0.00825,Improper Access Control
+cwe_id,CWE-191,212,1,0.004717,1.056277,0.000833,0.026231,Integer Underflow (Wrap or Wraparound)
+cwe_id,CWE-269,1340,6,0.004478,1.002675,0.002054,0.009735,Improper Privilege Management
+cwe_id,CWE-755,269,1,0.003717,0.832456,0.000657,0.020754,Improper Handling of Exceptional Conditions
+cwe_id,CWE-835,277,1,0.00361,0.808414,0.000638,0.020163,Loop with Unreachable Exit Condition ('Infinite Loop')
+cwe_id,CWE-209,279,1,0.003584,0.802619,0.000633,0.02002,Generation of Error Message Containing Sensitive Information
+cwe_id,CWE-552,280,1,0.003571,0.799752,0.000631,0.01995,Files or Directories Accessible to External Parties
+cwe_id,CWE-347,280,1,0.003571,0.799752,0.000631,0.01995,Improper Verification of Cryptographic Signature
+cwe_id,CWE-532,587,2,0.003407,0.762967,0.000935,0.012337,Insertion of Sensitive Information into Log File
+cwe_id,CWE-129,308,1,0.003247,0.727048,0.000573,0.018159,Improper Validation of Array Index
+cwe_id,(missing),8789,27,0.003072,0.68792,0.002112,0.004466,(no CWE listed)
+cwe_id,CWE-415,347,1,0.002882,0.645333,0.000509,0.016141,Double Free
+cwe_id,CWE-74,2670,7,0.002622,0.587084,0.001271,0.005402,Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')
+cwe_id,CWE-125,3868,10,0.002585,0.578931,0.001405,0.004753,Out-of-bounds Read
+cwe_id,CWE-918,1252,3,0.002396,0.536575,0.000815,0.007021,Server-Side Request Forgery (SSRF)
+cwe_id,CWE-203,423,1,0.002364,0.529387,0.000417,0.013268,Observable Discrepancy
+cwe_id,CWE-362,941,2,0.002125,0.475942,0.000583,0.007716,Concurrent Execution using Shared Resource with Improper Synchronization ('Race Condition')
+cwe_id,CWE-120,2429,5,0.002058,0.460952,0.00088,0.00481,Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')
+cwe_id,CWE-200,2496,5,0.002003,0.448579,0.000856,0.004681,Exposure of Sensitive Information to an Unauthorized Actor
+cwe_id,CWE-732,598,1,0.001672,0.374466,0.000295,0.009411,Incorrect Permission Assignment for Critical Resource
+cwe_id,CWE-434,2403,4,0.001665,0.372752,0.000647,0.004272,Unrestricted Upload of File with Dangerous Type
+cwe_id,CWE-400,1469,2,0.001361,0.304875,0.000373,0.004951,Uncontrolled Resource Consumption
+cwe_id,CWE-276,854,1,0.001171,0.262214,0.000207,0.006603,Incorrect Default Permissions
+cwe_id,CWE-89,9599,10,0.001042,0.233285,0.000566,0.001917,Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')
+cwe_id,CWE-401,1080,1,0.000926,0.207343,0.000163,0.005226,Missing Release of Memory after Effective Lifetime
+cwe_id,CWE-862,4826,4,0.000829,0.185604,0.000322,0.002129,Missing Authorization
+cwe_id,CWE-79,21693,13,0.000599,0.134195,0.00035,0.001025,Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')
+cwe_id,CWE-352,4983,1,0.000201,0.044939,3.5e-05,0.001136,Cross-Site Request Forgery (CSRF)
+cwe_id,CWE-922,272,0,0.0,0.0,0.0,0.013927,Insecure Storage of Sensitive Information
+cwe_id,CWE-770,958,0,0.0,0.0,0.0,0.003994,Allocation of Resources Without Limits or Throttling
+cwe_id,CWE-80,333,0,0.0,0.0,0.0,0.011405,Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
+cwe_id,CWE-404,399,0,0.0,0.0,0.0,0.009536,Improper Resource Shutdown or Release
+cwe_id,CWE-668,392,0,0.0,0.0,0.0,0.009705,Exposure of Resource to Wrong Sphere
+cwe_id,CWE-667,496,0,0.0,0.0,0.0,0.007686,Improper Locking
+cwe_id,CWE-126,334,0,0.0,0.0,0.0,0.011371,Buffer Over-read
+cwe_id,CWE-1321,264,0,0.0,0.0,0.0,0.014343,Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')
+cwe_id,CWE-1333,321,0,0.0,0.0,0.0,0.011826,Inefficient Regular Expression Complexity
+cwe_id,CWE-23,254,0,0.0,0.0,0.0,0.014899,Relative Path Traversal
+cwe_id,CWE-266,510,0,0.0,0.0,0.0,0.007476,Incorrect Privilege Assignment
+cwe_id,CWE-281,207,0,0.0,0.0,0.0,0.01822,Improper Preservation of Permissions
+cwe_id,CWE-285,647,0,0.0,0.0,0.0,0.005903,Improper Authorization
+cwe_id,CWE-307,300,0,0.0,0.0,0.0,0.012643,Improper Restriction of Excessive Authentication Attempts
+cwe_id,CWE-312,409,0,0.0,0.0,0.0,0.009305,Cleartext Storage of Sensitive Information
+cwe_id,CWE-319,379,0,0.0,0.0,0.0,0.010034,Cleartext Transmission of Sensitive Information
+cwe_id,CWE-327,264,0,0.0,0.0,0.0,0.014343,Use of a Broken or Risky Cryptographic Algorithm
+cwe_id,CWE-346,223,0,0.0,0.0,0.0,0.016935,Origin Validation Error
+cwe_id,CWE-427,594,0,0.0,0.0,0.0,0.006426,Uncontrolled Search Path Element
+cwe_id,CWE-476,2839,0,0.0,0.0,0.0,0.001351,NULL Pointer Dereference
+cwe_id,CWE-522,523,0,0.0,0.0,0.0,0.007292,Insufficiently Protected Credentials
+cwe_id,CWE-601,705,0,0.0,0.0,0.0,0.00542,URL Redirection to Untrusted Site ('Open Redirect')
+cwe_id,CWE-613,252,0,0.0,0.0,0.0,0.015016,Insufficient Session Expiration
+cwe_id,CWE-617,392,0,0.0,0.0,0.0,0.009705,Reachable Assertion
+cwe_id,CWE-639,823,0,0.0,0.0,0.0,0.004646,Authorization Bypass Through User-Controlled Key
+cwe_id,CWE-98,469,0,0.0,0.0,0.0,0.008124,Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion')

@@ -1,0 +1,39 @@
+attribute,category,n,attacked,rate,lift,ci_low,ci_high
+attack_vector,NETWORK,92215,425,0.004609,1.032051,0.004192,0.005067
+attack_vector,LOCAL,31289,138,0.00441,0.987645,0.003735,0.005208
+attack_vector,ADJACENT_NETWORK,2987,11,0.003683,0.824653,0.002058,0.006583
+attack_vector,PHYSICAL,1052,3,0.002852,0.638586,0.00097,0.008351
+attack_vector,(missing),1665,0,0.0,0.0,0.0,0.002302
+attack_complexity,HIGH,6665,31,0.004651,1.041538,0.003279,0.006594
+attack_complexity,LOW,120878,546,0.004517,1.011484,0.004154,0.004911
+attack_complexity,(missing),1665,0,0.0,0.0,0.0,0.002302
+privileges_required,NONE,66774,397,0.005945,1.331364,0.00539,0.006558
+privileges_required,HIGH,11743,42,0.003577,0.80091,0.002647,0.004831
+privileges_required,LOW,49026,138,0.002815,0.630327,0.002383,0.003324
+privileges_required,(missing),1665,0,0.0,0.0,0.0,0.002302
+user_interaction,NONE,86474,445,0.005146,1.15236,0.004691,0.005645
+user_interaction,REQUIRED,41069,132,0.003214,0.719736,0.002711,0.00381
+user_interaction,(missing),1665,0,0.0,0.0,0.0,0.002302
+scope,UNCHANGED,99694,505,0.005066,1.134321,0.004643,0.005526
+scope,CHANGED,27849,72,0.002585,0.578944,0.002054,0.003254
+scope,(missing),1665,0,0.0,0.0,0.0,0.002302
+confidentiality_impact,HIGH,66072,514,0.007779,1.742045,0.007137,0.008479
+confidentiality_impact,NONE,29100,34,0.001168,0.261637,0.000836,0.001632
+confidentiality_impact,LOW,32371,29,0.000896,0.200611,0.000624,0.001286
+confidentiality_impact,(missing),1665,0,0.0,0.0,0.0,0.002302
+integrity_impact,HIGH,55776,477,0.008552,1.91507,0.007821,0.009351
+integrity_impact,NONE,38100,65,0.001706,0.382034,0.001339,0.002174
+integrity_impact,LOW,33667,35,0.00104,0.232797,0.000748,0.001445
+integrity_impact,(missing),1665,0,0.0,0.0,0.0,0.002302
+availability_impact,HIGH,68865,460,0.00668,1.495798,0.006098,0.007316
+availability_impact,NONE,49165,108,0.002197,0.491905,0.00182,0.002651
+availability_impact,LOW,9513,9,0.000946,0.211855,0.000498,0.001797
+availability_impact,(missing),1665,0,0.0,0.0,0.0,0.002302
+cvss3_severity,CRITICAL,18543,219,0.01181,2.644708,0.010353,0.01347
+cvss3_severity,HIGH,47491,285,0.006001,1.343839,0.005345,0.006737
+cvss3_severity,MEDIUM,58940,70,0.001188,0.265951,0.00094,0.0015
+cvss3_severity,LOW,2567,3,0.001169,0.261703,0.000398,0.003431
+cvss3_severity,(missing),1665,0,0.0,0.0,0.0,0.002302
+network + no privileges + no user interaction,network + no privileges + no user interaction,36776,264,0.007179,1.607508,0.006366,0.008094
+network + no privileges + no user interaction,all other CVSS 3 CVEs,90767,313,0.003448,0.7722,0.003087,0.003851
+network + no privileges + no user interaction,(missing),1665,0,0.0,0.0,0.0,0.002302

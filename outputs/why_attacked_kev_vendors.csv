@@ -1,0 +1,141 @@
+kev_vendor,vendor_group,attacked,share_of_attacked
+Microsoft,"Operating systems, browsers & platforms",105,0.181976
+Apple,"Operating systems, browsers & platforms",43,0.074523
+Google,"Operating systems, browsers & platforms",31,0.053726
+Cisco,"Network, security & storage appliances",21,0.036395
+Ivanti,"Network, security & storage appliances",20,0.034662
+VMware,Enterprise & IT-management software,14,0.024263
+Fortinet,"Network, security & storage appliances",13,0.02253
+Adobe,Enterprise & IT-management software,13,0.02253
+Linux,"Operating systems, browsers & platforms",12,0.020797
+Apache,"Web apps, CMS & open source",12,0.020797
+Citrix,"Network, security & storage appliances",11,0.019064
+Synacor,Enterprise & IT-management software,11,0.019064
+Palo Alto Networks,"Network, security & storage appliances",10,0.017331
+D-Link,"Network, security & storage appliances",9,0.015598
+Android,"Operating systems, browsers & platforms",9,0.015598
+Zyxel,"Network, security & storage appliances",8,0.013865
+Qualcomm,"Chips, mobile & device firmware",8,0.013865
+Mitel,"Network, security & storage appliances",7,0.012132
+Oracle,Enterprise & IT-management software,6,0.010399
+Juniper,"Network, security & storage appliances",6,0.010399
+Progress,Enterprise & IT-management software,6,0.010399
+Atlassian,Enterprise & IT-management software,6,0.010399
+Arm,"Chips, mobile & device firmware",5,0.008666
+Samsung,"Chips, mobile & device firmware",5,0.008666
+Fortra,Enterprise & IT-management software,4,0.006932
+Veeam,Enterprise & IT-management software,4,0.006932
+TP-Link,"Network, security & storage appliances",4,0.006932
+Trend Micro,"Network, security & storage appliances",4,0.006932
+SonicWall,"Network, security & storage appliances",4,0.006932
+Roundcube,"Web apps, CMS & open source",4,0.006932
+RARLAB,Desktop & file utilities,4,0.006932
+SolarWinds,Enterprise & IT-management software,4,0.006932
+WatchGuard,"Network, security & storage appliances",3,0.005199
+SAP,Enterprise & IT-management software,3,0.005199
+TeleMessage,Enterprise & IT-management software,3,0.005199
+SysAid,Enterprise & IT-management software,3,0.005199
+Zoho,Enterprise & IT-management software,3,0.005199
+Qlik,Enterprise & IT-management software,3,0.005199
+Dassault Systèmes,Enterprise & IT-management software,3,0.005199
+CrushFTP,"Web apps, CMS & open source",3,0.005199
+Mozilla,"Operating systems, browsers & platforms",3,0.005199
+F5,"Network, security & storage appliances",3,0.005199
+Sophos,"Network, security & storage appliances",3,0.005199
+Craft CMS,"Web apps, CMS & open source",3,0.005199
+MinIO,"Web apps, CMS & open source",2,0.003466
+PaperCut,Enterprise & IT-management software,2,0.003466
+N-able,Enterprise & IT-management software,2,0.003466
+PTZOptics,"IoT, cameras & embedded",2,0.003466
+Red Hat,"Operating systems, browsers & platforms",2,0.003466
+ServiceNow,Enterprise & IT-management software,2,0.003466
+OSGeo,"Web apps, CMS & open source",2,0.003466
+Kentico,"Web apps, CMS & open source",2,0.003466
+QNAP,"Network, security & storage appliances",2,0.003466
+IETF,Other / unclassified,2,0.003466
+GeoVision,"IoT, cameras & embedded",2,0.003466
+Zabbix,Enterprise & IT-management software,2,0.003466
+JetBrains,"Web apps, CMS & open source",2,0.003466
+Commvault,Enterprise & IT-management software,2,0.003466
+Cleo,Enterprise & IT-management software,2,0.003466
+CWP,"Web apps, CMS & open source",2,0.003466
+Broadcom,Enterprise & IT-management software,2,0.003466
+BeyondTrust,Enterprise & IT-management software,2,0.003466
+CyberPersons,"Web apps, CMS & open source",2,0.003466
+ConnectWise,Enterprise & IT-management software,2,0.003466
+Hitachi Vantara,Enterprise & IT-management software,2,0.003466
+Advantive,Enterprise & IT-management software,2,0.003466
+dotCMS,"Web apps, CMS & open source",1,0.001733
+SolarView,"IoT, cameras & embedded",1,0.001733
+Smartbedded,"IoT, cameras & embedded",1,0.001733
+Sitecore,Enterprise & IT-management software,1,0.001733
+SimpleHelp ,"Web apps, CMS & open source",1,0.001733
+ZKTeco,"IoT, cameras & embedded",1,0.001733
+ZK Framework,"Web apps, CMS & open source",1,0.001733
+ownCloud,"Web apps, CMS & open source",1,0.001733
+reviewdog,Other / unclassified,1,0.001733
+Trimble,"IoT, cameras & embedded",1,0.001733
+XWiki,"Web apps, CMS & open source",1,0.001733
+Yiiframework,"Web apps, CMS & open source",1,0.001733
+Wing FTP Server,"Web apps, CMS & open source",1,0.001733
+Twilio,Other / unclassified,1,0.001733
+TerraMaster,"Network, security & storage appliances",1,0.001733
+Unitronics,"IoT, cameras & embedded",1,0.001733
+Teclib,Enterprise & IT-management software,1,0.001733
+ScienceLogic,Other / unclassified,1,0.001733
+VMware Tanzu,Enterprise & IT-management software,1,0.001733
+Versa,"Network, security & storage appliances",1,0.001733
+WSO2,Enterprise & IT-management software,1,0.001733
+Wazuh,"Web apps, CMS & open source",1,0.001733
+WebKitGTK,"Operating systems, browsers & platforms",1,0.001733
+WebRTC,"Operating systems, browsers & platforms",1,0.001733
+SugarCRM,Enterprise & IT-management software,1,0.001733
+Sudo,"Web apps, CMS & open source",1,0.001733
+Srimax,Other / unclassified,1,0.001733
+Spreadsheet::ParseExcel,"Web apps, CMS & open source",1,0.001733
+7-Zip,Desktop & file utilities,1,0.001733
+Netwrix,Enterprise & IT-management software,1,0.001733
+Sangoma,Other / unclassified,1,0.001733
+Ruckus Wireless,"Network, security & storage appliances",1,0.001733
+IBM,Enterprise & IT-management software,1,0.001733
+Gladinet,"Web apps, CMS & open source",1,0.001733
+GitLab,"Web apps, CMS & open source",1,0.001733
+Git,"Web apps, CMS & open source",1,0.001733
+GNU,"Web apps, CMS & open source",1,0.001733
+FreeType,"Web apps, CMS & open source",1,0.001733
+FXC,"IoT, cameras & embedded",1,0.001733
+Erlang,"Web apps, CMS & open source",1,0.001733
+Edimax,Other / unclassified,1,0.001733
+DrayTek,"Network, security & storage appliances",1,0.001733
+Digiever,"IoT, cameras & embedded",1,0.001733
+Check Point,"Network, security & storage appliances",1,0.001733
+Cacti,"Web apps, CMS & open source",1,0.001733
+Barracuda Networks,"Network, security & storage appliances",1,0.001733
+Aviatrix,"Network, security & storage appliances",1,0.001733
+Audinate,Enterprise & IT-management software,1,0.001733
+Array Networks ,"Network, security & storage appliances",1,0.001733
+Acronis,"Network, security & storage appliances",1,0.001733
+ASUS,"Network, security & storage appliances",1,0.001733
+IGEL,"IoT, cameras & embedded",1,0.001733
+Ignite Realtime,Enterprise & IT-management software,1,0.001733
+Jenkins,"Web apps, CMS & open source",1,0.001733
+NextGen Healthcare,Enterprise & IT-management software,1,0.001733
+Reolink,"IoT, cameras & embedded",1,0.001733
+Rejetto,"Web apps, CMS & open source",1,0.001733
+Redis,"Web apps, CMS & open source",1,0.001733
+Qualitia,Other / unclassified,1,0.001733
+ProjectSend,Other / unclassified,1,0.001733
+PHP Group,"Web apps, CMS & open source",1,0.001733
+Novi Survey,Enterprise & IT-management software,1,0.001733
+North Grid,Other / unclassified,1,0.001733
+AMI,"IoT, cameras & embedded",1,0.001733
+Joomla!,"Web apps, CMS & open source",1,0.001733
+NUUO,"IoT, cameras & embedded",1,0.001733
+NAKIVO,Other / unclassified,1,0.001733
+Meta Platforms,"Web apps, CMS & open source",1,0.001733
+MDaemon,Other / unclassified,1,0.001733
+Libraesva,Other / unclassified,1,0.001733
+Langflow,"Web apps, CMS & open source",1,0.001733
+Kingsoft,Desktop & file utilities,1,0.001733
+Justice AV Solutions,Other / unclassified,1,0.001733
+tj-actions,Other / unclassified,1,0.001733

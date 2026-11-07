@@ -1,0 +1,8 @@
+group,positives,invisible,share_invisible,ci_low,ci_high
+Enterprise & IT-management software,22,11,0.5,0.307218,0.692782
+"Web apps, CMS & open source",22,10,0.454545,0.2692,0.653405
+"Network, security & storage appliances",12,9,0.75,0.46769,0.91106
+"Operating systems, browsers & platforms",11,8,0.727273,0.43435,0.902541
+"IoT, cameras & embedded",5,3,0.6,0.23072,0.882382
+Desktop & file utilities,2,2,1.0,0.342372,1.0
+"Chips, mobile & device firmware",1,1,1.0,0.206543,1.0

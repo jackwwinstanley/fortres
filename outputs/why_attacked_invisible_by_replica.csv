@@ -1,0 +1,4 @@
+group,positives,invisible,share_invisible,ci_low,ci_high
+replica 2024,27,17,0.62963,0.442289,0.784677
+replica 2025,48,27,0.5625,0.422748,0.692989
+both replicas,75,44,0.586667,0.473663,0.691224
