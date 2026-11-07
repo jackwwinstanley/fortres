@@ -3,7 +3,6 @@ data.zip
 .venv/
 __pycache__/
 *.npy
-outputs/*.parquet
 outputs/emb*
 outputs/pool.csv
 .DS_Store

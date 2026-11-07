@@ -3,9 +3,10 @@
 One owner per file. Never edit the other person's files. Validate with
 `python scripts/check_contract.py` (schemas live in `src/common/schema.py`).
 
-Note: `.parquet`, `.npy` and `emb*` files are **gitignored** (large). Share them out-of-band
-(AirDrop / shared drive) or regenerate with the owner's script. `top500_v*.csv`,
-`runlog.csv` and `explanations.csv` are tracked in git.
+Note: small `.parquet` files (replicas, scoreboard/text/extracted features) **are tracked in git**
+so the other person can pull them. `.npy` and `emb*` files (embeddings, hundreds of MB) are
+**gitignored**; pass them through the shared drive. `top500_v*.csv`, `runlog.csv` and
+`explanations.csv` are also tracked.
 
 ## Files
 
