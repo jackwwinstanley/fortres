@@ -1,0 +1,225 @@
+replica,subset,ranking,depth_label,depth,k,positives_in_subset,hits_arbitrary,hits_expected
+2024,all,"Exploit code, then EPSS (baseline)",10,10,198,27,1,1.0
+2024,all,"Exploit code, then EPSS (baseline)",25,25,198,27,3,3.0
+2024,all,"Exploit code, then EPSS (baseline)",50,50,198,27,3,3.0
+2024,all,"Exploit code, then EPSS (baseline)",100,100,198,27,5,5.0
+2024,all,"Exploit code, then EPSS (baseline)",k/2,99,198,27,5,5.0
+2024,all,"Exploit code, then EPSS (baseline)",k,198,198,27,6,6.0
+2024,all,"Exploit code, then EPSS (baseline)",1.5k,297,198,27,6,6.0
+2024,all,"Exploit code, then EPSS (baseline)",2k,396,198,27,8,8.347
+2024,all,v1 LightGBM,10,10,198,27,3,3.0
+2024,all,v1 LightGBM,25,25,198,27,4,4.0
+2024,all,v1 LightGBM,50,50,198,27,4,4.0
+2024,all,v1 LightGBM,100,100,198,27,5,5.0
+2024,all,v1 LightGBM,k/2,99,198,27,5,5.0
+2024,all,v1 LightGBM,k,198,198,27,6,6.0
+2024,all,v1 LightGBM,1.5k,297,198,27,7,7.0
+2024,all,v1 LightGBM,2k,396,198,27,8,8.0
+2024,all,v1 logistic regression,10,10,198,27,1,1.0
+2024,all,v1 logistic regression,25,25,198,27,4,4.0
+2024,all,v1 logistic regression,50,50,198,27,4,4.0
+2024,all,v1 logistic regression,100,100,198,27,6,6.0
+2024,all,v1 logistic regression,k/2,99,198,27,6,6.0
+2024,all,v1 logistic regression,k,198,198,27,7,7.0
+2024,all,v1 logistic regression,1.5k,297,198,27,8,8.0
+2024,all,v1 logistic regression,2k,396,198,27,8,8.0
+2024,all,kev_text_score,10,10,198,27,0,0.0
+2024,all,kev_text_score,25,25,198,27,0,0.0
+2024,all,kev_text_score,50,50,198,27,0,0.0
+2024,all,kev_text_score,100,100,198,27,2,2.0
+2024,all,kev_text_score,k/2,99,198,27,2,2.0
+2024,all,kev_text_score,k,198,198,27,2,2.0
+2024,all,kev_text_score,1.5k,297,198,27,3,3.0
+2024,all,kev_text_score,2k,396,198,27,4,4.0
+2024,all,nearest_kev_sim,10,10,198,27,0,0.0
+2024,all,nearest_kev_sim,25,25,198,27,1,1.111
+2024,all,nearest_kev_sim,50,50,198,27,2,2.0
+2024,all,nearest_kev_sim,100,100,198,27,3,3.0
+2024,all,nearest_kev_sim,k/2,99,198,27,3,3.0
+2024,all,nearest_kev_sim,k,198,198,27,3,3.0
+2024,all,nearest_kev_sim,1.5k,297,198,27,4,4.0
+2024,all,nearest_kev_sim,2k,396,198,27,4,4.0
+2024,all,assigner_kev_rate_smooth,10,10,198,27,0,0.0
+2024,all,assigner_kev_rate_smooth,25,25,198,27,0,0.692
+2024,all,assigner_kev_rate_smooth,50,50,198,27,1,1.0
+2024,all,assigner_kev_rate_smooth,100,100,198,27,1,1.0
+2024,all,assigner_kev_rate_smooth,k/2,99,198,27,1,1.0
+2024,all,assigner_kev_rate_smooth,k,198,198,27,1,1.612
+2024,all,assigner_kev_rate_smooth,1.5k,297,198,27,3,3.108
+2024,all,assigner_kev_rate_smooth,2k,396,198,27,4,3.618
+2024,all,vendor_kev_count_max,10,10,198,27,0,0.032
+2024,all,vendor_kev_count_max,25,25,198,27,0,0.081
+2024,all,vendor_kev_count_max,50,50,198,27,0,0.162
+2024,all,vendor_kev_count_max,100,100,198,27,0,0.324
+2024,all,vendor_kev_count_max,k/2,99,198,27,0,0.32
+2024,all,vendor_kev_count_max,k,198,198,27,0,0.641
+2024,all,vendor_kev_count_max,1.5k,297,198,27,1,0.961
+2024,all,vendor_kev_count_max,2k,396,198,27,1,1.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",10,10,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",25,25,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",50,50,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",100,100,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",k/2,99,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",k,198,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",1.5k,297,198,17,0,0.0
+2024,blind-spot,"Exploit code, then EPSS (baseline)",2k,396,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,10,10,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,25,25,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,50,50,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,100,100,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,k/2,99,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,k,198,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,1.5k,297,198,17,0,0.0
+2024,blind-spot,v1 LightGBM,2k,396,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,10,10,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,25,25,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,50,50,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,100,100,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,k/2,99,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,k,198,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,1.5k,297,198,17,0,0.0
+2024,blind-spot,v1 logistic regression,2k,396,198,17,0,0.0
+2024,blind-spot,kev_text_score,10,10,198,17,0,0.0
+2024,blind-spot,kev_text_score,25,25,198,17,0,0.0
+2024,blind-spot,kev_text_score,50,50,198,17,0,0.0
+2024,blind-spot,kev_text_score,100,100,198,17,1,1.0
+2024,blind-spot,kev_text_score,k/2,99,198,17,1,1.0
+2024,blind-spot,kev_text_score,k,198,198,17,1,1.0
+2024,blind-spot,kev_text_score,1.5k,297,198,17,2,2.0
+2024,blind-spot,kev_text_score,2k,396,198,17,3,3.0
+2024,blind-spot,nearest_kev_sim,10,10,198,17,0,0.0
+2024,blind-spot,nearest_kev_sim,25,25,198,17,1,0.733
+2024,blind-spot,nearest_kev_sim,50,50,198,17,1,1.0
+2024,blind-spot,nearest_kev_sim,100,100,198,17,2,2.0
+2024,blind-spot,nearest_kev_sim,k/2,99,198,17,2,2.0
+2024,blind-spot,nearest_kev_sim,k,198,198,17,2,2.0
+2024,blind-spot,nearest_kev_sim,1.5k,297,198,17,3,3.0
+2024,blind-spot,nearest_kev_sim,2k,396,198,17,3,3.0
+2024,blind-spot,assigner_kev_rate_smooth,10,10,198,17,0,0.0
+2024,blind-spot,assigner_kev_rate_smooth,25,25,198,17,0,0.692
+2024,blind-spot,assigner_kev_rate_smooth,50,50,198,17,1,1.0
+2024,blind-spot,assigner_kev_rate_smooth,100,100,198,17,1,1.0
+2024,blind-spot,assigner_kev_rate_smooth,k/2,99,198,17,1,1.0
+2024,blind-spot,assigner_kev_rate_smooth,k,198,198,17,1,1.714
+2024,blind-spot,assigner_kev_rate_smooth,1.5k,297,198,17,3,3.124
+2024,blind-spot,assigner_kev_rate_smooth,2k,396,198,17,4,3.519
+2024,blind-spot,vendor_kev_count_max,10,10,198,17,0,0.034
+2024,blind-spot,vendor_kev_count_max,25,25,198,17,0,0.084
+2024,blind-spot,vendor_kev_count_max,50,50,198,17,0,0.169
+2024,blind-spot,vendor_kev_count_max,100,100,198,17,0,0.338
+2024,blind-spot,vendor_kev_count_max,k/2,99,198,17,0,0.334
+2024,blind-spot,vendor_kev_count_max,k,198,198,17,0,0.669
+2024,blind-spot,vendor_kev_count_max,1.5k,297,198,17,1,1.0
+2024,blind-spot,vendor_kev_count_max,2k,396,198,17,1,1.0
+2025,all,"Exploit code, then EPSS (baseline)",10,10,243,48,2,2.0
+2025,all,"Exploit code, then EPSS (baseline)",25,25,243,48,2,2.0
+2025,all,"Exploit code, then EPSS (baseline)",50,50,243,48,4,4.0
+2025,all,"Exploit code, then EPSS (baseline)",100,100,243,48,8,8.0
+2025,all,"Exploit code, then EPSS (baseline)",k/2,122,243,48,8,8.0
+2025,all,"Exploit code, then EPSS (baseline)",k,243,243,48,13,13.0
+2025,all,"Exploit code, then EPSS (baseline)",1.5k,364,243,48,16,16.0
+2025,all,"Exploit code, then EPSS (baseline)",2k,486,243,48,17,17.185
+2025,all,v1 LightGBM,10,10,243,48,1,1.0
+2025,all,v1 LightGBM,25,25,243,48,4,4.0
+2025,all,v1 LightGBM,50,50,243,48,6,6.0
+2025,all,v1 LightGBM,100,100,243,48,8,8.0
+2025,all,v1 LightGBM,k/2,122,243,48,8,8.0
+2025,all,v1 LightGBM,k,243,243,48,11,11.0
+2025,all,v1 LightGBM,1.5k,364,243,48,12,12.0
+2025,all,v1 LightGBM,2k,486,243,48,12,12.0
+2025,all,v1 logistic regression,10,10,243,48,4,4.0
+2025,all,v1 logistic regression,25,25,243,48,7,7.0
+2025,all,v1 logistic regression,50,50,243,48,8,8.0
+2025,all,v1 logistic regression,100,100,243,48,8,8.0
+2025,all,v1 logistic regression,k/2,122,243,48,8,8.0
+2025,all,v1 logistic regression,k,243,243,48,9,9.0
+2025,all,v1 logistic regression,1.5k,364,243,48,12,12.0
+2025,all,v1 logistic regression,2k,486,243,48,17,17.0
+2025,all,kev_text_score,10,10,243,48,0,0.0
+2025,all,kev_text_score,25,25,243,48,0,0.0
+2025,all,kev_text_score,50,50,243,48,0,0.0
+2025,all,kev_text_score,100,100,243,48,0,0.0
+2025,all,kev_text_score,k/2,122,243,48,0,0.0
+2025,all,kev_text_score,k,243,243,48,2,2.0
+2025,all,kev_text_score,1.5k,364,243,48,3,3.0
+2025,all,kev_text_score,2k,486,243,48,6,6.0
+2025,all,nearest_kev_sim,10,10,243,48,0,0.0
+2025,all,nearest_kev_sim,25,25,243,48,0,0.0
+2025,all,nearest_kev_sim,50,50,243,48,0,0.0
+2025,all,nearest_kev_sim,100,100,243,48,1,1.0
+2025,all,nearest_kev_sim,k/2,122,243,48,1,1.0
+2025,all,nearest_kev_sim,k,243,243,48,2,2.0
+2025,all,nearest_kev_sim,1.5k,364,243,48,6,6.0
+2025,all,nearest_kev_sim,2k,486,243,48,6,6.0
+2025,all,assigner_kev_rate_smooth,10,10,243,48,1,0.909
+2025,all,assigner_kev_rate_smooth,25,25,243,48,1,1.28
+2025,all,assigner_kev_rate_smooth,50,50,243,48,1,1.78
+2025,all,assigner_kev_rate_smooth,100,100,243,48,3,3.164
+2025,all,assigner_kev_rate_smooth,k/2,122,243,48,3,3.493
+2025,all,assigner_kev_rate_smooth,k,243,243,48,3,5.299
+2025,all,assigner_kev_rate_smooth,1.5k,364,243,48,9,7.104
+2025,all,assigner_kev_rate_smooth,2k,486,243,48,9,8.925
+2025,all,vendor_kev_count_max,10,10,243,48,0,0.0
+2025,all,vendor_kev_count_max,25,25,243,48,0,0.0
+2025,all,vendor_kev_count_max,50,50,243,48,0,0.0
+2025,all,vendor_kev_count_max,100,100,243,48,0,0.0
+2025,all,vendor_kev_count_max,k/2,122,243,48,0,0.0
+2025,all,vendor_kev_count_max,k,243,243,48,0,0.0
+2025,all,vendor_kev_count_max,1.5k,364,243,48,1,1.043
+2025,all,vendor_kev_count_max,2k,486,243,48,1,1.627
+2025,blind-spot,"Exploit code, then EPSS (baseline)",10,10,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",25,25,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",50,50,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",100,100,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",k/2,122,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",k,243,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",1.5k,364,243,27,0,0.0
+2025,blind-spot,"Exploit code, then EPSS (baseline)",2k,486,243,27,0,0.0
+2025,blind-spot,v1 LightGBM,10,10,243,27,0,0.0
+2025,blind-spot,v1 LightGBM,25,25,243,27,0,0.0
+2025,blind-spot,v1 LightGBM,50,50,243,27,0,0.0
+2025,blind-spot,v1 LightGBM,100,100,243,27,0,0.0
+2025,blind-spot,v1 LightGBM,k/2,122,243,27,0,0.0
+2025,blind-spot,v1 LightGBM,k,243,243,27,2,2.0
+2025,blind-spot,v1 LightGBM,1.5k,364,243,27,2,2.0
+2025,blind-spot,v1 LightGBM,2k,486,243,27,2,2.0
+2025,blind-spot,v1 logistic regression,10,10,243,27,0,0.0
+2025,blind-spot,v1 logistic regression,25,25,243,27,0,0.0
+2025,blind-spot,v1 logistic regression,50,50,243,27,0,0.0
+2025,blind-spot,v1 logistic regression,100,100,243,27,0,0.0
+2025,blind-spot,v1 logistic regression,k/2,122,243,27,0,0.0
+2025,blind-spot,v1 logistic regression,k,243,243,27,5,4.812
+2025,blind-spot,v1 logistic regression,1.5k,364,243,27,6,6.0
+2025,blind-spot,v1 logistic regression,2k,486,243,27,7,7.0
+2025,blind-spot,kev_text_score,10,10,243,27,0,0.0
+2025,blind-spot,kev_text_score,25,25,243,27,0,0.0
+2025,blind-spot,kev_text_score,50,50,243,27,0,0.0
+2025,blind-spot,kev_text_score,100,100,243,27,0,0.0
+2025,blind-spot,kev_text_score,k/2,122,243,27,0,0.0
+2025,blind-spot,kev_text_score,k,243,243,27,1,1.0
+2025,blind-spot,kev_text_score,1.5k,364,243,27,2,2.0
+2025,blind-spot,kev_text_score,2k,486,243,27,4,4.0
+2025,blind-spot,nearest_kev_sim,10,10,243,27,0,0.0
+2025,blind-spot,nearest_kev_sim,25,25,243,27,0,0.0
+2025,blind-spot,nearest_kev_sim,50,50,243,27,0,0.0
+2025,blind-spot,nearest_kev_sim,100,100,243,27,1,1.0
+2025,blind-spot,nearest_kev_sim,k/2,122,243,27,1,1.0
+2025,blind-spot,nearest_kev_sim,k,243,243,27,1,1.0
+2025,blind-spot,nearest_kev_sim,1.5k,364,243,27,5,5.0
+2025,blind-spot,nearest_kev_sim,2k,486,243,27,5,5.0
+2025,blind-spot,assigner_kev_rate_smooth,10,10,243,27,0,0.02
+2025,blind-spot,assigner_kev_rate_smooth,25,25,243,27,0,0.32
+2025,blind-spot,assigner_kev_rate_smooth,50,50,243,27,1,0.82
+2025,blind-spot,assigner_kev_rate_smooth,100,100,243,27,2,2.069
+2025,blind-spot,assigner_kev_rate_smooth,k/2,122,243,27,2,2.186
+2025,blind-spot,assigner_kev_rate_smooth,k,243,243,27,2,2.828
+2025,blind-spot,assigner_kev_rate_smooth,1.5k,364,243,27,4,3.469
+2025,blind-spot,assigner_kev_rate_smooth,2k,486,243,27,7,4.904
+2025,blind-spot,vendor_kev_count_max,10,10,243,27,0,0.0
+2025,blind-spot,vendor_kev_count_max,25,25,243,27,0,0.0
+2025,blind-spot,vendor_kev_count_max,50,50,243,27,0,0.0
+2025,blind-spot,vendor_kev_count_max,100,100,243,27,0,0.0
+2025,blind-spot,vendor_kev_count_max,k/2,122,243,27,0,0.0
+2025,blind-spot,vendor_kev_count_max,k,243,243,27,0,0.0
+2025,blind-spot,vendor_kev_count_max,1.5k,364,243,27,1,1.0
+2025,blind-spot,vendor_kev_count_max,2k,486,243,27,1,1.0

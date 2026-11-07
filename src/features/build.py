@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import ALLOWED_FEATURES
+from src.common.schema import V1_FEATURES
 
 SMOOTH = 20  # pseudo-count for the smoothed assigner KEV rate
 GENERIC_WORDS = {"inc", "corp", "corporation", "ltd", "llc", "co", "company", "gmbh", "plc",
@@ -125,7 +125,7 @@ def build_features(pool: pd.DataFrame, vuln: pd.DataFrame, kev: pd.DataFrame, cu
     ven = vendor_features(desc, lex)
     keep = [c for c in ["cve_id", "snapshot_month", "published", "label"] if c in pool]
     out = pd.concat([pool[keep], sig, asg, ven], axis=1)
-    return out[keep + ALLOWED_FEATURES], dropped
+    return out[keep + V1_FEATURES], dropped
 
 
 def main(data_dir=DATA_DIR, out_dir=OUT_DIR):

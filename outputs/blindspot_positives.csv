@@ -1,0 +1,45 @@
+cve_id,replica,kev_vendor,assigner,days_to_kev,kev_text_score,assigner_kev_rate_smooth,vendor_kev_count_max,nearest_kev_sim
+CVE-2024-1086,2024,Linux,cve-coordination@google.com,120,0.2009,0.01682,0.0,0.769
+CVE-2024-21338,2024,Microsoft,secure@microsoft.com,4,0.9434,0.02904,0.0,1.0048
+CVE-2024-23113,2024,Fortinet,psirt@fortinet.com,223,0.9086,0.01881,2.485,0.8014
+CVE-2024-23692,2024,Rejetto,disclosure@vulncheck.com,39,0.1905,0.00318,0.693,0.7512
+CVE-2024-26169,2024,Microsoft,secure@microsoft.com,74,0.8136,0.02904,0.0,0.999
+CVE-2024-27348,2024,Apache,security@apache.org,141,0.6005,0.01933,3.434,0.7491
+CVE-2024-28987,2024,SolarWinds,psirt@solarwinds.com,45,0.7291,0.01704,1.609,0.7791
+CVE-2024-29824,2024,Ivanti,support@hackerone.com,124,0.281,0.0118,2.565,0.7816
+CVE-2024-36971,2024,Android,416baaa9-dc9f-4396-8d5f-8c081fb06d67,38,0.4877,0.00477,0.0,0.7282
+CVE-2024-37085,2024,VMware,security@vmware.com,30,0.8136,0.04037,2.944,0.7928
+CVE-2024-37383,2024,Roundcube,cve@mitre.org,116,0.6992,0.0022,1.792,0.8919
+CVE-2024-38094,2024,Microsoft,secure@microsoft.com,83,0.8883,0.02904,5.62,0.9351
+CVE-2024-40766,2024,SonicWall,PSIRT@sonicwall.com,9,0.5993,0.06497,2.303,0.8247
+CVE-2024-4358,2024,Progress,security@progress.com,13,0.7614,0.02608,1.099,0.7597
+CVE-2024-7262,2024,Kingsoft,security@eset.com,3,0.3088,0.03534,0.0,0.7576
+CVE-2024-8956,2024,PTZOptics,disclosure@vulncheck.com,35,0.3175,0.00318,0.0,0.7394
+CVE-2024-8957,2024,PTZOptics,disclosure@vulncheck.com,35,0.6436,0.00318,0.0,0.7788
+CVE-2024-13159,2025,Ivanti,3c1d8aa1-5a33-4ea4-8992-aadd6440af75,38,0.6762,0.0579,3.178,0.8982
+CVE-2024-13160,2025,Ivanti,3c1d8aa1-5a33-4ea4-8992-aadd6440af75,38,0.6762,0.0579,3.178,0.8982
+CVE-2024-13161,2025,Ivanti,3c1d8aa1-5a33-4ea4-8992-aadd6440af75,38,0.6762,0.0579,3.178,0.8982
+CVE-2024-53704,2025,SonicWall,PSIRT@sonicwall.com,18,0.7895,0.0627,0.0,0.8107
+CVE-2024-54085,2025,AMI,biossecurity@ami.com,86,0.4577,0.0017,0.0,0.7527
+CVE-2024-57968,2025,Advantive,cve@mitre.org,10,0.9128,0.00231,0.0,0.7589
+CVE-2024-58136,2025,Yiiframework,cve@mitre.org,2,0.0331,0.00231,0.0,0.6729
+CVE-2025-0411,2025,7-Zip,zdi-disclosures@trendmicro.com,6,0.4674,0.0004,0.0,0.7754
+CVE-2025-21043,2025,Samsung,mobile.security@samsung.com,2,0.5588,0.01075,0.0,0.7476
+CVE-2025-23209,2025,Craft CMS,security-advisories@github.com,20,0.0774,0.00163,0.0,0.7611
+CVE-2025-24054,2025,Microsoft,secure@microsoft.com,17,0.8917,0.02944,0.0,0.7868
+CVE-2025-24472,2025,Fortinet,psirt@fortinet.com,18,0.8539,0.02123,0.0,0.8959
+CVE-2025-25181,2025,Advantive,cve@mitre.org,10,0.3017,0.00231,0.0,0.7951
+CVE-2025-2746,2025,Kentico,disclosure@vulncheck.com,203,0.121,0.06022,0.693,0.7741
+CVE-2025-2747,2025,Kentico,disclosure@vulncheck.com,203,0.171,0.06022,0.693,0.7873
+CVE-2025-27915,2025,Synacor,cve@mitre.org,190,0.1302,0.00231,0.0,0.8608
+CVE-2025-32463,2025,Sudo,cve@mitre.org,91,0.3823,0.00231,0.0,0.744
+CVE-2025-35939,2025,Craft CMS,9119a7d8-5eab-497f-8521-727c672e3725,2,0.0319,0.07583,0.0,0.7193
+CVE-2025-38352,2025,Linux,416baaa9-dc9f-4396-8d5f-8c081fb06d67,35,0.0561,0.00025,0.0,0.7471
+CVE-2025-3935,2025,ConnectWise,7d616e1a-3288-43b1-a0dd-0a65d3e70a49,33,0.9219,0.00475,0.0,0.7487
+CVE-2025-48927,2025,TeleMessage,cve@mitre.org,31,0.2143,0.00231,0.0,0.6525
+CVE-2025-48928,2025,TeleMessage,cve@mitre.org,31,0.6041,0.00231,0.0,0.6869
+CVE-2025-55177,2025,Meta Platforms,cve-assign@fb.com,2,0.3941,0.0119,4.357,0.8154
+CVE-2025-6204,2025,Dassault Systèmes,3DS.Information-Security@3ds.com,58,0.4469,0.00161,0.0,0.7862
+CVE-2025-6205,2025,Dassault Systèmes,3DS.Information-Security@3ds.com,58,0.4516,0.00161,0.0,0.7475
+CVE-2025-6554,2025,Google,chrome-cve-admin@google.com,2,0.8968,0.01882,4.111,0.9514
+CVE-2025-9377,2025,TP-Link,f23511db-6c3e-4e32-a477-6aa17d310630,3,0.402,0.00475,1.099,0.8252

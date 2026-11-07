@@ -9,3 +9,4 @@ torch
 streamlit
 plotly
 pytest
+matplotlib

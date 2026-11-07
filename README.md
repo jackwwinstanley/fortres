@@ -28,6 +28,12 @@ python scripts/check_top500.py outputs/top500_v1.csv
 Not used by the model: `nvd_status`, `n_affected_cpes`, `n_references`, CVSS (baseline only), `cwe_ids`, references, affected products, any 2026 KEV information.
 Results and caveats (low power: 75 positives): `outputs/v1_report.md`. Run: `python -m src.replicas && python -m src.features.build && python -m src.models.train_v1`.
 
+## Columns used (v2 adds Person B's text features)
+`kev_text_score`, `nearest_kev_sim` and the 14 `txt_*` flags from `outputs/text_features.parquet`, joined by `cve_id` only
+(KEV part uses the same prior-December-31 cutoff). v2 / two-channel results: `outputs/v2_report.md`.
+Run: `python -m src.models.train_v2 && python -m src.analysis.depth_curves && python -m src.models.two_channel &&
+python -m src.analysis.blindspot_profile && python -m src.models.report_v2`.
+
 ## Text feature columns
 ### Text features (Person B, `outputs/text_features.parquet`)
 Run `python -m src.b.texts && python -m src.b.embed && python -m src.b.text_features`

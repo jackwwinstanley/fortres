@@ -56,6 +56,16 @@ leave-one-snapshot-month-out CV on the training replica only; nothing is tuned o
 model tie-break is score, then `epss_rank_in_month`, then `cve_id`. Ties at the cutoff are also reported as
 tie-aware expected hits (`expected_hits_at_k`).
 
+## v2 (text features) and two-channel allocation (Person A)
+`ALLOWED_FEATURES` = the 18 v1 features + `TEXT_FEATURES` (`kev_text_score`, `nearest_kev_sim`, 14 `txt_*` flags from
+`text_features.parquet`, joined by `cve_id`). `kev_text_score` and `nearest_kev_sim` are the only text-derived names containing
+"kev" and are allowed because they obey the prior-December-31 cutoff above. Outputs: `outputs/top500_v2.csv` (single column
+`cve_id`, 500 unique), `outputs/v2_report.md`, `outputs/depth_curves.csv`, `outputs/blindspot_positives.csv`
+(descriptive only, never a feature). Two-channel allocation (`src/models/two_channel.py`): Channel A = exploit-then-EPSS order,
+Channel B = mean of within-pool percentile ranks of `kev_text_score`, `assigner_kev_rate_smooth`, `vendor_kev_count_max`,
+`nearest_kev_sim` (no fitting); top s from A then B fills the rest. Final list uses the s with the highest pooled hits over both
+replicas, ties to the larger s.
+
 ### Text features must be time-safe (Person B)
 `kev_text_score` and `nearest_kev_sim` for a CVE in snapshot month *M* may only use KEV
 entries with `date_added` ≤ end of month *M* (e.g. fit/compare against the KEV set as of the

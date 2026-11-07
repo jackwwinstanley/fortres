@@ -75,11 +75,20 @@ FEATURE_GROUPS = {
     "assigner": ["assigner_prior_cves", "assigner_kev_count", "assigner_kev_12m", "assigner_kev_rate_smooth"],
     "vendor": ["n_vendors_mentioned", "vendor_kev_count_max", "vendor_kev_12m_max"],
 }
-ALLOWED_FEATURES = [c for cols in FEATURE_GROUPS.values() for c in cols]
+V1_FEATURES = [c for cols in FEATURE_GROUPS.values() for c in cols]
+# v2 adds Person B's text features (outputs/text_features.parquet). Their KEV-based parts use the same
+# prior-December-31 cutoff (CONTRACT.md), and the text classifier trains only on CVEs published before the pool year.
+TEXT_FEATURES = ["kev_text_score", "nearest_kev_sim",
+                 "txt_rce", "txt_unauth", "txt_auth_bypass", "txt_cmd_injection", "txt_deserialization",
+                 "txt_path_traversal", "txt_sqli", "txt_priv_esc", "txt_memory", "txt_edge_device",
+                 "txt_enterprise", "txt_browser", "txt_wordpress", "txt_xss"]
+FEATURE_GROUPS_V2 = {**FEATURE_GROUPS, "text": TEXT_FEATURES}
+ALLOWED_FEATURES = V1_FEATURES + TEXT_FEATURES
 # the only allowed column names that contain "kev": history features computed with the fixed
 # prior-December-31 cutoff (see CONTRACT.md)
 HISTORY_KEV_FEATURES = {"assigner_kev_count", "assigner_kev_12m", "assigner_kev_rate_smooth",
-                        "vendor_kev_count_max", "vendor_kev_12m_max"}
+                        "vendor_kev_count_max", "vendor_kev_12m_max",
+                        "kev_text_score", "nearest_kev_sim"}
 BANNED_NAMES = [r"nvd_status", r"n_affected_cpes", r"n_references", r"cvss", r"cwe",
                 r"affected", r"reference", r"kev", r"description", r"last_modified"]
 MONOTONE_UP = ["epss", "epss_rank_in_month", "exploitdb", "metasploit", "nuclei", "poc_github",

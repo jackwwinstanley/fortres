@@ -8,6 +8,7 @@ Rules (decided before looking at test results):
     simpler logreg, otherwise the higher AP; both models are always reported
   * model tie-break: score, then epss_rank_in_month, then cve_id; baselines keep their own rule
 """
+import hashlib
 import itertools
 import json
 from datetime import datetime, timezone
@@ -23,10 +24,10 @@ from sklearn.preprocessing import StandardScaler
 
 from src.baselines import add_scores, load_cvss
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import ALLOWED_FEATURES, FEATURE_GROUPS, MONOTONE_UP, check_feature_list
+from src.common.schema import FEATURE_GROUPS, MONOTONE_UP, V1_FEATURES, check_feature_list
 from src.common.scoring import expected_hits_at_k, k_for_pool, paired_bootstrap_hits, rank_order
 
-FEATURES = list(ALLOWED_FEATURES)
+FEATURES = list(V1_FEATURES)
 GRID = dict(num_leaves=[4, 7], min_child_samples=[30, 100], n_estimators=[150, 400],
             reg_lambda=[1, 10], scale_pos_weight=[1, 10])
 FIXED = dict(learning_rate=0.03, subsample=0.8, subsample_freq=1, colsample_bytree=0.8,
@@ -67,7 +68,22 @@ def lomo_oof(kind, params, X, y, groups, feats):
     return oof
 
 
+def _cache_path(X, y, groups, feats, tag):
+    h = hashlib.md5()
+    for part in (tag, repr(feats), repr(GRID), repr(sorted(FIXED.items())), repr(N_BOOT)):
+        h.update(part.encode())
+    for a in (X[feats].to_numpy(dtype="float64"), np.asarray(y), np.asarray(groups).astype(str)):
+        h.update(np.ascontiguousarray(a).tobytes())
+    return OUT_DIR / ".cache" / f"sel_{h.hexdigest()[:16]}.json"
+
+
 def select_lgbm(X, y, groups, feats, tag=""):
+    """Grid search by pooled leave-one-month-out AP. Results are cached (deterministic) in outputs/.cache."""
+    cp = _cache_path(X, y, groups, feats, tag)
+    if cp.exists():
+        c = json.loads(cp.read_text())
+        print(f"  [{tag}] LightGBM selection loaded from cache: AP={c['ap']:.4f} params={c['params']}")
+        return c["params"], np.array(c["oof"]), c["ap"]
     best = None
     combos = [dict(zip(GRID, v)) for v in itertools.product(*GRID.values())]
     for i, p in enumerate(combos):
@@ -76,6 +92,8 @@ def select_lgbm(X, y, groups, feats, tag=""):
         if best is None or ap > best[0]:
             best = (ap, p, oof)
     print(f"  [{tag}] LightGBM grid ({len(combos)} combos) best AP={best[0]:.4f} params={best[1]}")
+    cp.parent.mkdir(exist_ok=True)
+    cp.write_text(json.dumps({"ap": best[0], "params": best[1], "oof": best[2].tolist()}))
     return best[1], best[2], best[0]
 
 
