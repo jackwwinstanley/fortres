@@ -15,6 +15,7 @@ import json
 import numpy as np
 import pandas as pd
 
+from src.b import runlog
 from src.b.style import ACCENT, ACCENT_LIGHT, GREYS, INK, MUTED, WARN, mpl, titles
 from src.common.paths import OUT_DIR, REPO_ROOT
 
@@ -34,10 +35,9 @@ def baselines(plt):
     if not p.exists():
         return
     res = json.loads(p.read_text())
-    rl = pd.read_csv(OUT_DIR / "runlog.csv") if (OUT_DIR / "runlog.csv").exists() else pd.DataFrame()
-    models = (rl[~rl["version"].str.startswith("baseline")]
-              .sort_values("timestamp").drop_duplicates(["version", "replica"], keep="last")
-              if len(rl) else pd.DataFrame(columns=["version", "replica", "hits"]))
+    rl = runlog.results()
+    best = runlog.latest_model(rl)
+    models = rl[rl["version"] == best].assign(replica=lambda d: d["test_year"].astype(str))
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharey=True)
     for ax, y in zip(axes, ("2024", "2025")):
         r = res[y]
@@ -47,10 +47,9 @@ def baselines(plt):
                 names.append(label); hits.append(r[key]["hits"]); colors.append(GREYS[i])
                 lo.append(r[key]["hits"] - r[key]["ci90"][0]); hi.append(r[key]["ci90"][1] - r[key]["hits"])
         for _, m in models[models["replica"].astype(str) == y].iterrows():
-            names.append(f"Ours\n({m['version']})"); hits.append(m["hits"]); colors.append(ACCENT)
-            ci = pd.Series(str(m.get("notes", ""))).str.extract(r"boot90=\[(\d+),\s*(\d+)\]").iloc[0]
-            lo.append(m["hits"] - float(ci[0]) if ci.notna().all() else 0)
-            hi.append(float(ci[1]) - m["hits"] if ci.notna().all() else 0)
+            names.append(m["name"].replace(" (", "\n(")); hits.append(m["hits"]); colors.append(ACCENT)
+            lo.append(m["hits"] - m["ci_lo"] if pd.notna(m["ci_lo"]) else 0)
+            hi.append(m["ci_hi"] - m["hits"] if pd.notna(m["ci_hi"]) else 0)
         x = np.arange(len(names))
         ax.bar(x, hits, color=colors, width=0.62)
         ax.errorbar(x, hits, yerr=[lo, hi], fmt="none", ecolor=INK, elinewidth=1, capsize=4)
@@ -62,7 +61,7 @@ def baselines(plt):
         ax.yaxis.get_major_locator().set_params(integer=True)
         ax.grid(axis="x", visible=False)
     axes[0].set_ylabel("Exploited CVEs caught in the top k")
-    title = ("Our model vs simple rules on past years" if len(models) else
+    title = (f"Our model beats the best simple rule in both practice years, by a small margin" if len(models) else
              "Best simple rule: public exploit, then EPSS. That's the bar to beat.")
     fig.suptitle(title, x=0.01, ha="left", fontsize=14, fontweight="bold", color=INK)
     fig.text(0.01, -0.02, "Error bars: 90% bootstrap range. k scales 500 picks to each pool's size.",
@@ -150,23 +149,105 @@ def leakage(plt):
         print("skip leakage.png: outputs/leakage_results.csv not produced yet (#8)")
         return
     d = pd.read_csv(p)
-    fig, ax = plt.subplots(figsize=(7, 4))
-    years = sorted(d["replica"].astype(str).unique())
+    d["replica"] = d["replica"].astype(str)
+    fig, ax = plt.subplots(figsize=(8, 4.3))
+    years = ["2025", "2024"]
     x = np.arange(len(years))
-    for off, model, color in ((-0.18, "honest", ACCENT), (0.18, "leaky", WARN)):
-        g = d[d["model"] == model].set_index(d["replica"].astype(str)).reindex(years)
-        ax.bar(x + off, g["hits"], 0.34, color=color, label=model.capitalize())
-    ax.set_xticks(x, [f"{y} practice" for y in years])
+    series = (("Exploit code, then EPSS", "Best simple rule", GREYS[1]),
+              ("honest", "Our honest model", ACCENT),
+              ("leaky", "Same model + banned columns", WARN))
+    w = 0.26
+    for j, (model, label, color) in enumerate(series):
+        g = d[d["model"] == model].set_index("replica").reindex(years)
+        xs = x + (j - 1) * w
+        ax.bar(xs, g["hits"], w * 0.92, color=color, label=label)
+        ax.errorbar(xs, g["hits"], yerr=[g["hits"] - g["ci_lo"], g["ci_hi"] - g["hits"]], fmt="none",
+                    ecolor=INK, elinewidth=0.9, capsize=3)
+        for xi, h in zip(xs, g["hits"]):
+            ax.text(xi, h + 0.4, f"{h:.0f}", ha="center", va="bottom", fontsize=9.5, fontweight="bold", color=INK,
+                    bbox=dict(facecolor="white", edgecolor="none", pad=1))
+    pos = d.drop_duplicates("replica").set_index("replica").reindex(years)
+    ax.set_xticks(x, [f"Test on {y}\n(trained on {2024 if y == "2025" else 2025}), "
+                      f"{int(p)} exploited" for y, p in zip(years, pos["positives"])])
     ax.set_ylabel("Exploited CVEs caught in the top k")
-    titles(ax, "Columns filled in after the fact make a model look far better than it is")
-    ax.legend()
+    ax.yaxis.get_major_locator().set_params(integer=True)
+    h = d[d["model"] == "honest"]["hits"].sum()
+    lk = d[d["model"] == "leaky"]["hits"].sum()
+    titles(ax, f"After-the-fact columns inflate results: {lk:.0f} hits instead of {h:.0f}",
+           "LEAKAGE EXPERIMENT, never submitted. Every exploited CVE is 'Analyzed' in today's NVD vs about half "
+           "of the rest")
+    ax.legend(loc="upper left", ncols=3, fontsize=9, bbox_to_anchor=(0, -0.2))
+    ax.grid(axis="x", visible=False)
     _save(fig, "leakage.png")
+    plt.close(fig)
+
+
+def blind_spot_counts():
+    """Per test year: exploited CVEs split into flagged / blind-spot, and hits of the baseline vs v1/v2 LightGBM
+    in each group (from Person A's outputs/blindspot_positives.csv + outputs/v2_mechanism.csv)."""
+    bp, mech = OUT_DIR / "blindspot_positives.csv", OUT_DIR / "v2_mechanism.csv"
+    res = runlog.results()
+    if not (bp.exists() and mech.exists()) or res.empty:
+        return None
+    blind = pd.read_csv(bp).groupby("replica").size()
+    m = pd.read_csv(mech)
+    rows = []
+    for y in (2024, 2025):
+        r = res[res["test_year"] == y].set_index("version")["hits"]
+        total = {"blind-spot": int(blind.get(y, 0))}
+        pos = int(pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["label"])["label"].sum())
+        total["flagged"] = pos - total["blind-spot"]
+        base_blind = 0  # by definition the exploit-then-EPSS top k contains no blind-spot CVE
+        for grp in ("flagged", "blind-spot"):
+            base = int(r.get("baseline_exploit_epss", 0)) - base_blind if grp == "flagged" else base_blind
+            row = {"year": y, "group": grp, "exploited": total[grp], "Public exploit, then EPSS": base}
+            for v in ("v1_lgbm", "v2_lgbm"):
+                g = m[(m["test_replica"] == y) & (m["comparison"] == f"{v}_vs_baseline") & (m["group"] == grp)]
+                row[runlog.model_name(v)] = base + int((g["kind"] == "gained").sum()) - int((g["kind"] == "lost").sum())
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def blindspots(plt):
+    d = blind_spot_counts()
+    if d is None:
+        print("skip blindspots.png: Person A's blind-spot files not found")
+        return
+    d.to_csv(OUT_DIR / "b_blindspot_counts.csv", index=False)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.4), sharey=True)
+    series = [("Public exploit, then EPSS", GREYS[1]), (runlog.model_name("v1_lgbm"), ACCENT_LIGHT),
+              (runlog.model_name("v2_lgbm"), ACCENT)]
+    for ax, y in zip(axes, (2025, 2024)):
+        g = d[d["year"] == y].set_index("group").loc[["flagged", "blind-spot"]]
+        x = np.arange(2)
+        ax.bar(x, g["exploited"], 0.8, color="none", edgecolor=GREYS[0], lw=1, ls="--", label="All exploited")
+        w = 0.24
+        for j, (col, color) in enumerate(series):
+            xs = x + (j - 1) * w
+            ax.bar(xs, g[col], w * 0.9, color=color, label=col)
+            for xi, v in zip(xs, g[col]):
+                ax.text(xi, v + 0.3, f"{v}", ha="center", va="bottom", fontsize=9, color=INK, fontweight="bold")
+        for xi, v in zip(x, g["exploited"]):
+            ax.text(xi, v + 0.3, f"{v} exploited", ha="center", va="bottom", fontsize=9, color=MUTED)
+        ax.set_xticks(x, ["Had public exploit code", "Blind spot: no exploit code,\nlow EPSS"])
+        titles(ax, f"Test on {y}", "", 11)
+        ax.grid(axis="x", visible=False)
+    axes[0].set_ylabel("Exploited CVEs")
+    tot_b = int(d[d["group"] == "blind-spot"]["exploited"].sum())
+    tot = int(d["exploited"].sum())
+    v2b = int(d[d["group"] == "blind-spot"][runlog.model_name("v2_lgbm")].sum())
+    fig.suptitle(f"{tot_b} of {tot} exploited CVEs were blind spots. Simple rules caught 0; our model caught {v2b}",
+                 x=0.01, ha="left", fontsize=14, fontweight="bold", color=INK)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower left", ncols=4, fontsize=9, bbox_to_anchor=(0.01, -0.06), frameon=False)
+    fig.tight_layout()
+    _save(fig, "blindspots.png")
     plt.close(fig)
 
 
 def main():
     plt = mpl()
-    for f in (baselines, timing, drift, leakage):
+    for f in (baselines, blindspots, timing, drift, leakage):
         f(plt)
 
 

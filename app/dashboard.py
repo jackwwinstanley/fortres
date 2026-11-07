@@ -1,25 +1,28 @@
-"""Before the Breach: team dashboard (issue #10 skeleton).
+"""Before the Breach: team dashboard.
 
 Run:  streamlit run app/dashboard.py
 
 Reads whatever is in outputs/ and shows a placeholder when a file isn't there yet:
-  top500_v*.csv (newest version), explanations.csv, runlog.csv, text_features.parquet,
-  scoreboard_features.parquet, b_drift.json.
+  top500_final.csv or the newest top500_v*.csv, explanations.csv, runlog.csv (via src.b.runlog),
+  text_features.parquet, scoreboard_features.parquet, b_drift.json, blindspot_positives.csv +
+  v2_mechanism.csv (blind spots), leakage_results.csv (leakage experiment).
 """
 import json
 import re
+import sys
 from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-OUT = Path(__file__).resolve().parents[1] / "outputs"
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from src.b import runlog  # noqa: E402
+from src.b.charts import blind_spot_counts  # noqa: E402
+from src.b.style import ACCENT, ACCENT_LIGHT, GREYS, WARN  # noqa: E402
 
-# One palette everywhere: our model = accent blue, baselines = neutral greys.
-ACCENT = "#2563eb"
-GREYS = ["#9aa5b1", "#7b8794", "#616e7c"]
-WARN = "#d97706"
+OUT = ROOT / "outputs"
 FLAG_LABELS = {
     "txt_rce": "remote code execution", "txt_unauth": "no login needed",
     "txt_auth_bypass": "authentication bypass", "txt_cmd_injection": "command injection",
@@ -29,8 +32,6 @@ FLAG_LABELS = {
     "txt_enterprise": "widely deployed enterprise product", "txt_browser": "web browser",
     "txt_wordpress": "WordPress plugin", "txt_xss": "cross-site scripting",
 }
-BASELINE_NAMES = {"baseline_cvss": "Highest CVSS", "baseline_epss": "Highest EPSS",
-                  "baseline_exploit_epss": "Public exploit, then EPSS"}
 
 st.set_page_config(page_title="Before the Breach", page_icon="🛡️", layout="wide")
 
@@ -48,18 +49,29 @@ def read(name: str):
 
 
 def latest_top500():
+    final = OUT / "top500_final.csv"
+    if final.exists():
+        return "top500_final", pd.read_csv(final)
     files = sorted(OUT.glob("top500_v*.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[-1]))
     return (files[-1].stem, pd.read_csv(files[-1])) if files else (None, None)
 
 
 def style(fig: go.Figure, title: str, x_title: str = "", y_title: str = "") -> go.Figure:
     fig.update_layout(title=dict(text=title, x=0, xanchor="left", font=dict(size=17)),
-                      xaxis_title=x_title, yaxis_title=y_title, bargap=0.35,
+                      xaxis_title=x_title, yaxis_title=y_title, bargap=0.25, bargroupgap=0.05,
                       margin=dict(l=10, r=10, t=60, b=10), legend_title_text="",
-                      legend=dict(orientation="h", yanchor="bottom", y=1.0, x=1, xanchor="right"))
+                      legend=dict(orientation="h", yanchor="top", y=-0.15, x=0, xanchor="left"))
     fig.update_xaxes(showgrid=False)
     fig.update_yaxes(gridwidth=0.5)
     return fig
+
+
+def bars(fig, name, x, y, color, lo=None, hi=None):
+    err = None if lo is None else dict(type="data", array=list(hi - y), arrayminus=list(y - lo),
+                                       thickness=1, width=4)
+    inside = dict(textposition="inside", insidetextanchor="end", textfont=dict(color="white", size=13))
+    fig.add_bar(name=name, x=x, y=y, marker_color=color, text=y, cliponaxis=False, error_y=err,
+                **(inside if err else dict(textposition="outside")))
 
 
 def placeholder(what: str, how: str):
@@ -67,36 +79,62 @@ def placeholder(what: str, how: str):
 
 
 version, top = latest_top500()
-runlog, tf, sb = read("runlog.csv"), read("text_features.parquet"), read("scoreboard_features.parquet")
-explanations, drift = read("explanations.csv"), read("b_drift.json")
+res = runlog.results()
+best_model = runlog.latest_model(res)
+tf, sb = read("text_features.parquet"), read("scoreboard_features.parquet")
+explanations, drift, leak = read("explanations.csv"), read("b_drift.json"), read("leakage_results.csv")
+blind = blind_spot_counts()
 
 st.title("Before the Breach")
 st.caption("Which of the 72,670 CVEs in the 2026 scoreboard will be added to CISA's Known Exploited "
-           "Vulnerabilities list by 4 Nov 2026? We pick 500, using only what was known at the time.")
+           "Vulnerabilities list by 4 Nov 2026? We pick 500, using only what was known at the time, "
+           "and tested the method on 2024 and 2025 first.")
 
-# Headline: best model vs best baseline on each practice year.
-cols = st.columns(4)
-if runlog is not None:
-    rl = runlog.sort_values("timestamp").drop_duplicates(["version", "replica"], keep="last")
-    for i, y in enumerate((2024, 2025)):
-        r = rl[rl["replica"] == y]
-        base = r[r["version"].str.startswith("baseline")]
-        model = r[~r["version"].str.startswith("baseline")]
-        best_base = int(base["hits"].max()) if len(base) else None
-        if len(model):
-            m = model.loc[model["hits"].idxmax()]
-            cols[2 * i].metric(f"{y}: our hits", int(m["hits"]),
-                               delta=None if best_base is None else f"{int(m['hits']) - best_base:+d} vs best baseline")
-        else:
-            cols[2 * i].metric(f"{y}: our hits", "–", help="No model run logged yet")
-        cols[2 * i + 1].metric(f"{y}: best simple rule", "–" if best_base is None else best_base,
-                               help=f"k = {int(r['k'].iloc[0]) if len(r) else '?'} picks")
+# ---- headline -----------------------------------------------------------------------------------
+c = st.columns(4)
+if best_model:
+    ours = res[res["version"] == best_model].set_index("test_year")["hits"]
+    base = res[res["version"] == "baseline_exploit_epss"].set_index("test_year")["hits"]
+    c[0].metric("Our catches, 2024+2025", int(ours.sum()),
+                delta=f"{int(ours.sum() - base.sum()):+d} vs best simple rule")
+    c[1].metric("Best simple rule", int(base.sum()), help="Public exploit code first, then highest EPSS. Exploited CVEs caught in the top k, both test years.")
 else:
-    placeholder("Practice results", "Person A logs runs to outputs/runlog.csv.")
+    placeholder("Practice results", "Person A logs model runs to outputs/runlog.csv.")
+if blind is not None:
+    b = blind[blind["group"] == "blind-spot"]
+    c[2].metric("Blind spots", help="Exploited CVEs with no public exploit code and low EPSS", value=
+                f"{int(b['exploited'].sum())} of {int(blind['exploited'].sum())}")
+    c[3].metric("Blind spots caught", help="Best simple rule → our model", value=
+                f"0 → {int(b[runlog.model_name('v2_lgbm')].sum())}")
 
-tab_list, tab_base, tab_drift = st.tabs(["Top 500", "How we beat the baselines", "Is 2026 different?"])
+tabs = st.tabs(["Blind spots", "Top 500", "vs simple rules", "Is 2026 different?", "Leakage experiment"])
 
-with tab_list:
+# ---- blind spots --------------------------------------------------------------------------------
+with tabs[0]:
+    if blind is None:
+        placeholder("Blind-spot view", "Needs Person A's blindspot_positives.csv and v2_mechanism.csv.")
+    else:
+        st.markdown("Most exploited CVEs never had public exploit code and had a low EPSS score when they "
+                    "were published, so rules built on those signals **cannot see them at all**. Our text "
+                    "features (IBM Granite + description tags) are the only signal that reaches some of them.")
+        series = [("Public exploit, then EPSS", GREYS[1]), (runlog.model_name("v1_lgbm"), ACCENT_LIGHT),
+                  (runlog.model_name("v2_lgbm"), ACCENT)]
+        cols = st.columns(2)
+        for col, y in zip(cols, (2025, 2024)):
+            g = blind[blind["year"] == y].set_index("group").loc[["flagged", "blind-spot"]]
+            x = [f"Had exploit code ({g.loc['flagged', 'exploited']})",
+                 f"Blind spot ({g.loc['blind-spot', 'exploited']})"]
+            fig = go.Figure()
+            for name, color in series:
+                bars(fig, name, x, g[name].to_numpy(), color)
+            fig.update_yaxes(range=[0, g[[s for s, _ in series]].to_numpy().max() * 1.3 + 1])
+            col.plotly_chart(style(fig, f"Test on {y}", "", "Exploited CVEs caught"),
+                             use_container_width=True, theme="streamlit")
+        st.caption("Blind spot = no public exploit flag and EPSS rank below what a top-k EPSS list reaches "
+                   "(Person A's definition). Small numbers: 27 and 48 exploited CVEs in the two test years.")
+
+# ---- top 500 ------------------------------------------------------------------------------------
+with tabs[1]:
     if top is None:
         placeholder("The top 500 list", "Person A writes outputs/top500_vN.csv.")
     else:
@@ -108,7 +146,7 @@ with tab_list:
             d["public exploit"] = d[["exploitdb", "metasploit", "nuclei", "poc_github"]].max(axis=1).map({1: "yes", 0: ""})
         if tf is not None:
             d = d.merge(tf, on="cve_id", how="left")
-        if explanations is not None:
+        if explanations is not None and d["cve_id"].isin(explanations["cve_id"]).mean() > 0.95:
             d = d.merge(explanations, on="cve_id", how="left")
         else:
             flags = [c for c in FLAG_LABELS if c in d]
@@ -134,75 +172,81 @@ with tab_list:
                     "Sounds like past KEV", format="%.2f", min_value=0, max_value=1,
                     help="IBM Granite text score: how much the description resembles known-exploited ones"),
             })
-        if explanations is None:
-            st.caption("Reasons are draft tags from the description until Granite explanations (#13) land.")
+        st.caption("Reasons are written by IBM Granite from facts our pipeline supplies; a checker rejects any "
+                   "sentence that mentions a product, number or CVE not in those facts.")
 
-with tab_base:
-    if runlog is None:
+# ---- vs simple rules ----------------------------------------------------------------------------
+with tabs[2]:
+    if res.empty:
         placeholder("Baseline comparison", "Person A logs runs to outputs/runlog.csv.")
     else:
-        rl = runlog.sort_values("timestamp").drop_duplicates(["version", "replica"], keep="last")
-        versions = list(dict.fromkeys(rl.sort_values("version")["version"]))
-        base_v = [v for v in versions if v.startswith("baseline")]
-        model_v = [v for v in versions if not v.startswith("baseline")]
         fig = go.Figure()
-        for i, v in enumerate(base_v + model_v):
-            r = rl[rl["version"] == v].sort_values("replica")
-            is_model = v in model_v
-            fig.add_bar(name=BASELINE_NAMES.get(v, v), x=r["replica"].astype(str), y=r["hits"],
-                        marker_color=ACCENT if is_model else GREYS[i % len(GREYS)],
-                        text=r["hits"], textposition="outside", cliponaxis=False)
-        best = rl[rl["version"].isin(base_v)].groupby("replica")["hits"].max()
-        title = ("Our model vs simple rules on past years" if model_v else
-                 f"Best simple rule finds {best.get(2024, '?')} (2024) and {best.get(2025, '?')} (2025) "
-                 "exploited CVEs: that's the bar to beat")
-        fig.update_yaxes(range=[0, rl["hits"].max() * 1.2 + 1])
-        st.plotly_chart(style(fig, title, "Practice year", "Exploited CVEs caught in the top k"),
-                        use_container_width=True, theme="streamlit")
-        pos = runlog.drop_duplicates("replica").set_index("replica")["notes"].str.extract(r"positives=(\d+)")[0]
-        st.caption("k scales the 500 picks to each practice pool's size. Positives available: "
-                   + ", ".join(f"{y}: {p}" for y, p in pos.items()) + ".")
-        if not model_v:
-            placeholder("Our model's bars", "They appear here once Person A logs a model run.")
+        shown = [v for v in ["baseline_cvss", "baseline_epss", "baseline_exploit_epss"] if v in set(res["version"])]
+        shown += [best_model] if best_model else []
+        for i, v in enumerate(shown):
+            r = res[res["version"] == v].sort_values("test_year")
+            color = ACCENT if v == best_model else GREYS[i % len(GREYS)]
+            bars(fig, runlog.model_name(v), r["test_year"].astype(str), r["hits"].to_numpy(), color,
+                 r["ci_lo"].to_numpy(), r["ci_hi"].to_numpy())
+        fig.update_yaxes(range=[0, res["ci_hi"].max() * 1.15 + 1])
+        title = ("Our model beats the best simple rule in both test years, by a small margin" if best_model
+                 else "The bar to beat")
+        st.plotly_chart(style(fig, title, "Test year (model trained on the other year)",
+                              "Exploited CVEs caught in the top k"), use_container_width=True, theme="streamlit")
+        st.caption("Error bars: 90% bootstrap range. k scales the 500 picks to each practice pool's size "
+                   "(198 for 2024, 243 for 2025). With only 27 and 48 exploited CVEs, a gap of a few is within noise.")
 
-with tab_drift:
+# ---- drift --------------------------------------------------------------------------------------
+with tabs[3]:
     if drift is None:
         placeholder("Drift check", "Run `python -m src.b.drift`.")
     else:
         auc = drift["spot_the_year_auc"]
         shift = pd.DataFrame(drift["shift"]).head(10).iloc[::-1]
         c1, c2 = st.columns([1, 2])
-        c1.metric("Spot-the-year score", f"AUC {auc:.2f}",
-                  help="0.5 = indistinguishable, 1.0 = perfectly separable")
+        c1.metric("Spot-the-year score", f"AUC {auc:.2f}", help="0.5 = indistinguishable, 1.0 = perfectly separable")
         c1.markdown(
-            "The 2026 scoreboard is **clearly different** from the practice pools. The biggest change is "
+            "The 2026 scoreboard is **clearly different** from the practice years. The biggest change is "
             "EPSS: the typical 2026 score is several times higher, so a fixed EPSS threshold tuned on past "
             "years won't transfer. Ranking *within* the year is safer." if auc >= 0.75 else
-            "The 2026 scoreboard looks broadly similar to the practice pools.")
+            "The 2026 scoreboard looks broadly similar to the practice years.")
         colors = [WARN if v > 0.25 else ACCENT if v > 0.1 else GREYS[0] for v in shift["psi_2025_vs_2026"]]
         fig = go.Figure(go.Bar(x=shift["psi_2025_vs_2026"], y=shift["feature"], orientation="h",
                                marker_color=colors, text=shift["psi_2025_vs_2026"].round(2),
                                textposition="outside", cliponaxis=False))
         fig.update_xaxes(range=[0, shift["psi_2025_vs_2026"].max() * 1.15])
-        fig.add_vline(x=0.25, line_dash="dot", line_width=1, annotation_text="large shift",
-                      annotation_position="top")
-        top_f = shift.iloc[-1]
-        c2.plotly_chart(style(fig, f"{top_f['feature']} moved the most between 2025 and 2026",
+        fig.add_vline(x=0.25, line_dash="dot", line_width=1, annotation_text="large shift", annotation_position="top")
+        c2.plotly_chart(style(fig, f"{shift.iloc[-1]['feature']} moved the most between 2025 and 2026",
                               "Population stability index (higher = bigger change)"),
                         use_container_width=True, theme="streamlit")
-        if sb is not None:
-            ep = []
-            for y, f in (("2024", "replica_2024.parquet"), ("2025", "replica_2025.parquet"), ("2026", None)):
-                s = sb["epss"] if f is None else read(f)["epss"]
-                ep.append((y, s.median() * 100, s.quantile(0.9) * 100))
-            ep = pd.DataFrame(ep, columns=["year", "median", "90th percentile"])
-            fig = go.Figure()
-            fig.add_bar(name="Median CVE", x=ep["year"], y=ep["median"], marker_color=GREYS[0])
-            fig.add_bar(name="90th percentile CVE", x=ep["year"], y=ep["90th percentile"], marker_color=ACCENT)
-            st.plotly_chart(style(fig, "EPSS scores in the 2026 pool sit several times higher than in past years",
-                                  "Pool", "EPSS (% chance of exploitation in 30 days)"),
-                            use_container_width=True, theme="streamlit")
+
+# ---- leakage ------------------------------------------------------------------------------------
+with tabs[4]:
+    if leak is None:
+        placeholder("Leakage experiment", "Run `python -m src.b.leakage`.")
+    else:
+        leak["replica"] = leak["replica"].astype(str)
+        h = leak[leak["model"] == "honest"]["hits"].sum()
+        lk = leak[leak["model"] == "leaky"]["hits"].sum()
+        st.warning("**Leakage experiment, never submitted.** Same model, plus columns that NVD fills in "
+                   "*after* a CVE gets attention (analysis status, reference and product counts, exploit links).",
+                   icon="🧪")
+        fig = go.Figure()
+        for model, label, color in (("Exploit code, then EPSS", "Best simple rule", GREYS[1]),
+                                    ("honest", "Our honest model", ACCENT),
+                                    ("leaky", "Same model + banned columns", WARN)):
+            g = leak[leak["model"] == model].set_index("replica").reindex(["2025", "2024"])
+            bars(fig, label, ["Test on 2025", "Test on 2024"], g["hits"].to_numpy(), color,
+                 g["ci_lo"].to_numpy(), g["ci_hi"].to_numpy())
+        fig.update_yaxes(range=[0, leak["ci_hi"].max() * 1.15 + 1])
+        st.plotly_chart(style(fig, f"After-the-fact columns would inflate our results: {lk:.0f} hits instead of {h:.0f}",
+                              "", "Exploited CVEs caught in the top k"), use_container_width=True, theme="streamlit")
+        st.markdown("Why: in today's NVD data **every** exploited CVE in both practice years is marked "
+                    "*Analyzed*, against about half of the others, because NVD analyses attacked CVEs first. "
+                    "At the moment of prediction that field wasn't filled in yet, so a model using it would "
+                    "look great on paper and fail on 2026. We never use these columns.")
 
 st.divider()
 st.caption("Sheridan Datathon 2026 · IBM 'Before the Breach' track · Text features by IBM Granite "
-           "(granite-embedding-30m-english). Only information available at each snapshot is used.")
+           "(granite-embedding-30m-english), reasons by granite-3.3-2b-instruct. Only information available "
+           "at each snapshot is used.")
