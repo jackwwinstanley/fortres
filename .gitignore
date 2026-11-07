@@ -1,0 +1,6 @@
+data/
+data.zip
+.venv/
+__pycache__/
+.DS_Store
+outputs/pool.csv

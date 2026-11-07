@@ -1,0 +1,7 @@
+duckdb
+pandas
+scikit-learn
+lightgbm
+transformers
+torch
+streamlit
