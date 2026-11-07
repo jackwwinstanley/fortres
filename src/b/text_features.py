@@ -9,10 +9,14 @@ TIME-SAFETY (see CONTRACT.md):
   kev_text_score   For target year Y, a logistic regression on Granite embeddings is trained
                    only on CVEs published before Y-01-01, labelled 1 if KEV date_added
                    <= (Y-1)-12-31. One model per Y in {2024, 2025, 2026}.
-  nearest_kev_sim  For a target with snapshot month M, the max cosine similarity between its
-                   description and KEV entries with date_added <= last day of M.
-  txt_* flags      Regexes on the description only. Phrases that could have been added AFTER an
-                   attack ("exploited in the wild", "actively exploited") are NOT used.
+  nearest_kev_sim  For target year Y, the max cosine similarity between its description and KEV
+                   entries with date_added <= (Y-1)-12-31 (the shared cutoff from issue #5:
+                   2023-12-31 for replica 2024, 2024-12-31 for replica 2025, 2025-12-31 for the
+                   2026 scoreboard), excluding the target CVEs themselves.
+  txt_* flags      Regexes on the description only.
+  Post-attack phrases ("exploited in the wild", ...) are stripped from the text in texts.py
+  BEFORE embedding; this script asserts none are left.
+Every cve_id in replica_2024, replica_2025 and scoreboard_features must get a row (asserted).
 Limit: descriptions are the current NVD text and can be edited after publication.
 """
 import re
@@ -21,6 +25,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
+from src.b.phrases import POST_ATTACK
 from src.common.paths import OUT_DIR
 
 FLAGS = {
@@ -40,7 +45,6 @@ FLAGS = {
     "txt_wordpress": r"wordpress|wp plugin|plugin for wordpress",
     "txt_xss": r"cross[- ]site scripting|\bxss\b",
 }
-BANNED_PHRASES = re.compile(r"exploited in the wild|actively exploited|known to be exploited", re.I)
 
 
 def _targets() -> pd.DataFrame:
@@ -85,22 +89,25 @@ def main():
         print(f"{y}: trained on {len(tr):,} CVEs published < {cut_pub.date()}, "
               f"{ytr.sum():,} KEV-positive as of {cut_kev.date()}")
 
-    kev = texts[texts["kev_date_added"].notna()].sort_values("kev_date_added")
-    for month, g in tg.groupby("snapshot_month"):
-        end = pd.Timestamp(f"{month}-01") + pd.offsets.MonthEnd(0)
-        k = kev[(kev["kev_date_added"] <= end) & ~kev["cve_id"].isin(g["cve_id"])]
+    kev = texts[texts["kev_date_added"].notna()]
+    for y, g in tg.groupby("year"):
+        cut_kev = pd.Timestamp(f"{y - 1}-12-31")
+        k = kev[(kev["kev_date_added"] <= cut_kev) & ~kev["cve_id"].isin(g["cve_id"])]
         K = emb[row.loc[k["cve_id"]].to_numpy()]
         X = emb[g["i"].to_numpy()]
         tg.loc[g.index, "nearest_kev_sim"] = (X @ K.T).max(axis=1) if len(K) else 0.0
+        print(f"{y}: nearest_kev_sim against {len(k):,} KEV entries added <= {cut_kev.date()}")
 
     desc = texts.set_index("cve_id").loc[tg["cve_id"], "description"].str.lower().to_numpy()
     for name, pat in FLAGS.items():
         rx = re.compile(pat, re.I)
         tg[name] = np.fromiter((bool(rx.search(d)) for d in desc), dtype=bool, count=len(desc)).astype("int8")
-    n_banned = sum(bool(BANNED_PHRASES.search(d)) for d in desc)
-    print(f"{n_banned:,} target descriptions mention post-attack phrases (not used as features)")
+    n_banned = sum(bool(POST_ATTACK.search(d)) for d in desc)
+    print(f"{n_banned:,} target descriptions still contain post-attack phrases (expected 0)")
 
     out = tg[["cve_id", "kev_text_score", "nearest_kev_sim", *FLAGS]].copy()
+    missing = set(_targets()["cve_id"]) - set(out["cve_id"])
+    assert not missing, f"{len(missing):,} target CVEs have no text features, e.g. {sorted(missing)[:5]}"
     out["kev_text_score"] = out["kev_text_score"].astype("float64")
     out["nearest_kev_sim"] = out["nearest_kev_sim"].astype("float64")
     out = out.sort_values("cve_id").reset_index(drop=True)

@@ -12,6 +12,8 @@ role is one of: kev, replica_2024, replica_2025, scoreboard, history
                used only as negatives when training the text classifier
 
 Only `description` and `published` come from vulnerabilities.csv. No banned columns are read.
+Post-attack phrases ("exploited in the wild", ...; see src/b/phrases.py) are removed from every
+description here, BEFORE embedding, so they can't leak the label into any text feature.
 The output is gitignored (it holds full descriptions); it is an intermediate file, not a contract file.
 """
 import argparse
@@ -19,6 +21,7 @@ import argparse
 import duckdb
 import pandas as pd
 
+from src.b.phrases import strip_post_attack
 from src.common.paths import DATA_DIR, OUT_DIR, SCOREBOARD_CSV
 
 N_HISTORY = 40_000
@@ -66,6 +69,11 @@ def main(n_history: int = N_HISTORY) -> pd.DataFrame:
              .merge(kev, on="cve_id", how="left"))
     missing = out["description"].isna().sum()
     out["description"] = out["description"].fillna("").astype(str)
+    stripped = out["description"].map(strip_post_attack)
+    changed = stripped != out["description"]
+    out["description"] = stripped
+    print("descriptions with post-attack phrases removed, by role:")
+    print(changed.groupby(out["role"]).sum().to_string())
     out = out.sort_values("cve_id").reset_index(drop=True)
     OUT_DIR.mkdir(exist_ok=True)
     out.to_parquet(OUT_DIR / "b_texts.parquet", index=False)
