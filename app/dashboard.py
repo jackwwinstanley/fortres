@@ -86,6 +86,8 @@ explanations, drift, leak = read("explanations.csv"), read("b_drift.json"), read
 blind = blind_spot_counts()
 
 st.title("Before the Breach")
+st.caption("Analyst view. For the scroll story built for non-technical readers, serve `site/` "
+           "(`python -m http.server -d site 8765`, then open http://localhost:8765).")
 st.caption("Which of the 72,670 CVEs in the 2026 scoreboard will be added to CISA's Known Exploited "
            "Vulnerabilities list by 4 Nov 2026? We pick 500, using only what was known at the time, "
            "and tested the method on 2024 and 2025 first.")

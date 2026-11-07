@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Before the Breach</title>
+  <meta name="description" content="Which of 2026's 72,670 new security holes will attackers actually use? A scroll story from the Sheridan Datathon 2026, IBM track.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%225%22 fill=%22%23e8622a%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <p class="kicker">Sheridan Datathon 2026 · IBM “Before the Breach”</p>
+    <h1>Before the Breach</h1>
+    <p class="dek">Every year, tens of thousands of software security holes are made public. Attackers use only a handful.
+      Can we spot that handful <em>before</em> it happens?</p>
+    <p class="scroll-hint" aria-hidden="true">Scroll ↓</p>
+  </header>
+
+  <main id="story">
+    <div class="sticky" aria-hidden="true">
+      <canvas id="field"></canvas>
+      <svg id="stage"></svg>
+      <div id="overlay"></div>
+    </div>
+
+    <div class="steps">
+      <section class="step" data-scene="field" data-step="0">
+        <p class="lede">In 2026, <strong class="num" data-key="field.scoreboard">72,670</strong> new security holes were published.</p>
+        <p>Each dot is one. Security people call them <em>CVEs</em>: a public ID for one flaw in one piece of software.</p>
+      </section>
+      <section class="step" data-scene="field" data-step="1">
+        <p class="lede">Only about <strong class="ember">1 in <span data-key="field.one_in">855</span></strong> ever gets used by real attackers.</p>
+        <p>That's the rate we saw in 2024 and 2025. If 2026 is the same, about <span data-key="field.expected_2026">85</span> of these dots will catch fire.</p>
+      </section>
+      <section class="step" data-scene="grid" data-step="0">
+        <p class="lede">Defenders can't fix them all. The challenge: <strong>pick 500.</strong></p>
+        <p>Patch the right 500 and most attacks have nowhere to land. Pick the wrong ones and the fires start anyway.</p>
+      </section>
+      <section class="step" data-scene="fan" data-step="0">
+        <p class="lede">Today, teams pick with a simple rule: <strong>“Is there public attack code? Then the highest risk score.”</strong></p>
+        <p>We tested that rule on 2024 and 2025, where we already know which holes were attacked.</p>
+      </section>
+      <section class="step" data-scene="fan" data-step="1">
+        <p class="lede">It caught <strong class="mute-num" data-key="fan.caught_pct">25%</strong> of the attacked holes. It missed the rest.</p>
+        <p><span data-key="fan.caught">19</span> caught, <span data-key="fan.missed">56</span> missed, out of <span data-key="fan.exploited">75</span> that attackers used.</p>
+      </section>
+      <section class="step" data-scene="blind" data-step="0">
+        <p class="lede">Here are those <span data-key="blind.total">75</span> attacked holes.</p>
+        <p><span data-key="blind.visible">31</span> had public attack code, so the simple rule could at least see them.</p>
+      </section>
+      <section class="step" data-scene="blind" data-step="1">
+        <p class="lede"><strong class="ember" data-key="blind.blind">44</strong> were <strong>blind spots</strong>: no attack code and a low risk score.</p>
+        <p>The simple rule caught <strong>0</strong> of them. It can't. Nothing it looks at says “danger”.</p>
+      </section>
+      <section class="step" data-scene="blind" data-step="2">
+        <p class="lede">Our model caught <strong class="mint" data-key="blind.ours">2</strong> of the 44.</p>
+        <p>That's small, and we won't pretend it isn't. But zero to two is the first sign of a signal the usual tools don't have: <em>the words</em>.</p>
+      </section>
+      <section class="step" data-scene="read" data-step="0">
+        <p class="lede">What <strong>IBM Granite</strong> reads</p>
+        <p>One of the two: a FortiOS flaw from 2025. No public attack code. A low risk score. Granite reads the description…</p>
+      </section>
+      <section class="step" data-scene="read" data-step="1">
+        <p class="lede">…and recognises it.</p>
+        <p>It sounds more like a known attack than <strong class="mint" data-key="example.pct">98%</strong> of 2025's holes. Its closest past attack: <span data-key="example.nearest_name">a Fortinet login bypass</span>, exploited in <span data-key="example.nearest_year">2022</span>.</p>
+      </section>
+      <section class="step" data-scene="heat" data-step="0">
+        <p class="lede">But 2026 is <strong>different</strong>.</p>
+        <p>Each square is one month: the typical risk score (EPSS) of new holes from each reporter. Brighter means a higher score.</p>
+      </section>
+      <section class="step" data-scene="heat" data-step="1">
+        <p class="lede">From July 2026, scores jumped about <strong class="ember" data-key="heat.ratio">6×</strong>.</p>
+        <p>That's <span data-key="heat.late_share">62%</span> of the 2026 list. A cut-off tuned on past years would break here, so our model compares each hole only with others from the same month.</p>
+      </section>
+      <section class="step" data-scene="leak" data-step="0">
+        <p class="lede">Some data looks magical. It's <strong>too good to be true</strong>.</p>
+        <p>Our honest model caught <span data-key="leak.honest">21</span>. Add a few columns from today's database and watch…</p>
+      </section>
+      <section class="step" data-scene="leak" data-step="1">
+        <p class="lede"><strong class="ember" data-key="leak.analyzed">100%</strong> of attacked holes are marked “Analyzed” today, against <span data-key="leak.others">46%</span> of the rest.</p>
+        <p>The database reviews attacked holes <em>first</em>, so that field leaks the answer. On the day you'd have to choose, it wasn't filled in yet. We never use it.</p>
+      </section>
+      <section class="step" data-scene="pack" data-step="0">
+        <p class="lede">Our 500 picks for 2026</p>
+        <p>Grouped by who reported them. Bigger circles are higher on our list. <span class="only-hover">Hover or tap one to read why IBM Granite says it's dangerous.</span></p>
+      </section>
+      <section class="step" data-scene="results" data-step="0">
+        <p class="lede">The honest result</p>
+        <p>Tested on the past two years, we caught <strong class="mint" data-key="results.ours">21</strong> attacked holes, against <strong data-key="results.base">19</strong> for the best simple rule. That's a small edge, and the uncertainty range says it could be luck.</p>
+        <p>What we <em>are</em> sure of: the blind spots are real, 2026 shifted mid-year, and we didn't cheat.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credits">
+    <p><strong>How we built it.</strong> Practice runs rebuild 2024 and 2025 exactly the way the 2026 list is scored, using only information available at the time.
+      Text features: IBM Granite (<code>granite-embedding-30m-english</code>); reasons: <code>granite-3.3-2b-instruct</code>, fact-checked.
+      Every number on this page comes from <code>site/data/story.json</code>, generated by <code>python -m src.b.export_story</code>.</p>
+    <p>Analyst view with every table: <code>streamlit run app/dashboard.py</code> · Code: <a href="https://github.com/jackwwinstanley/ibm-breach">github.com/jackwwinstanley/ibm-breach</a></p>
+  </footer>
+
+  <div id="tip" role="tooltip" hidden></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/scrollama@3.2.0/build/scrollama.min.js"></script>
+  <script src="story.js"></script>
+</body>
+</html>
