@@ -105,7 +105,7 @@ if blind is not None:
     c[2].metric("Blind spots", help="Exploited CVEs with no public exploit code and low EPSS", value=
                 f"{int(b['exploited'].sum())} of {int(blind['exploited'].sum())}")
     c[3].metric("Blind spots caught", help="Best simple rule → our model", value=
-                f"0 → {int(b[runlog.model_name('v2_lgbm')].sum())}")
+                f"0 → {int(b[[c for c in blind.columns if c.startswith('Ours')][-1]].sum())}")
 
 tabs = st.tabs(["Blind spots", "Top 500", "vs simple rules", "Is 2026 different?", "Leakage experiment"])
 
@@ -116,9 +116,10 @@ with tabs[0]:
     else:
         st.markdown("Most exploited CVEs never had public exploit code and had a low EPSS score when they "
                     "were published, so rules built on those signals **cannot see them at all**. Our text "
-                    "features (IBM Granite + description tags) are the only signal that reaches some of them.")
-        series = [("Public exploit, then EPSS", GREYS[1]), (runlog.model_name("v1_lgbm"), ACCENT_LIGHT),
-                  (runlog.model_name("v2_lgbm"), ACCENT)]
+                    "features (IBM Granite + description tags) are one of the few signals that reach any of them.")
+        models = [c for c in blind.columns if c.startswith("Ours")]
+        series = [("Public exploit, then EPSS", GREYS[1])] + [(c, ACCENT if c == models[-1] else ACCENT_LIGHT)
+                                                              for c in models]
         cols = st.columns(2)
         for col, y in zip(cols, (2025, 2024)):
             g = blind[blind["year"] == y].set_index("group").loc[["flagged", "blind-spot"]]
@@ -189,7 +190,7 @@ with tabs[2]:
             bars(fig, runlog.model_name(v), r["test_year"].astype(str), r["hits"].to_numpy(), color,
                  r["ci_lo"].to_numpy(), r["ci_hi"].to_numpy())
         fig.update_yaxes(range=[0, res["ci_hi"].max() * 1.15 + 1])
-        title = ("Our model beats the best simple rule in both test years, by a small margin" if best_model
+        title = ("Our model vs the best simple rule: a small gain overall, within the noise" if best_model
                  else "The bar to beat")
         st.plotly_chart(style(fig, title, "Test year (model trained on the other year)",
                               "Exploited CVEs caught in the top k"), use_container_width=True, theme="streamlit")

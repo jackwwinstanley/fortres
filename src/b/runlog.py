@@ -17,17 +17,18 @@ NICE = {"baseline_cvss": "Highest CVSS", "baseline_epss": "Highest EPSS",
 def model_name(version: str) -> str:
     if version in NICE:
         return NICE[version]
-    m = re.match(r"v(\d+)_(lgbm|logreg)", version)
+    m = re.match(r"v(\d+)_(lgbm|logreg|bag)", version)
     if not m:
         return version
+    kind = {"lgbm": "LightGBM", "logreg": "logistic", "bag": "LightGBM bag"}[m[2]]
     text = " + text" if int(m[1]) >= 2 else ", no text"
-    return f"Ours v{m[1]} ({'LightGBM' if m[2] == 'lgbm' else 'logistic'}{text})"
+    return f"Ours v{m[1]} ({kind}{text})"
 
 
 def results(path=OUT_DIR / "runlog.csv") -> pd.DataFrame:
     """Columns: version, name, is_baseline, test_year (int), k, hits, ci_lo, ci_hi, timestamp."""
     if not path.exists():
-        return pd.DataFrame(columns=["version", "name", "is_baseline", "test_year", "k", "hits", "ci_lo", "ci_hi"])
+        return pd.DataFrame(columns=["version", "name", "is_baseline", "headline", "test_year", "k", "hits", "ci_lo", "ci_hi", "timestamp"])
     rl = pd.read_csv(path)
     rep = rl["replica"].astype(str)
     keep = rep.str.fullmatch(r"\d{4}") | rep.str.fullmatch(r"train\d{4}_test\d{4}")
@@ -37,13 +38,18 @@ def results(path=OUT_DIR / "runlog.csv") -> pd.DataFrame:
     ci = rl["notes"].astype(str).str.extract(r"boot90=\[(\d+)\s*[-,]\s*(\d+)\]").astype(float)
     rl["ci_lo"], rl["ci_hi"] = ci[0], ci[1]
     rl["name"] = rl["version"].map(model_name)
+    rl["headline"] = rl["notes"].astype(str).str.contains("headline model", case=False)
     rl = rl.sort_values("timestamp").drop_duplicates(["version", "test_year"], keep="last")
-    return rl[["version", "name", "is_baseline", "test_year", "k", "hits", "ci_lo", "ci_hi", "timestamp"]]
+    return rl[["version", "name", "is_baseline", "headline", "test_year", "k", "hits", "ci_lo", "ci_hi", "timestamp"]]
 
 
 def latest_model(res: pd.DataFrame) -> str | None:
-    """Newest model version with results for both test years (prefers LightGBM on ties)."""
+    """The model Person A marks as 'headline model' in the runlog notes; otherwise the newest model version with
+    results for both test years (prefers LightGBM on ties)."""
     m = res[~res["is_baseline"]]
+    if "headline" in m and m["headline"].any():
+        h = m[m["headline"]].sort_values("timestamp")
+        return h.iloc[-1]["version"]
     both = m.groupby("version")["test_year"].nunique()
     m = m[m["version"].isin(both[both == 2].index)]
     if m.empty:

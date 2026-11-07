@@ -3,8 +3,8 @@
 Run:  python -m src.b.leakage
 
 Question: how much better would a model LOOK if it used columns that are only filled in after the
-fact (CONTRACT.md "BANNED")? Same data, same model and same parameters as Person A's v2 LightGBM;
-the only difference is the extra banned columns:
+fact (CONTRACT.md "BANNED")? Same data, features, parameter rule and 20-seed rank-averaged bag as Person A's
+v4 headline model (src/models/train_v4.py); the only difference is the extra banned columns:
   nvd_status (one-hot), n_affected_cpes, n_references, blank-vs-filled CVSS 3 / CVSS 4 / CWE
   indicators, NVD-sourced CVSS 3 score (cvss3_source == nvd@nist.gov), and reference-link features
   from references.csv (refs tagged "Exploit", refs to exploit hosting sites).
@@ -19,13 +19,13 @@ import numpy as np
 import pandas as pd
 
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import TEXT_FEATURES, is_banned
+from src.common.schema import ALLOWED_FEATURES, PSI_REPLACED, is_banned
+from src.features import drift_fix as dfx
 from src.models import train_v1 as v1
 from src.models.train_v2 import load_with_text
+from src.models.train_v4 import BAG_SEEDS, bag
 
-# Same parameters as the v2 LightGBM forward run (outputs/runlog.csv, v2_lgbm train2024_test2025); not tuned here.
-PARAMS = {"num_leaves": 4, "min_child_samples": 100, "n_estimators": 150, "reg_lambda": 1, "scale_pos_weight": 10}
-HONEST = list(v1.FEATURES) + TEXT_FEATURES
+HONEST = list(ALLOWED_FEATURES)  # the v4 set: no raw EPSS, drift-prone features as within-pool ranks
 EXPLOIT_HOSTS = r"exploit-db\.com|packetstormsecurity|github\.com|gist\.github|seclists\.org|rapid7\.com"
 
 
@@ -66,21 +66,23 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
     for y in (2024, 2025):
         ids = data[y]["meta"]["cve_id"]
         b = banned_columns(ids, data_dir).set_index("cve_id").reindex(ids).reset_index(drop=True)
-        data[y]["XL"] = pd.concat([data[y]["X2"].reset_index(drop=True), b], axis=1)
+        x4 = dfx.to_v4(data[y]["X2"], PSI_REPLACED)[HONEST].reset_index(drop=True)
+        data[y]["XL"] = pd.concat([x4, b], axis=1)
     leaky = HONEST + [c for c in data[2024]["XL"].columns if c.startswith("leak_")]
-    assert all(is_banned(c.replace("leak_", "")) or "nvd_status" in c or "refs" in c
-               for c in leaky if c.startswith("leak_")), "every extra column should be a banned one"
     assert not any(c.startswith("leak_") for c in HONEST)
 
     rows, imps = [], []
     for name, tr, te, note in v1.DIRECTIONS:
         Xtr, ytr, Xte = data[tr]["XL"], data[tr]["y"], data[te]["XL"]
+        # Person A's pre-set rule: params chosen by pooled leave-one-month-out AP on the TRAINING replica (v4 features),
+        # reused unchanged for the leaky model so the only difference is the extra columns.
+        params, _, _ = v1.select_lgbm(Xtr[HONEST], ytr, data[tr]["groups"], HONEST, f"v4 train {tr}")
         scores = {}
         for label, feats in (("honest", HONEST), ("leaky", leaky)):
-            m = v1.lgbm_model(PARAMS, feats).fit(Xtr[feats], ytr)
-            scores[label] = m.predict_proba(Xte[feats])[:, 1]
+            models = [v1.lgbm_model(params, feats, seed=s).fit(Xtr[feats], ytr) for s in BAG_SEEDS]
+            scores[label] = bag([m.predict_proba(Xte[feats])[:, 1] for m in models])
             if label == "leaky":
-                g = pd.Series(m.booster_.feature_importance("gain"), index=feats)
+                g = pd.Series(np.mean([m.booster_.feature_importance("gain") for m in models], axis=0), index=feats)
                 imps.append((g / g.sum()).rename(name))
         res, _, names, k = v1.eval_frame(data[te]["meta"], scores)
         for n in names:
@@ -106,7 +108,7 @@ def write_report(out, imp, out_dir):
     leak_share = imp.loc[[c for c in imp.index if c.startswith("leak_")], "mean"].sum()
     lines = [
         "# LEAKAGE EXPERIMENT (issue #8). Not a submission model.", "",
-        "Same data, model and parameters as the v2 LightGBM; the leaky model also gets banned "
+        "Same data, v4 features, parameter rule and 20-seed bag as the v4 headline model; the leaky model also gets banned "
         "after-the-fact columns (NVD status, CPE/reference counts, blank-vs-filled CVSS/CWE, NVD CVSS, "
         "exploit-tagged reference links). Run: `python -m src.b.leakage`.", "",
         "## In plain words",

@@ -47,12 +47,14 @@ def baselines(plt):
                 names.append(label); hits.append(r[key]["hits"]); colors.append(GREYS[i])
                 lo.append(r[key]["hits"] - r[key]["ci90"][0]); hi.append(r[key]["ci90"][1] - r[key]["hits"])
         for _, m in models[models["replica"].astype(str) == y].iterrows():
-            names.append(m["name"].replace(" (", "\n(")); hits.append(m["hits"]); colors.append(ACCENT)
-            lo.append(m["hits"] - m["ci_lo"] if pd.notna(m["ci_lo"]) else 0)
-            hi.append(m["ci_hi"] - m["hits"] if pd.notna(m["ci_hi"]) else 0)
+            names.append(f"Ours\n({m['version'].split('_')[0]} model)"); hits.append(m["hits"]); colors.append(ACCENT)
+            lo.append(m["hits"] - m["ci_lo"] if pd.notna(m["ci_lo"]) else np.nan)
+            hi.append(m["ci_hi"] - m["hits"] if pd.notna(m["ci_hi"]) else np.nan)
         x = np.arange(len(names))
         ax.bar(x, hits, color=colors, width=0.62)
-        ax.errorbar(x, hits, yerr=[lo, hi], fmt="none", ecolor=INK, elinewidth=1, capsize=4)
+        ok = ~np.isnan(np.array(lo, dtype=float))
+        ax.errorbar(x[ok], np.array(hits)[ok], yerr=[np.array(lo)[ok], np.array(hi)[ok]], fmt="none", ecolor=INK,
+                    elinewidth=1, capsize=4)
         for xi, h in zip(x, hits):
             ax.text(xi, h + 0.3, f"{h}", ha="center", va="bottom", color=INK, fontsize=10, fontweight="bold",
                     bbox=dict(facecolor="white", edgecolor="none", pad=1))
@@ -61,11 +63,18 @@ def baselines(plt):
         ax.yaxis.get_major_locator().set_params(integer=True)
         ax.grid(axis="x", visible=False)
     axes[0].set_ylabel("Exploited CVEs caught in the top k")
-    title = (f"Our model beats the best simple rule in both practice years, by a small margin" if len(models) else
+    title = (f"Our model vs the best simple rule: {int(models['hits'].sum())} vs "
+             f"{sum(res[y]['baseline_exploit_epss']['hits'] for y in ('2024', '2025'))} exploited CVEs caught" if len(models) else
              "Best simple rule: public exploit, then EPSS. That's the bar to beat.")
     fig.suptitle(title, x=0.01, ha="left", fontsize=14, fontweight="bold", color=INK)
-    fig.text(0.01, -0.02, "Error bars: 90% bootstrap range. k scales 500 picks to each pool's size.",
-             color=MUTED, fontsize=8.5)
+    note = "Error bars: 90% bootstrap range for the simple rules. k scales 500 picks to each pool's size."
+    hp = OUT_DIR / "headline.json"
+    if hp.exists() and len(models):
+        h = json.loads(hp.read_text())
+        lo_, hi_ = h["diff_vs_baseline_cve_level_90"]
+        note += (f" Ours vs best rule, both years: {h['pooled_hits_bag'] - h['baseline_pooled_hits']:+d} "
+                 f"(90% range {lo_:+.0f} to {hi_:+.0f}), so the gain is within the noise.")
+    fig.text(0.01, -0.02, note, color=MUTED, fontsize=8.5)
     fig.tight_layout()
     _save(fig, "baselines.png")
     plt.close(fig)
@@ -183,27 +192,36 @@ def leakage(plt):
 
 
 def blind_spot_counts():
-    """Per test year: exploited CVEs split into flagged / blind-spot, and hits of the baseline vs v1/v2 LightGBM
-    in each group (from Person A's outputs/blindspot_positives.csv + outputs/v2_mechanism.csv)."""
-    bp, mech = OUT_DIR / "blindspot_positives.csv", OUT_DIR / "v2_mechanism.csv"
+    """Per test year: exploited CVEs split into flagged / blind-spot, and hits of the best simple rule vs our headline
+    model in each group. Uses Person A's outputs/blindspot_positives.csv and the newest mechanism file
+    (v4_mechanism.csv: gained/lost vs the baseline for the headline model; else v2_mechanism.csv for v1/v2 LightGBM)."""
+    bp = OUT_DIR / "blindspot_positives.csv"
     res = runlog.results()
-    if not (bp.exists() and mech.exists()) or res.empty:
+    if not bp.exists() or res.empty:
+        return None
+    if (OUT_DIR / "v4_mechanism.csv").exists():
+        m = pd.read_csv(OUT_DIR / "v4_mechanism.csv")
+        best = runlog.latest_model(res)
+        comps = {runlog.model_name(best): m}
+    elif (OUT_DIR / "v2_mechanism.csv").exists():
+        m = pd.read_csv(OUT_DIR / "v2_mechanism.csv")
+        comps = {runlog.model_name(v): m[m["comparison"] == f"{v}_vs_baseline"] for v in ("v1_lgbm", "v2_lgbm")}
+    else:
         return None
     blind = pd.read_csv(bp).groupby("replica").size()
-    m = pd.read_csv(mech)
     rows = []
     for y in (2024, 2025):
         r = res[res["test_year"] == y].set_index("version")["hits"]
-        total = {"blind-spot": int(blind.get(y, 0))}
         pos = int(pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["label"])["label"].sum())
+        total = {"blind-spot": int(blind.get(y, 0))}
         total["flagged"] = pos - total["blind-spot"]
-        base_blind = 0  # by definition the exploit-then-EPSS top k contains no blind-spot CVE
         for grp in ("flagged", "blind-spot"):
-            base = int(r.get("baseline_exploit_epss", 0)) - base_blind if grp == "flagged" else base_blind
+            # by definition the exploit-then-EPSS top k contains no blind-spot CVE
+            base = int(r.get("baseline_exploit_epss", 0)) if grp == "flagged" else 0
             row = {"year": y, "group": grp, "exploited": total[grp], "Public exploit, then EPSS": base}
-            for v in ("v1_lgbm", "v2_lgbm"):
-                g = m[(m["test_replica"] == y) & (m["comparison"] == f"{v}_vs_baseline") & (m["group"] == grp)]
-                row[runlog.model_name(v)] = base + int((g["kind"] == "gained").sum()) - int((g["kind"] == "lost").sum())
+            for name, mm in comps.items():
+                g = mm[(mm["test_replica"] == y) & (mm["group"] == grp)]
+                row[name] = base + int((g["kind"] == "gained").sum()) - int((g["kind"] == "lost").sum())
             rows.append(row)
     return pd.DataFrame(rows)
 
@@ -215,8 +233,8 @@ def blindspots(plt):
         return
     d.to_csv(OUT_DIR / "b_blindspot_counts.csv", index=False)
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.4), sharey=True)
-    series = [("Public exploit, then EPSS", GREYS[1]), (runlog.model_name("v1_lgbm"), ACCENT_LIGHT),
-              (runlog.model_name("v2_lgbm"), ACCENT)]
+    models = [c for c in d.columns if c.startswith("Ours")]
+    series = [("Public exploit, then EPSS", GREYS[1])] + [(c, ACCENT if c == models[-1] else ACCENT_LIGHT) for c in models]
     for ax, y in zip(axes, (2025, 2024)):
         g = d[d["year"] == y].set_index("group").loc[["flagged", "blind-spot"]]
         x = np.arange(2)
@@ -235,8 +253,8 @@ def blindspots(plt):
     axes[0].set_ylabel("Exploited CVEs")
     tot_b = int(d[d["group"] == "blind-spot"]["exploited"].sum())
     tot = int(d["exploited"].sum())
-    v2b = int(d[d["group"] == "blind-spot"][runlog.model_name("v2_lgbm")].sum())
-    fig.suptitle(f"{tot_b} of {tot} exploited CVEs were blind spots. Simple rules caught 0; our model caught {v2b}",
+    v2b = int(d[d["group"] == "blind-spot"][models[-1]].sum())
+    fig.suptitle(f"{tot_b} of {tot} exploited CVEs were blind spots: simple rules caught 0, our model {v2b}",
                  x=0.01, ha="left", fontsize=14, fontweight="bold", color=INK)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower left", ncols=4, fontsize=9, bbox_to_anchor=(0.01, -0.06), frameon=False)
