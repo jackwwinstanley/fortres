@@ -1,0 +1,7 @@
+timestamp,version,replica,k,hits,baseline_exploit_epss_hits,notes
+2026-11-07T20:30:05+00:00,baseline_cvss,2024,198,0,6,"pool=28839 positives=27 boot90=[0,0]"
+2026-11-07T20:30:05+00:00,baseline_epss,2024,198,3,6,"pool=28839 positives=27 boot90=[1,7]"
+2026-11-07T20:30:05+00:00,baseline_exploit_epss,2024,198,6,6,"pool=28839 positives=27 boot90=[2,10]"
+2026-11-07T20:30:05+00:00,baseline_cvss,2025,243,5,13,"pool=35280 positives=48 boot90=[2,9]"
+2026-11-07T20:30:05+00:00,baseline_epss,2025,243,8,13,"pool=35280 positives=48 boot90=[4,13]"
+2026-11-07T20:30:05+00:00,baseline_exploit_epss,2025,243,13,13,"pool=35280 positives=48 boot90=[8,19]"

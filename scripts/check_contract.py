@@ -18,6 +18,7 @@ def _type_ok(t: pa.DataType, code: str) -> bool:
         "str": pa.types.is_string(t) or pa.types.is_large_string(t),
         "date": pa.types.is_date(t) or pa.types.is_timestamp(t),
         "float": pa.types.is_floating(t),
+        "int": pa.types.is_integer(t),
         "int8": pa.types.is_int8(t),
     }[code]
 
