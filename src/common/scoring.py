@@ -99,3 +99,26 @@ def paired_bootstrap_hits(labels, rank_positions, k, n=1000, seed=0):
             order = np.argsort(pos[idx], kind="stable")
             out[i, j] = lab[order][:k].sum()
     return out
+
+
+def clustered_paired_bootstrap_hits(labels, event_ids, rank_positions, k, n=1000, seed=0):
+    """Event-clustered paired bootstrap of hits@k for several rankings of the SAME rows.
+    event_ids: array, >= 0 for positives (CVEs that belong to the same KEV event share an id), -1 for negatives.
+    Each resample draws E events with replacement (all positives of a drawn event enter together, so the events,
+    not the CVEs, are the independent units) and resamples the negatives iid; k stays fixed, so the resample size
+    varies slightly. Returns array (n, n_rankings)."""
+    labels = np.asarray(labels)
+    event_ids = np.asarray(event_ids)
+    neg = np.flatnonzero(labels == 0)
+    events = [np.flatnonzero(event_ids == e) for e in np.unique(event_ids[event_ids >= 0])]
+    rng = np.random.default_rng(seed)
+    out = np.empty((n, len(rank_positions)))
+    for i in range(n):
+        neg_draw = neg[rng.integers(0, len(neg), len(neg))]
+        ev_draw = rng.integers(0, len(events), len(events))
+        idx = np.concatenate([neg_draw, *[events[e] for e in ev_draw]])
+        lab = labels[idx]
+        for j, pos in enumerate(rank_positions):
+            order = np.argsort(pos[idx], kind="stable")
+            out[i, j] = lab[order][:k].sum()
+    return out

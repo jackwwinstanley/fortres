@@ -77,3 +77,17 @@ def test_paired_bootstrap_shapes_and_reproducible():
     x = paired_bootstrap_hits(labels, [a, b], k=2, n=50, seed=3)
     y = paired_bootstrap_hits(labels, [a, b], k=2, n=50, seed=3)
     assert x.shape == (50, 2) and (x == y).all()
+
+
+def test_clustered_bootstrap_resamples_events_together():
+    import numpy as np
+    from src.common.scoring import clustered_paired_bootstrap_hits
+    # rows 0-1 are one event (2 positives), row 2 is a second event (1 positive), rows 3-9 are negatives
+    labels = np.array([1, 1, 1, 0, 0, 0, 0, 0, 0, 0])
+    events = np.array([0, 0, 1, -1, -1, -1, -1, -1, -1, -1])
+    pos = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])  # perfect ranking
+    out = clustered_paired_bootstrap_hits(labels, events, [pos], k=3, n=400, seed=1)
+    # two event draws: 2+2 = 4, 2+1 = 3 or 1+1 = 2 positives; hits@3 = min(3, positives)
+    assert set(np.unique(out)) <= {2.0, 3.0} and {2.0, 3.0} <= set(np.unique(out))
+    again = clustered_paired_bootstrap_hits(labels, events, [pos], k=3, n=400, seed=1)
+    assert (out == again).all()

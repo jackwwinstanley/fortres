@@ -1,5 +1,8 @@
 # v3 report: stress tests of v2 LightGBM and the final candidate list
 
+> **PRE-DRIFT-FIX (raw epss included): superseded by `outputs/v4_report.md`. Do not use any number in this report in a headline.**
+> The 3c numbers below, including the seed-0 results and the 10-seed means, come from the legacy v2 feature set that contains raw `epss`.
+
 > **LOW POWER.** 27 (2024) and 48 (2025) positives, 75 in total. Directions: train 2024 -> test 2025 (forward in time) and train 2025 -> test 2024 (stability check, not forward in time). Hits are in the top k (k = 198 for 2024, 243 for 2025), ties broken by score, epss_rank_in_month, cve_id. No hyper-parameter was tuned on test data.
 
 ## Pre-declared policy (fixed before the checks ran)

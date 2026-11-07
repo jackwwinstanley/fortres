@@ -24,7 +24,7 @@ from sklearn.preprocessing import StandardScaler
 
 from src.baselines import add_scores, load_cvss
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import FEATURE_GROUPS, MONOTONE_UP, V1_FEATURES, check_feature_list
+from src.common.schema import FEATURE_GROUPS, MONOTONE_UP, V1_FEATURES, V2_FEATURES, check_feature_list
 from src.common.scoring import expected_hits_at_k, k_for_pool, paired_bootstrap_hits, rank_order
 
 FEATURES = list(V1_FEATURES)
@@ -174,7 +174,7 @@ def tie_str(e):
 
 # ---- main -------------------------------------------------------------------------------------
 def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
-    assert not check_feature_list(FEATURES), check_feature_list(FEATURES)
+    assert not check_feature_list(FEATURES, allowed=V2_FEATURES), check_feature_list(FEATURES, allowed=V2_FEATURES)
     data, sb = load(out_dir, data_dir)
     L = ["# v1 report: allowed features, logistic regression and LightGBM", "",
          "> **LOW POWER.** The replicas have 27 (2024) and 48 (2025) positives, 75 in total. Every number "

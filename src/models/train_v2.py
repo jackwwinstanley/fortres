@@ -13,11 +13,11 @@ import pandas as pd
 from sklearn.metrics import average_precision_score
 
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import ALLOWED_FEATURES, FEATURE_GROUPS_V2, TEXT_FEATURES, check_feature_list
+from src.common.schema import FEATURE_GROUPS_V2, TEXT_FEATURES, V2_FEATURES, check_feature_list
 from src.common.scoring import k_for_pool
 from src.models import train_v1 as v1
 
-FEATURES_V2 = list(ALLOWED_FEATURES)
+FEATURES_V2 = list(V2_FEATURES)  # legacy v2 set (raw epss included); the current set is schema.ALLOWED_FEATURES
 VARIANTS = {"logreg_v1": ("logreg", v1.FEATURES), "lgbm_v1": ("lgbm", v1.FEATURES),
             "logreg_v2": ("logreg", FEATURES_V2), "lgbm_v2": ("lgbm", FEATURES_V2)}
 LABEL = {"logreg_v1": "Logistic regression, v1", "lgbm_v1": "LightGBM, v1",
@@ -45,7 +45,7 @@ def load_with_text(out_dir=OUT_DIR, data_dir=DATA_DIR):
 
 
 def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
-    assert not check_feature_list(FEATURES_V2), check_feature_list(FEATURES_V2)
+    assert not check_feature_list(FEATURES_V2, allowed=V2_FEATURES)
     data, sb, sb2 = load_with_text(out_dir, data_dir)
 
     # ---- selection per training replica and feature set
