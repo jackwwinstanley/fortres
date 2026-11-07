@@ -66,6 +66,15 @@ Channel B = mean of within-pool percentile ranks of `kev_text_score`, `assigner_
 `nearest_kev_sim` (no fitting); top s from A then B fills the rest. Final list uses the s with the highest pooled hits over both
 replicas, ties to the larger s.
 
+## v3 stress tests and the final candidate (Person A)
+`python -m src.models.stress_v2` runs the stress tests and applies a pre-declared policy: the primary candidate is v2 LightGBM
+trained on both replicas (parameters from the pooled-AP selection); it is vetoed only if the placebo p-value exceeds 0.20, the
+10-seed mean of pooled hits is below the best baseline's, or any leakage is found; a veto falls back to `top500_v2.csv`.
+Outputs: `outputs/top500_v3.csv` (single column `cve_id`, 500 unique), `v3_report.md`, `v3_top500_contrib.parquet`
+(`cve_id` + one LightGBM contribution column per feature of `ALLOWED_FEATURES`, same row order as `top500_v3.csv`),
+`v2_mechanism.csv` (gained/lost hits with post-snapshot KEV vendor and dates, descriptive only, never a feature) and
+`v2_placebo.csv`. The placebo shuffles the 16 text columns jointly across rows within each snapshot month.
+
 ### Text features must be time-safe (Person B)
 `kev_text_score` and `nearest_kev_sim` for a CVE in snapshot month *M* may only use KEV
 entries with `date_added` ≤ end of month *M* (e.g. fit/compare against the KEV set as of the

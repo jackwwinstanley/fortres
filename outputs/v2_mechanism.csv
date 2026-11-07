@@ -1,0 +1,33 @@
+test_replica,comparison,kind,cve_id,group,kev_vendor,kev_date_added,days_to_kev
+2025,v2_lgbm_vs_baseline,gained,CVE-2024-13159,blind-spot,Ivanti,2025-03-10,38
+2025,v2_lgbm_vs_baseline,gained,CVE-2024-13160,blind-spot,Ivanti,2025-03-10,38
+2025,v2_lgbm_vs_baseline,gained,CVE-2024-13161,blind-spot,Ivanti,2025-03-10,38
+2025,v2_lgbm_vs_baseline,gained,CVE-2025-20281,flagged,Cisco,2025-07-28,28
+2025,v2_lgbm_vs_baseline,gained,CVE-2025-24472,blind-spot,Fortinet,2025-03-18,18
+2025,v2_lgbm_vs_baseline,gained,CVE-2025-41244,flagged,Broadcom,2025-10-30,30
+2025,v2_lgbm_vs_baseline,gained,CVE-2025-5777,flagged,Citrix,2025-07-10,10
+2025,v2_lgbm_vs_baseline,lost,CVE-2024-57727,flagged,SimpleHelp ,2025-02-13,13
+2025,v2_lgbm_vs_baseline,lost,CVE-2025-32433,flagged,Erlang,2025-06-09,40
+2025,v2_lgbm_vs_baseline,lost,CVE-2025-5086,flagged,Dassault Systèmes,2025-09-11,73
+2025,v2_lgbm_vs_baseline,lost,CVE-2025-54236,flagged,Adobe,2025-10-24,24
+2025,v2_lgbm_vs_baseline,lost,CVE-2025-54253,flagged,Adobe,2025-10-15,45
+2025,v1_lgbm_vs_baseline,gained,CVE-2025-20281,flagged,Cisco,2025-07-28,28
+2025,v1_lgbm_vs_baseline,gained,CVE-2025-2746,blind-spot,Kentico,2025-10-20,203
+2025,v1_lgbm_vs_baseline,gained,CVE-2025-2747,blind-spot,Kentico,2025-10-20,203
+2025,v1_lgbm_vs_baseline,gained,CVE-2025-41244,flagged,Broadcom,2025-10-30,30
+2025,v1_lgbm_vs_baseline,gained,CVE-2025-5777,flagged,Citrix,2025-07-10,10
+2025,v1_lgbm_vs_baseline,lost,CVE-2024-57727,flagged,SimpleHelp ,2025-02-13,13
+2025,v1_lgbm_vs_baseline,lost,CVE-2025-2776,flagged,SysAid,2025-07-22,52
+2025,v1_lgbm_vs_baseline,lost,CVE-2025-32433,flagged,Erlang,2025-06-09,40
+2025,v1_lgbm_vs_baseline,lost,CVE-2025-4008,flagged,Smartbedded,2025-10-02,124
+2025,v1_lgbm_vs_baseline,lost,CVE-2025-5086,flagged,Dassault Systèmes,2025-09-11,73
+2025,v1_lgbm_vs_baseline,lost,CVE-2025-54236,flagged,Adobe,2025-10-24,24
+2025,v1_lgbm_vs_baseline,lost,CVE-2025-54253,flagged,Adobe,2025-10-15,45
+2024,v2_lgbm_vs_baseline,gained,CVE-2024-30088,flagged,Microsoft,2024-10-15,107
+2024,v2_lgbm_vs_baseline,gained,CVE-2024-40711,flagged,Veeam,2024-10-17,17
+2024,v2_lgbm_vs_baseline,gained,CVE-2024-4358,blind-spot,Progress,2024-06-13,13
+2024,v2_lgbm_vs_baseline,gained,CVE-2024-6670,flagged,Progress,2024-09-16,16
+2024,v2_lgbm_vs_baseline,lost,CVE-2024-23897,flagged,Jenkins,2024-08-19,201
+2024,v2_lgbm_vs_baseline,lost,CVE-2024-32113,flagged,Apache,2024-08-07,68
+2024,v1_lgbm_vs_baseline,gained,CVE-2022-2586,flagged,Linux,2024-06-26,147
+2024,v1_lgbm_vs_baseline,lost,CVE-2024-23897,flagged,Jenkins,2024-08-19,201
