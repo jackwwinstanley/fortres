@@ -32,7 +32,8 @@ Results and caveats (low power: 75 positives): `outputs/v1_report.md`. Run: `pyt
 `kev_text_score`, `nearest_kev_sim` and the 14 `txt_*` flags from `outputs/text_features.parquet`, joined by `cve_id` only
 (KEV part uses the same prior-December-31 cutoff). v2 / two-channel results: `outputs/v2_report.md`.
 Run: `python -m src.models.train_v2 && python -m src.analysis.depth_curves && python -m src.models.two_channel &&
-python -m src.analysis.blindspot_profile && python -m src.models.report_v2`.
+python -m src.analysis.blindspot_profile && python -m src.models.report_v2 && python -m src.models.stress_v2`.
+Stress tests, the policy and the final candidate list (`outputs/top500_v3.csv`, same v2 columns): `outputs/v3_report.md`.
 
 ## Text feature columns
 ### Text features (Person B, `outputs/text_features.parquet`)

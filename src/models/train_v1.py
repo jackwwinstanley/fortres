@@ -43,9 +43,11 @@ MODELS = {"logreg": "Logistic regression", "lgbm": "LightGBM"}
 
 
 # ---- models -----------------------------------------------------------------------------------
-def lgbm_model(params, feats):
+def lgbm_model(params, feats, seed=None):
+    """seed=None keeps the fixed default (random_state=0); the stress tests pass other seeds."""
     mono = [1 if f in MONOTONE_UP else 0 for f in feats]
-    return lgb.LGBMClassifier(monotone_constraints=mono, **FIXED, **params)
+    fixed = FIXED if seed is None else {**FIXED, "random_state": int(seed)}
+    return lgb.LGBMClassifier(monotone_constraints=mono, **fixed, **params)
 
 
 def lr_model():
