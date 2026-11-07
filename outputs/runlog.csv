@@ -5,15 +5,20 @@ timestamp,version,replica,k,hits,baseline_exploit_epss_hits,notes
 2026-11-07T20:30:05+00:00,baseline_cvss,2025,243,5,13,"pool=35280 positives=48 boot90=[2,9]"
 2026-11-07T20:30:05+00:00,baseline_epss,2025,243,8,13,"pool=35280 positives=48 boot90=[4,13]"
 2026-11-07T20:30:05+00:00,baseline_exploit_epss,2025,243,13,13,"pool=35280 positives=48 boot90=[8,19]"
-2026-11-07T21:06:24+00:00,v1_logreg,train2024_test2025,243,9,13,low power; primary (forward in time); expected=9.0; boot90=[4-14]; params=C=1.0
-2026-11-07T21:06:24+00:00,v1_lgbm,train2024_test2025,243,11,13,"low power; primary (forward in time); expected=11.0; boot90=[6-16]; params={""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 400, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
-2026-11-07T21:06:24+00:00,v1_logreg,train2025_test2024,198,7,6,low power; stability check (NOT forward in time); expected=7.0; boot90=[3-12]; params=C=1.0
-2026-11-07T21:06:24+00:00,v1_lgbm,train2025_test2024,198,6,6,"low power; stability check (NOT forward in time); expected=6.0; boot90=[2-10]; params={""num_leaves"": 4, ""min_child_samples"": 30, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
-2026-11-07T21:06:24+00:00,v1_logreg,lomo2024,198,4,6,low power; optimistic pooled leave-one-month-out; expected=4.0; boot90=[1-8]
-2026-11-07T21:06:24+00:00,v1_lgbm,lomo2024,198,6,6,low power; optimistic pooled leave-one-month-out; expected=6.0; boot90=[2-10]
-2026-11-07T21:06:24+00:00,v1_logreg,lomo2025,243,12,13,low power; optimistic pooled leave-one-month-out; expected=12.0; boot90=[7-18]
-2026-11-07T21:06:24+00:00,v1_lgbm,lomo2025,243,12,13,low power; optimistic pooled leave-one-month-out; expected=12.0; boot90=[7-18]
-2026-11-07T21:32:08+00:00,v2_logreg,train2024_test2025,243,13,13,low power; primary (forward in time); expected=13.0; boot90=[7-19]; params=C=1.0
-2026-11-07T21:32:08+00:00,v2_lgbm,train2024_test2025,243,15,13,"low power; primary (forward in time); expected=15.0; boot90=[9-21]; params={""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
-2026-11-07T21:32:08+00:00,v2_logreg,train2025_test2024,198,8,6,low power; stability check (NOT forward in time); expected=8.0; boot90=[4-13]; params=C=1.0
-2026-11-07T21:32:08+00:00,v2_lgbm,train2025_test2024,198,8,6,"low power; stability check (NOT forward in time); expected=8.0; boot90=[4-13]; params={""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
+2026-11-07T21:06:24+00:00,v1_logreg,train2024_test2025,243,9,13,pre-drift-fix (raw epss included); not for headline; low power; primary (forward in time); expected=9.0; boot90=[4-14]; params=C=1.0
+2026-11-07T21:06:24+00:00,v1_lgbm,train2024_test2025,243,11,13,"pre-drift-fix (raw epss included); seed0 only, not for headline; low power; primary (forward in time); expected=11.0; boot90=[6-16]; params={""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 400, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
+2026-11-07T21:06:24+00:00,v1_logreg,train2025_test2024,198,7,6,pre-drift-fix (raw epss included); not for headline; low power; stability check (NOT forward in time); expected=7.0; boot90=[3-12]; params=C=1.0
+2026-11-07T21:06:24+00:00,v1_lgbm,train2025_test2024,198,6,6,"pre-drift-fix (raw epss included); seed0 only, not for headline; low power; stability check (NOT forward in time); expected=6.0; boot90=[2-10]; params={""num_leaves"": 4, ""min_child_samples"": 30, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
+2026-11-07T21:06:24+00:00,v1_logreg,lomo2024,198,4,6,pre-drift-fix (raw epss included); not for headline; low power; optimistic pooled leave-one-month-out; expected=4.0; boot90=[1-8]
+2026-11-07T21:06:24+00:00,v1_lgbm,lomo2024,198,6,6,"pre-drift-fix (raw epss included); seed0 only, not for headline; low power; optimistic pooled leave-one-month-out; expected=6.0; boot90=[2-10]"
+2026-11-07T21:06:24+00:00,v1_logreg,lomo2025,243,12,13,pre-drift-fix (raw epss included); not for headline; low power; optimistic pooled leave-one-month-out; expected=12.0; boot90=[7-18]
+2026-11-07T21:06:24+00:00,v1_lgbm,lomo2025,243,12,13,"pre-drift-fix (raw epss included); seed0 only, not for headline; low power; optimistic pooled leave-one-month-out; expected=12.0; boot90=[7-18]"
+2026-11-07T21:32:08+00:00,v2_logreg,train2024_test2025,243,13,13,pre-drift-fix (raw epss included); not for headline; low power; primary (forward in time); expected=13.0; boot90=[7-19]; params=C=1.0
+2026-11-07T21:32:08+00:00,v2_lgbm,train2024_test2025,243,15,13,"pre-drift-fix (raw epss included); seed0 only, not for headline; low power; primary (forward in time); expected=15.0; boot90=[9-21]; params={""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
+2026-11-07T21:32:08+00:00,v2_logreg,train2025_test2024,198,8,6,pre-drift-fix (raw epss included); not for headline; low power; stability check (NOT forward in time); expected=8.0; boot90=[4-13]; params=C=1.0
+2026-11-07T21:32:08+00:00,v2_lgbm,train2025_test2024,198,8,6,"pre-drift-fix (raw epss included); seed0 only, not for headline; low power; stability check (NOT forward in time); expected=8.0; boot90=[4-13]; params={""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}"
+2026-11-07T22:30:35+00:00,v4_bag,train2024_test2025,243,12,13,"low power; 20-seed LightGBM bag, no raw epss, rank-averaged; headline model"
+2026-11-07T22:30:35+00:00,v4_logreg,train2024_test2025,243,13,13,"low power; v4 features, deterministic logistic regression; not the final model"
+2026-11-07T22:30:35+00:00,v4_bag,train2025_test2024,198,9,6,"low power; 20-seed LightGBM bag, no raw epss, rank-averaged; headline model"
+2026-11-07T22:30:35+00:00,v4_logreg,train2025_test2024,198,11,6,"low power; v4 features, deterministic logistic regression; not the final model"
+2026-11-07T22:30:35+00:00,v4_bag,pooled,441,21,19,"low power; pooled over both directions; 20-seed bag; diff vs best baseline: CVE-level 90% [-4, +9], event-clustered 90% [-4, +9]; single-seed pooled mean 22.1 (min 17, max 25)"

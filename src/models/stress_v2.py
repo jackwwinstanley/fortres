@@ -20,7 +20,7 @@ from sklearn.metrics import roc_auc_score
 
 from src.b.phrases import POST_ATTACK, strip_post_attack
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import TEXT_FEATURES, check_feature_list
+from src.common.schema import TEXT_FEATURES, V2_FEATURES, check_feature_list
 from src.common.scoring import k_for_pool, rank_order
 from src.models import train_v1 as v1
 from src.models.train_v2 import FEATURES_V2, load_with_text
@@ -141,10 +141,11 @@ def mechanism(ctx, preds, kev):
     return pd.DataFrame(rows), tables
 
 
-def leakage_audit(data, data_dir):
+def leakage_audit(data, data_dir, features=None, allowed=None):
     """Returns (list of (check, result, flagged)) plus detail tables. Flags are pre-declared rules."""
     items, tables = [], {}
-    probs = check_feature_list(FEATURES_V2)
+    probs = check_feature_list(FEATURES_V2 if features is None else features,
+                               allowed=allowed or (V2_FEATURES if features is None else None))
     items.append(("feature names pass the allowed/banned guard", "OK" if not probs else "; ".join(probs), bool(probs)))
     desc = duckdb.connect().execute(
         f"SELECT cve_id, description FROM read_csv_auto('{data_dir}/vulnerabilities.csv', all_varchar=true)").df().set_index("cve_id")["description"]
@@ -322,6 +323,7 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
     pts = (p_val <= 0.05) + (int(sd["v2_pooled"].min()) >= base_pool) + (ci_lo is not None and ci_lo > 0)
     strength = ["WEAK", "WEAK", "MODERATE", "STRONG"][int(pts)]
     L = ["# v3 report: stress tests of v2 LightGBM and the final candidate list", "",
+         "> **PRE-DRIFT-FIX (raw epss included): superseded by `outputs/v4_report.md`. Do not use any number in this report in a headline.**", "",
          "> **LOW POWER.** 27 (2024) and 48 (2025) positives, 75 in total. Directions: train 2024 -> test 2025 (forward in time) "
          "and train 2025 -> test 2024 (stability check, not forward in time). Hits are in the top k "
          "(k = 198 for 2024, 243 for 2025), ties broken by score, epss_rank_in_month, cve_id. No hyper-parameter was tuned on test data.", "",

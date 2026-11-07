@@ -75,6 +75,19 @@ Outputs: `outputs/top500_v3.csv` (single column `cve_id`, 500 unique), `v3_repor
 `v2_mechanism.csv` (gained/lost hits with post-snapshot KEV vendor and dates, descriptive only, never a feature) and
 `v2_placebo.csv`. The placebo shuffles the 16 text columns jointly across rows within each snapshot month.
 
+## v4: drift-robust features and the 20-seed bag (Person A, `python -m src.models.train_v4`)
+Decided on drift evidence, not test hits: raw `epss` is removed from the model features (its scale moved ~4x in 2026); `epss_rank_in_month`
+and `epss_missing` stay. Every scale-type feature (counts or raw scores, not binary flags, not an existing rank) with PSI > 0.25 between
+the pooled replicas and the 2026 scoreboard is replaced by its within-pool percentile rank, computed separately per replica and for
+the scoreboard (`<feature>_pctrank`): `days_to_cutoff`, `assigner_prior_cves`, `assigner_kev_count`, `assigner_kev_12m`,
+`assigner_kev_rate_smooth`. `ALLOWED_FEATURES` in `src/common/schema.py` is now this 33-feature set (`V4_FEATURES`); `V1_FEATURES` and
+`V2_FEATURES` stay as legacy lists so old results can be reproduced. `tests/test_drift_fix.py` recomputes the PSI table and asserts the
+replaced list still matches. The final model is a 20-seed LightGBM bag (each seed's scores rank-normalised within the pool, then averaged).
+Outputs: `outputs/top500_v4.csv`, `v4_report.md`, `v4_top500_contrib.parquet` (contributions averaged over the 20 seeds), `v4_mechanism.csv`,
+`v4_placebo.csv`, `headline.json` (the headline numbers: 20-seed bag with CVE-level and event-clustered intervals; use these, not seed-0 rows).
+Runlog hygiene: rows for `v1_*` and `v2_*` models carry notes marked "pre-drift-fix (raw epss included)" and LightGBM rows "seed0 only, not for headline"
+(notes were relabelled once at step 3d; the other columns are unchanged). New rows `v4_bag` (per direction and `pooled`) and `v4_logreg` are appended.
+
 ### Text features must be time-safe (Person B)
 `kev_text_score` and `nearest_kev_sim` for a CVE in snapshot month *M* may only use KEV
 entries with `date_added` ≤ end of month *M* (e.g. fit/compare against the KEV set as of the

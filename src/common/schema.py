@@ -83,12 +83,30 @@ TEXT_FEATURES = ["kev_text_score", "nearest_kev_sim",
                  "txt_path_traversal", "txt_sqli", "txt_priv_esc", "txt_memory", "txt_edge_device",
                  "txt_enterprise", "txt_browser", "txt_wordpress", "txt_xss"]
 FEATURE_GROUPS_V2 = {**FEATURE_GROUPS, "text": TEXT_FEATURES}
-ALLOWED_FEATURES = V1_FEATURES + TEXT_FEATURES
+V2_FEATURES = V1_FEATURES + TEXT_FEATURES  # legacy v2 set (includes raw epss), kept so v2/v3 stay reproducible
+
+# ---- v4: drift-robust feature set (step 3d) -------------------------------------------------
+# Decision on drift evidence (outputs/v4_report.md): raw epss moved ~4x in 2026 (PSI 2.87 pooled replicas vs scoreboard), so it
+# is removed; epss_rank_in_month and epss_missing stay. Every scale-type feature with PSI > 0.25 is replaced by its within-pool
+# percentile rank (computed per replica / per scoreboard). src/features/drift_fix.py recomputes the PSI table and
+# tests/test_drift_fix.py asserts it still yields exactly this list.
+RAW_REMOVED = ["epss"]
+PSI_REPLACED = ["days_to_cutoff", "assigner_prior_cves", "assigner_kev_count", "assigner_kev_12m",
+                "assigner_kev_rate_smooth"]
+
+
+def _rank_name(f: str) -> str:
+    return f + "_pctrank"
+
+
+V4_FEATURES = [_rank_name(f) if f in PSI_REPLACED else f for f in V2_FEATURES if f not in RAW_REMOVED]
+ALLOWED_FEATURES = V4_FEATURES  # what a model may use from now on; V1/V2 lists stay for reproducing old results
 # the only allowed column names that contain "kev": history features computed with the fixed
 # prior-December-31 cutoff (see CONTRACT.md)
 HISTORY_KEV_FEATURES = {"assigner_kev_count", "assigner_kev_12m", "assigner_kev_rate_smooth",
                         "vendor_kev_count_max", "vendor_kev_12m_max",
-                        "kev_text_score", "nearest_kev_sim"}
+                        "kev_text_score", "nearest_kev_sim",
+                        "assigner_kev_count_pctrank", "assigner_kev_12m_pctrank", "assigner_kev_rate_smooth_pctrank"}
 BANNED_NAMES = [r"nvd_status", r"n_affected_cpes", r"n_references", r"cvss", r"cwe",
                 r"affected", r"reference", r"kev", r"description", r"last_modified"]
 MONOTONE_UP = ["epss", "epss_rank_in_month", "exploitdb", "metasploit", "nuclei", "poc_github",
@@ -102,8 +120,10 @@ def is_banned(name: str) -> bool:
     return any(re.search(p, name.lower()) for p in BANNED_NAMES)
 
 
-def check_feature_list(features) -> list[str]:
-    """Return problems with a model's feature list (empty = OK)."""
-    probs = [f"not in ALLOWED_FEATURES: {f}" for f in features if f not in ALLOWED_FEATURES]
+def check_feature_list(features, allowed=None) -> list[str]:
+    """Return problems with a model's feature list (empty = OK). `allowed` defaults to ALLOWED_FEATURES (the v4 set);
+    pass V2_FEATURES to check the legacy v1/v2 lists."""
+    allowed = ALLOWED_FEATURES if allowed is None else allowed
+    probs = [f"not in the allowed list: {f}" for f in features if f not in allowed]
     probs += [f"banned name: {f}" for f in features if is_banned(f)]
     return probs

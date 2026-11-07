@@ -1,0 +1,15 @@
+test_replica,kind,cve_id,group,kev_vendor,kev_date_added,days_to_kev
+2025,gained,CVE-2025-20281,flagged,Cisco,2025-07-28,28
+2025,gained,CVE-2025-24472,blind-spot,Fortinet,2025-03-18,18
+2025,gained,CVE-2025-41244,flagged,Broadcom,2025-10-30,30
+2025,gained,CVE-2025-5777,flagged,Citrix,2025-07-10,10
+2025,lost,CVE-2025-27363,flagged,FreeType,2025-05-06,36
+2025,lost,CVE-2025-32433,flagged,Erlang,2025-06-09,40
+2025,lost,CVE-2025-5086,flagged,Dassault Systèmes,2025-09-11,73
+2025,lost,CVE-2025-54236,flagged,Adobe,2025-10-24,24
+2025,lost,CVE-2025-54253,flagged,Adobe,2025-10-15,45
+2024,gained,CVE-2024-30088,flagged,Microsoft,2024-10-15,107
+2024,gained,CVE-2024-37085,blind-spot,VMware,2024-07-30,30
+2024,gained,CVE-2024-40711,flagged,Veeam,2024-10-17,17
+2024,gained,CVE-2024-6670,flagged,Progress,2024-09-16,16
+2024,lost,CVE-2024-23897,flagged,Jenkins,2024-08-19,201
