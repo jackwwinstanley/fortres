@@ -158,6 +158,9 @@ def check_reason(reason: str, facts: str) -> list[str]:
             if reason.find(w) == 0 or reason[max(0, reason.find(w) - 2):reason.find(w)] in (". ", "; "):
                 continue  # sentence-initial capital, not a name
             problems.append(f"name {w}")
+    for claim in re.findall(r"\b(critical|severe|severity|actively|in the wild|ransomware|zero[- ]day|"
+                            r"has been exploited|being exploited|known exploited)\b", reason, re.I):
+        problems.append(f"unsupported claim '{claim}'")
     for c in re.findall(r"CVE-\d{4}-\d+", reason):
         if c not in facts:
             problems.append(f"cve {c}")
@@ -173,13 +176,17 @@ def granite_rewrite(rows: pd.DataFrame) -> list[str | None]:
     out = []
     for _, r in rows.iterrows():
         msgs = [{"role": "system", "content":
-                 "You write one plain-English sentence (max 35 words) explaining why a security team should "
-                 "patch this vulnerability first. Use ONLY the facts given. Do not add products, numbers, "
-                 "dates or claims that are not in the facts. Do not say it has been exploited."},
+                 "Write ONE plain-English sentence of at most 30 words saying why this vulnerability should be "
+                 "patched early. Start with what kind of flaw it is. Do not repeat the CVE id of the flaw "
+                 "itself and do not start with 'The vulnerability' or 'The security team'. Use ONLY the facts "
+                 "given; add no products, numbers, dates or claims that are not in them. Never say it has "
+                 "been exploited. Mention the similar past exploited CVE only if its similarity is high."},
                 {"role": "user", "content": facts_text(r)}]
-        ids = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt").to(device)
-        gen = model.generate(ids, max_new_tokens=70, do_sample=False)
-        out.append(tok.decode(gen[0, ids.shape[1]:], skip_special_tokens=True).strip().split("\n")[0])
+        enc = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt",
+                                      return_dict=True).to(device)
+        gen = model.generate(**enc, max_new_tokens=120, do_sample=False)
+        n_in = enc["input_ids"].shape[1]
+        out.append(tok.decode(gen[0, n_in:], skip_special_tokens=True).strip().split("\n")[0])
     return out
 
 
@@ -201,6 +208,10 @@ def main(top_path=None, granite=False, limit=None):
     if granite:
         for i, txt in zip(f.index, granite_rewrite(f)):
             probs = check_reason(txt, facts_text(f.loc[i])) if txt else ["empty"]
+            if txt and not txt.rstrip().endswith("."):
+                probs.append("incomplete sentence")
+            if txt and len(txt.split()) > 45:
+                probs.append("too long")
             if not probs:
                 f.loc[i, ["reason", "source"]] = [txt, "granite"]
             else:
