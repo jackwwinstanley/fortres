@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T05:59:12+00:00",
+ "generated_at": "2026-11-08T06:33:42+00:00",
  "sdk": "ibm-watsonx-gov",
  "sdk_version": "1.5.2",
  "sdk_requires_python": ">=3.11,<3.14",
@@ -14,8 +14,8 @@
   "n": 500,
   "which": "all rows",
   "by_source": {
-   "granite": 347,
-   "template": 153
+   "granite": 318,
+   "template": 182
   }
  },
  "inputs": {
@@ -33,13 +33,13 @@
    "note": "share of the sentence's tokens found in the facts",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.7419,
+   "mean": 0.7317,
    "median": 0.7586,
    "min": 0.4444,
    "max": 0.8571,
    "mean_by_source": {
-    "granite": 0.7574,
-    "template": 0.7068
+    "granite": 0.7501,
+    "template": 0.6995
    },
    "secs": 0.2
   },
@@ -51,15 +51,15 @@
    "note": "MiniLM embedding similarity, sentence vs facts",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.66,
-   "median": 0.6649,
+   "mean": 0.6514,
+   "median": 0.6573,
    "min": 0.4652,
    "max": 0.8674,
    "mean_by_source": {
-    "granite": 0.6739,
-    "template": 0.6286
+    "granite": 0.6633,
+    "template": 0.6305
    },
-   "secs": 1.0
+   "secs": 0.8
   },
   {
    "column": "answer_similarity__token_recall",
@@ -69,15 +69,15 @@
    "note": "share of the template sentence's tokens in our sentence",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.9135,
-   "median": 0.9286,
-   "min": 0.6471,
+   "mean": 0.9227,
+   "median": 0.9365,
+   "min": 0.5789,
    "max": 1.0,
    "mean_by_source": {
-    "granite": 0.8754,
+    "granite": 0.8784,
     "template": 1.0
    },
-   "secs": 0.2
+   "secs": 0.4
   },
   {
    "column": "answer_similarity__bert_score_recall",
@@ -87,15 +87,15 @@
    "note": "BERTScore recall vs the template sentence",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.9354,
-   "median": 0.9299,
-   "min": 0.7604,
+   "mean": 0.9415,
+   "median": 0.9344,
+   "min": 0.7832,
    "max": 1.0,
    "mean_by_source": {
-    "granite": 0.9069,
+    "granite": 0.908,
     "template": 1.0
    },
-   "secs": 3.2
+   "secs": 2.8
   },
   {
    "column": "answer_similarity__sentence_bert_mini_lm",
@@ -105,15 +105,15 @@
    "note": "MiniLM embedding similarity vs template",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.9484,
-   "median": 0.9434,
-   "min": 0.6337,
+   "mean": 0.9501,
+   "median": 0.948,
+   "min": 0.5158,
    "max": 1.0,
    "mean_by_source": {
-    "granite": 0.9256,
+    "granite": 0.9215,
     "template": 1.0
    },
-   "secs": 0.8
+   "secs": 0.7
   },
   {
    "column": "answer_relevance__token_recall",
@@ -123,13 +123,13 @@
    "note": "question is one we wrote; low information",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.48,
+   "mean": 0.4665,
    "median": 0.5,
    "min": 0.25,
    "max": 0.75,
    "mean_by_source": {
-    "granite": 0.495,
-    "template": 0.4461
+    "granite": 0.4984,
+    "template": 0.4107
    },
    "secs": 0.2
   },
@@ -141,13 +141,13 @@
    "note": "readability (textstat)",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 14.3627,
-   "median": 14.59,
+   "mean": 13.8898,
+   "median": 14.3546,
    "min": 8.4744,
-   "max": 20.4967,
+   "max": 20.07,
    "mean_by_source": {
-    "granite": 14.871,
-    "template": 13.2097
+    "granite": 14.5033,
+    "template": 12.8179
    },
    "secs": 0.0
   },
@@ -159,13 +159,13 @@
    "note": "readability (textstat)",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 42.9899,
-   "median": 44.3765,
-   "min": 1.545,
+   "mean": 45.618,
+   "median": 46.0686,
+   "min": 16.9517,
    "max": 67.3289,
    "mean_by_source": {
-    "granite": 41.6469,
-    "template": 46.0358
+    "granite": 44.1561,
+    "template": 48.1722
    },
    "secs": 0.0
   }
@@ -719,9 +719,9 @@
   }
  ],
  "runtime_secs": {
-  "total": 12.9,
-  "inventory": 7.2,
-  "local_scoring_all_rows": 5.6
+  "total": 12.1,
+  "inventory": 7.1,
+  "local_scoring_all_rows": 5.1
  },
  "pip_freeze": [
   "Jinja2==3.1.6",

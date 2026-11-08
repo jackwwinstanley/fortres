@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from scripts.check_top500 import check
-from src.common.paths import OUT_DIR
+from src.common.paths import OUT_DIR, SCOREBOARD_CSV
 from src.common.schema import V4_FEATURES
 from src.models.train_v4 import FEATURES_V4, bag, kev_events
 
@@ -26,6 +26,7 @@ def test_kev_events_group_positives_by_date_and_vendor():
 
 
 @pytest.mark.skipif(not (OUT_DIR / "top500_v4.csv").exists(), reason="top500_v4.csv not produced yet")
+@pytest.mark.skipif(not SCOREBOARD_CSV.exists(), reason="needs the untracked datathon data (data/scoreboard_2026.csv) to validate the IDs")
 def test_top500_v4_format_and_contributions():
     assert check(OUT_DIR / "top500_v4.csv") == []
     ids = pd.read_csv(OUT_DIR / "top500_v4.csv")["cve_id"].tolist()
