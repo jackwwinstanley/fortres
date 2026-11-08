@@ -4,7 +4,7 @@ Run:  python scripts/number_sweep.py
 
 Expected values are READ from outputs/headline.json and the primary model's leakage and blind-spot files
 (src/common/primary.py: outputs/v6_leakage_results.csv, outputs/v6_blindspots.csv) and
-outputs/explanations_summary.json, never typed here. Checked files: docs/*.md, site/index.html, site/story.js, app/*.py,
+outputs/explanations_summary.json, never typed here. Checked files: docs/*.md, site/index.html, site/fortres.js, app/*.py,
 README.md. Checks:
   1. banned words: "verified", "predicts", "uses (IBM) Granite to read each description" (allowed right after "never"/"not",
      as in the wording rules themselves);
@@ -78,7 +78,7 @@ def expected(out=OUT) -> dict:
 
 
 def files(root=ROOT):
-    pats = ["docs/*.md", "site/index.html", "site/story.js", "app/*.py", "README.md"]
+    pats = ["docs/*.md", "site/index.html", "site/fortres.js", "app/*.py", "README.md"]
     for p in pats:
         yield from sorted(root.glob(p))
 
