@@ -29,6 +29,33 @@ in 2026; GitHub PoC creation dates plus the monthly EPSS change scored 18 instea
 Caveats on v6 itself: on matched seeds it beats v5 by only +2 to +5 (`outputs/v6_seed_spread.csv`), and a vendor-grouped
 diagnostic on v5 halves its 2025 in-year hits (19 → 10, `outputs/rank_vendor_cv.csv`).
 
+## 0b. Eleven more methods tested against v6 (the "method zoo", branch b/zoo)
+Every method ran through one evaluation harness, frozen in its own commit before any method ran, on the frozen v5
+features ([summary](https://github.com/jackwwinstanley/ibm-breach/blob/b/zoo/outputs/zoo_summary.md)). The screening rule was fixed before any result: at least v6's forward and stability, and a
+pooled gain of at least 2 (v6's own spread over four seed sets is 2). Each method was tried standalone, blended with v6,
+and, where it makes a feature, as an extra v6 feature. Best variant of each, forward / stability / pooled, against v6's
+18 / 9 / 27:
+
+| method | best variant | forward / stability / pooled | result |
+|---|---|---|---|
+| m01 elastic-net logistic regression | blend with v6 | 18 / 9 / 27 | no gain |
+| m02 CWE empirical-Bayes rate | extra feature | 16 / 9 / 25 | worse |
+| m03 Cox survival model | blend with v6 | 18 / 9 / 27 | no gain |
+| m06 seed-bag mean minus spread | standalone | 18 / 9 / 27 | no gain |
+| m07 extra trees | blend with v6 | 15 / 10 / 25 | worse forward |
+| m08 isolation-forest anomaly score | blend with v6 | 16 / 8 / 24 | worse |
+| m09 KEV prototypes | extra feature | 18 / 8 / 26 | worse stability |
+| m11 regex exploit/PoC words | extra feature | 18 / 10 / 28 | +1, below the bar of 2 |
+| m12 TF-IDF logistic regression | extra feature | 18 / 9 / 27 | no gain |
+| m18 balanced bagging | blend with v6 | 7 / 3 / 10 | much worse |
+| m19 adversarial "looks like 2026" score | extra feature | 18 / 9 / 27 | no gain |
+
+No method passed screening, so nothing was confirmed or adopted, and v6 stays.
+
+m11's +1 got a separate consistency check, with rules written down before any new result and the bar admittedly set after
+seeing the +1 ([check](https://github.com/jackwwinstanley/ibm-breach/blob/b/zoo/outputs/zoo/m11_consistency.md)). Across 10 seed sets, 6 of them fresh, the mean gain is +0.1 (90% interval −0.1 to +0.4). It
+falls below v6 on 3 sets, and 4 of 5 shuffled-feature placebos gain the same +1. So it is luck, not signal.
+
 ## 1. Track-record priors (Person B, `src/b/priors.py`, `outputs/b_priors_eval.md`)
 Time-safe extra columns: `knn_kev_rate` (share of the 50 most similar earlier CVEs, by Granite embedding, on KEV by the
 cutoff) and `product_kev_count_max` / `product_kev_12m_max` (past-KEV counts for products named in the description).

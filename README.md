@@ -38,7 +38,42 @@ below is for the v5 steps; `train_v6` adds its own checks (placebo, leakage, see
 `src/common/` shared paths, schema, scoring · `src/legacy/` first practice-pool script ·
 `scripts/` validators · `tests/` · `outputs/` handoff files · `notebooks/`
 
-## Columns used (v1, allowed columns only; see CONTRACT.md)
+## What v6 uses, and what it deliberately doesn't
+v6 uses the 33 frozen v5 features (`ALLOWED_FEATURES` in `src/common/schema.py`); only the model settings changed.
+- **Exploit signals at the snapshot:** Exploit-DB, Metasploit, Nuclei and GitHub proof-of-concept flags, plus their count.
+- **EPSS, ranked within the snapshot month:** raw EPSS is dropped because of the July 2026 jump; a missing-EPSS flag is kept.
+- **Timing:** days from publication to the snapshot and to the cutoff.
+- **Reporter (assigner) and vendor history:** counts and shares of past CVEs added to CISA KEV, all as of 31 December of
+  the previous year.
+- **Description text:** 14 keyword flags (`txt_*`) and two IBM Granite embedding scores, `kev_text_score` and
+  `nearest_kev_sim`, computed against KEV entries known at the snapshot.
+
+**Deliberately not used**, because they are filled in after the fact and leak the answer:
+- `nvd_status`;
+- the counts of affected products (CPEs) and of references;
+- the reference links;
+- CVSS, blank or filled (CVSS is used only as a baseline);
+- CWE ids;
+- any 2026 KEV information.
+
+The leakage test shows what they would add (27 → 33). An independent review (`docs/column_review.md`) found no leak.
+A feature-by-feature leak check of the v5 features ([table](https://github.com/jackwwinstanley/ibm-breach/blob/b/outside/outputs/outside_v5_leakcheck_features.csv)) found none of them coming from those sources and
+no blank-vs-filled CVSS signal.
+
+## Outside data we checked (none adopted)
+Each source was kept only if its records are dated on or before the end of the CVE's snapshot month ([round 1](https://github.com/jackwwinstanley/ibm-breach/blob/b/outside/outputs/outside_report.md),
+[round 2](https://github.com/jackwwinstanley/ibm-breach/blob/b/outside2/outputs/outside2_report.md)).
+
+| source | link | licence / terms | date rule | result |
+|---|---|---|---|---|
+| VulnCheck KEV | https://vulncheck.com/kev | VulnCheck Community terms (free account), not redistributed | needs a listing date; `date_added` is the earliest exploitation-report date (hindsight) | rejected: fails the date rule |
+| CISA Vulnrichment | https://github.com/cisagov/vulnrichment | CC0-1.0 | SSVC "Exploitation" timestamp on or before the snapshot end | allowed; flags 1 practice CVE and none in 2026 |
+| PoC-in-GitHub | https://github.com/nomi-sec/PoC-in-GitHub | CC0-1.0 | repo `created_at` on or before the snapshot end (never stars, forks or push dates) | about 92% overlap with our own GitHub PoC flag |
+| EPSS daily archive | https://epss.empiricalsecurity.com (FIRST EPSS) | free public data, FIRST's EPSS usage terms | the daily file's score date on or before the snapshot end; change over the month | tested |
+
+The combined test, v5 + PoC repo counts + the monthly EPSS change, scored 18 against v5's 21 pooled, so it was rejected.
+
+## Columns used in v1 (history; allowed columns only; see CONTRACT.md)
 - **signals:** `epss`, `epss_missing`, `epss_rank_in_month`
 - **exploit flags:** `exploitdb`, `metasploit`, `nuclei`, `poc_github`, `n_flags`, `any_exploit`
 - **timing:** `days_to_snapshot`, `days_to_cutoff`
@@ -68,7 +103,7 @@ fixed before any result** (`outputs/rank_report.md`, `outputs/v6_report.md`). v5
   (`outputs/v6_overlap.csv`).
 - **Caveat:** in a diagnostic that holds out whole vendors, v5's 2025 in-year hits roughly halve (19 → 10), so part of the
   in-year skill is familiarity with vendors already seen (`outputs/rank_vendor_cv.csv`).
-Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
+Explanations: 318 of 500 reasons passed a groundedness check (Granite Guardian answered "No"); the other 182 use the plain template (`outputs/explanations_summary.json`).
 IBM Granite and IBM Granite Guardian are open models run locally; nothing here runs on watsonx. Ideas tested and not adopted: `docs/considered_not_adopted.md`.
 Regenerate Person B outputs with `python -m src.b.refresh_all`; `python scripts/number_sweep.py` checks every number in docs/site/app/README against the outputs.
 
@@ -83,7 +118,7 @@ ablation shows them neutral within noise, so they are not claimed to add hits. S
 explains why and gives the intervals and caveats (low power: 75 positives). Final list: `outputs/top500_v5.csv`. A descriptive analysis of the traits of CVEs added to CISA KEV
 (`outputs/why_attacked_report.md`) uses today's NVD fields and is not used by any model or list.
 
-## Columns used (v2 adds Person B's text features)
+## Columns used in v2 (history; adds Person B's text features)
 `kev_text_score`, `nearest_kev_sim` and the 14 `txt_*` flags from `outputs/text_features.parquet`, joined by `cve_id` only
 (KEV part uses the same prior-December-31 cutoff). v2 / two-channel results: `outputs/v2_report.md`.
 Run: `python -m src.models.train_v2 && python -m src.analysis.depth_curves && python -m src.models.two_channel &&
@@ -108,4 +143,4 @@ writes `outputs/b_text_report.md`.
 `python -m src.b.explain --granite` writes `outputs/explanations.csv` (columns `cve_id`, `explanation`, `source`, `guardian_verdict`, plus `reason`, a copy of `explanation` for the dashboard) and
 `outputs/explanations_summary.json`. Granite (granite-3.3-2b-instruct) rewrites facts built only from tracked columns and the v5 contribution file; local checks and then
 Granite Guardian (`ollama pull granite3-guardian:2b`, risk = groundedness) must clearly answer "No", otherwise the template sentence is used. Results are cached in `outputs/.cache/`
-and the run resumes after a crash. The sentence must restate at most three facts in the form "Prioritised because ...". Local checks: a blocked-phrase list (`BLOCKED_PHRASES` at the top of `src/b/explain.py`, including predictions, interpretation and causal links), a check that every percentage stays attached to its own fact (EPSS only to EPSS), and a glue/unknown-word detector that uses the English word list `src/b/english_words.txt.gz`. The prompt version is part of the cache key, so changing the prompt regenerates every row, and cached Granite sentences that fail the current checks are regenerated automatically. `--time-box MINUTES` stops after that long: unfinished rows keep the template and are marked `pending`; run the same command again to continue. The committed files come from a 30-minute run: rows marked `pending` in `guardian_verdict` were not processed yet and show the template. No sentence is labelled Guardian-checked unless the Guardian model returned "No" for it.
+and the run resumes after a crash. The sentence must restate at most three facts in the form "Prioritised because ...". Local checks: a blocked-phrase list (`BLOCKED_PHRASES` at the top of `src/b/explain.py`, including predictions, interpretation and causal links), a check that every percentage stays attached to its own fact (EPSS only to EPSS), and a glue/unknown-word detector that uses the English word list `src/b/english_words.txt.gz`. The prompt version is part of the cache key, so changing the prompt regenerates every row, and cached Granite sentences that fail the current checks are regenerated automatically. `--time-box MINUTES` stops after that long: unfinished rows keep the template and are marked `pending`; run the same command again to continue. The committed files cover the v6 list (`top500_v6.csv`, `top_list` in the summary): 318 of 500 reasons passed a groundedness check, 182 use the plain template and 0 are pending (`passed_guardian`, `template_fallback`, `pending` in `outputs/explanations_summary.json`); the full model rebuild itself takes about 8.5 minutes (see "Reproduce the final list"). No sentence is labelled Guardian-checked unless the Guardian model returned "No" for it.

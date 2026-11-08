@@ -16,6 +16,9 @@ README.md. Checks:
   6. "N of M" blind-spot claims must equal the v5 blind-spot totals;
   7. Guardian counts in prose ("N of 500 ... passed") must equal `passed_guardian` in outputs/explanations_summary.json
      (without that file, any such count is an error);
+  9. no leftover "TODO(" markers in any checked file;
+ 10. explanation counts in prose: "N template(s)" must equal `template_fallback` and "N pending" must equal `pending`
+     (only on lines that are about the reasons/explanations/Guardian);
   8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it
      names in outputs/explanations_summary.json (dotted names such as `guardian_verdicts.No` are looked up inside objects).
 """
@@ -139,6 +142,18 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
                 probs.append(f"{where}: Guardian count without outputs/explanations_summary.json to check it against")
             elif int(m.group(1)) != g.get("passed_guardian"):
                 probs.append(f"{where}: Guardian count {m.group(1)} of 500, expected passed_guardian = {g.get('passed_guardian')}")
+        # 9. leftover TODO markers
+        if "TODO(" in line:
+            probs.append(f"{where}: leftover TODO( marker")
+        # 10. other explanation counts in prose
+        g = e.get("guardian")
+        if g is not None and re.search(r"reason|explanation|guardian|template", low):
+            for m in re.finditer(r"\b(\d+)\b[^\d.;:]{0,30}?\btemplates?\b", low):
+                if int(m.group(1)) != g.get("template_fallback"):
+                    probs.append(f"{where}: template count {m.group(1)}, expected template_fallback = {g.get('template_fallback')}")
+            for m in re.finditer(r"\b(\d+)\b[^\d.;:]{0,20}?\bpending\b", low):
+                if int(m.group(1)) != g.get("pending"):
+                    probs.append(f"{where}: pending count {m.group(1)}, expected pending = {g.get('pending')}")
     if rel == MODEL_CARD:
         probs += check_guardian_table(rel, text, e)
     return probs
