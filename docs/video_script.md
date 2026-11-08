@@ -2,7 +2,7 @@
 
 Target: about 290 spoken words, roughly 2:00 at a calm pace. Judges score Discovery 35%, Data use 25%,
 Communication 25% and Impact 15%, so we lead with findings, not code.
-Numbers are from the v5 headline model (`outputs/headline.json`), `outputs/leakage_results.csv` (leaky arm 28 on v5; 29 was the earlier v4 run) and `outputs/explanations_summary.json` (Guardian count, PR #35); recheck them if the final list changes. **[Bracketed text] = what's on screen.**
+Numbers are from the v6 headline model (`outputs/v6_headline_candidate.json`), `outputs/v6_leakage_results.csv` (leaky arm 33 on v6; 28 on v5 and 29 on the earlier v4 run) and `outputs/explanations_summary.json` (Guardian count, PR #35); recheck them if the final list changes. **[Bracketed text] = what's on screen.**
 
 ---
 
@@ -30,15 +30,15 @@ sentence that isn't supported by the facts we gave it."
 
 **1:15–1:35 · Results, stated honestly** *(Jack)*
 [baselines.png]
-"In the strictest test, training on 2024 and testing on 2025, we were one behind the best simple rule, 12 to 13. The
-other way round it was 9 to 6, so across both years 21 against 19: a small edge that could be luck. We show the
+"In the strictest test, training on 2024 and testing on 2025, we were five ahead of the best simple rule, 18 to 13. The
+other way round it was 9 to 6, so across both years 27 against 19, on only 75 positives. We show the
 uncertainty rather than overclaim."
 
 **1:35–1:50 · Two discoveries that protect the result** *(Aba)*
 [drift_epss.png, then leakage.png]
 "Two things we caught. One: EPSS jumped about six times from the July 2026 snapshot, cause unknown, so we compare each
-hole only with others from the same month instead of trusting raw scores. Two: columns filled in after a CVE is added to KEV would inflate our score from 21 to
-28. Every vulnerability added to KEV is marked 'Analyzed' in today's NVD, so we banned those columns."
+hole only with others from the same month instead of trusting raw scores. Two: columns filled in after a CVE is added to KEV would inflate our score from 27 to
+33. Every vulnerability added to KEV is marked 'Analyzed' in today's NVD, so we banned those columns."
 
 **1:50–2:00 · Close** *(Jack)*
 [Top 500 list, scrolling]

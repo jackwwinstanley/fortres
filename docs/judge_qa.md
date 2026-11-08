@@ -15,17 +15,17 @@ check" (not "verified").
 > *kinds* of flaws end up on that list. Flaws that need no login or sit in firewalls and VPNs show up about three times as often,
 > and enterprise software about four and a half times. WordPress plugins almost never do, though that partly reflects what CISA tracks. The surprise
 > was that 44 of the 75 flaws added to the list in our practice years had no public attack code and a low risk score, so
-> the standard rule can't see them at all. Our text features, simple keyword flags plus an IBM Granite score for how
-> similar a description is to past KEV entries, caught two of those 44. Either part alone still catches two or three;
-> with neither, none. The exact flaws change between runs, so we treat it as noise. Small, and we say so.
+> the standard rule can't see them at all. Our model, with simple keyword flags plus an IBM Granite score for how
+> similar a description is to past KEV entries, caught five of those 44, three from one Ivanti incident. On our
+> previous model, either text part alone still caught two or three; with neither, none. The exact flaws change between runs, so we treat it as noise. Small, and we say so.
 
 **Jack (the "how and how honest", for technical and IBM judges)**
 > We rebuilt 2024 and 2025 exactly the way 2026 is scored, used only information available at the time, and trained on
 > one year to test on the other. Our final model is a 20-seed LightGBM bag with text features, including IBM Granite
-> similarity scores. On the strictest forward test it's one behind the best simple rule, 12 vs 13; the other direction
-> is 9 vs 6, so across both years 21 vs 19. That's +2, with a 90% range from −4 to +8, so it could be luck. Two things make us trust the
+> similarity scores. On the strictest forward test it's five ahead of the best simple rule, 18 vs 13; the other direction
+> is 9 vs 6, so across both years 27 vs 19. That's +8, with a 90% range from +2 to +14, on only 75 positives. Two things make us trust the
 > setup. First, EPSS jumped about 6× from the July 2026 snapshot, so we rank within each month. Second, a leakage test:
-> adding database fields that are filled in after the fact lifts us to 28. Every CVE added to KEV is marked "Analyzed"
+> adding database fields that are filled in after the fact lifts us to 33. Every CVE added to KEV is marked "Analyzed"
 > today, so we never use those fields. Each of our 500 picks has a plain-English reason from Granite, checked by Granite
 > Guardian for groundedness.
 
@@ -44,13 +44,14 @@ Three ways:
 1. Every input is something known on the day you'd have to choose. Every KEV-based feature uses the prior December 31
    as its cutoff, and an independent column review found no leak (`docs/column_review.md`).
 2. Phrases that only appear after exploitation ("exploited in the wild", …) are deleted before Granite reads anything.
-3. A deliberate leakage test: adding fields NVD fills in *after* a CVE gets attention lifts the same model from 21 to 28.
+3. A deliberate leakage test: adding fields NVD fills in *after* a CVE gets attention lifts the same model from 27 to 33.
    Every CVE added to KEV is marked "Analyzed" in today's NVD, against 46% of the rest. We show this to prove we know
    where the trap is, and that we stayed out of it.
 
-**Is 21 vs 19 just luck?**
-It could be. In the strictest test (train on 2024, test on 2025) we're one behind, 12 vs 13; the other direction is
-9 vs 6. With only 75 CVEs added to KEV across the two practice years, the pooled +2 has a 90% range of −4 to +8. What *is* solid: the blind spots (44 of 75),
+**Is 27 vs 19 just luck?**
+Partly, maybe. In the strictest test (train on 2024, test on 2025) we're five ahead, 18 vs 13; the other direction is
+9 vs 6. With only 75 CVEs added to KEV across the two practice years, the pooled +8 has a 90% range of +2 to +14, and
+rerun with other random seeds our gain over the previous model shrinks to +2 to +5. What *is* solid: the blind spots (44 of 75),
 the July 2026 EPSS jump, and the leakage result.
 
 **Why 500?**
@@ -74,8 +75,8 @@ sentence instead. Count: TODO(#35): fill from outputs/explanations_summary.json 
 
 **What's the most interesting thing you found?**
 That the standard signals can't see most of the flaws that end up on KEV. 44 of 75 had no public attack code and a low
-risk score. Our text features (keyword flags plus Granite-embedding similarity to past KEV entries) caught 2 of them:
-either part alone (keyword flags or Granite similarity scores) still catches two or three of the 44; with neither, none; the exact CVEs change between runs, so treat it as noise. Without any text the model caught three more of the visible ones (22 vs 21 overall), so the text trades
+risk score. Our model caught 5 of them, three from one Ivanti EPM event. In a text-feature ablation on the previous model (v5),
+either part alone (keyword flags or Granite similarity scores) still caught two or three of the 44; with neither, none; the exact CVEs change between runs, so treat it as noise. Without any text v5 caught three more of the visible ones (22 vs 21 overall), so the text trades
 visible catches for blind spots. Also, the model and the simple rule fail in *opposite* ways. The rule catches high-EPSS flaws with public
 code from vendors rarely on KEV; the model catches enterprise and edge products whose descriptions read like past KEV
 entries. We tried a simple 50/50 mix and did not adopt it (`docs/considered_not_adopted.md`).
@@ -85,7 +86,7 @@ No. They rarely end up on CISA's KEV list (3 of 13,777 and 22 of 31,018), but KE
 government software. They're widely attacked in practice; they're just not what KEV tracks.
 
 **What would you do with more time?**
-- More practice years. 75 positives is too few to tell 21 from 19 reliably.
+- More practice years. 75 positives is too few to measure a few catches reliably.
 - Revisit the model + rule blend and the "track record" priors on more practice years. Both were considered and not
   adopted (`docs/considered_not_adopted.md`).
 - Run the Granite steps on watsonx so they're governed and repeatable.
