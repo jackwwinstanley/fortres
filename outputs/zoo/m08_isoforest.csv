@@ -1,0 +1,4 @@
+timestamp,method,variant,seed_set,deterministic,status,reason,params,notes,forward,forward_I,forward_v5,forward_delta_I,forward_delta_I_90,forward_hits_random_ties,forward_k,stability,stability_I,stability_v5,stability_delta_I,stability_delta_I_90,stability_hits_random_ties,stability_k,pooled,pooled_I,pooled_v5,pooled_delta_I,pooled_delta_I_90,pooled_delta_I_p_le0,pooled_delta_v5,coverage_2026,runtime_s,n_new_features
+2026-11-08T05:01:20+00:00,m08_isoforest,standalone,0-19,False,ok,,{},,13,18,12,-5,"[-9, +1]",13.0,243,6,9,9,-3,"[-8, +1]",6.0,198,19,27,21,-8,"[-14, -1]",0.973,-2,"{""iso_anomaly"": 1.0}",24.0,
+2026-11-08T05:01:44+00:00,m08_isoforest,blend_I,0-19,False,ok,,{},,16,18,12,-2,"[-4, +0]",16.0,243,8,9,9,-1,"[-4, +0]",8.0,198,24,27,21,-3,"[-7, +0]",1.0,3,,10.1,
+2026-11-08T05:01:54+00:00,m08_isoforest,I_plus_feature,0-19,False,ok,,{},,16,18,12,-2,"[-5, +0]",16.0,243,7,9,9,-2,"[-5, +0]",7.0,198,23,27,21,-4,"[-8, -1]",1.0,2,"{""iso_anomaly"": 1.0}",19.7,1.0

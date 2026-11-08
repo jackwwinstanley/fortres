@@ -1,0 +1,34 @@
+feature,gain_share,source,banned_source
+assigner_kev_rate_smooth_pctrank,0.2341,"vulnerabilities.csv: assigner, published; known_exploited.csv: date_added <= prior Dec 31",no
+n_flags,0.1641,exploit_signals_Y.csv / scoreboard_2026.csv: exploit flags (snapshot month),no
+kev_text_score,0.1074,vulnerabilities.csv: description (post-attack phrases stripped) -> Granite embeddings; known_exploited.csv <= prior Dec 31,no
+nearest_kev_sim,0.0884,vulnerabilities.csv: description (post-attack phrases stripped) -> Granite embeddings; known_exploited.csv <= prior Dec 31,no
+assigner_prior_cves_pctrank,0.0765,"vulnerabilities.csv: assigner, published; known_exploited.csv: date_added <= prior Dec 31",no
+days_to_snapshot,0.0599,vulnerabilities.csv: published + snapshot_month (calendar),no
+days_to_cutoff,0.0411,vulnerabilities.csv: published + snapshot_month (calendar),no
+epss_rank_in_month,0.0355,exploit_signals_Y.csv / scoreboard_2026.csv: epss (snapshot month),no
+txt_unauth,0.0323,"vulnerabilities.csv: description (stripped), regex",no
+txt_enterprise,0.0287,"vulnerabilities.csv: description (stripped), regex",no
+poc_github,0.0225,exploit_signals_Y.csv / scoreboard_2026.csv: exploit flags (snapshot month),no
+any_exploit,0.0157,exploit_signals_Y.csv / scoreboard_2026.csv: exploit flags (snapshot month),no
+assigner_kev_share,0.014,"vulnerabilities.csv: assigner, published; known_exploited.csv: date_added <= prior Dec 31",no
+txt_auth_bypass,0.0134,"vulnerabilities.csv: description (stripped), regex",no
+assigner_kev_12m_share,0.0129,"vulnerabilities.csv: assigner, published; known_exploited.csv: date_added <= prior Dec 31",no
+vendor_kev_count_max,0.0128,"vulnerabilities.csv: description (vendor names); known_exploited.csv: vendor, date_added <= prior Dec 31",no
+txt_rce,0.0095,"vulnerabilities.csv: description (stripped), regex",no
+vendor_kev_12m_max,0.0088,"vulnerabilities.csv: description (vendor names); known_exploited.csv: vendor, date_added <= prior Dec 31",no
+epss_missing,0.0041,exploit_signals_Y.csv / scoreboard_2026.csv: epss (snapshot month),no
+n_vendors_mentioned,0.0039,"vulnerabilities.csv: description (vendor names); known_exploited.csv: vendor, date_added <= prior Dec 31",no
+txt_cmd_injection,0.0034,"vulnerabilities.csv: description (stripped), regex",no
+txt_browser,0.0027,"vulnerabilities.csv: description (stripped), regex",no
+txt_memory,0.0022,"vulnerabilities.csv: description (stripped), regex",no
+txt_xss,0.0021,"vulnerabilities.csv: description (stripped), regex",no
+txt_priv_esc,0.0019,"vulnerabilities.csv: description (stripped), regex",no
+nuclei,0.0013,exploit_signals_Y.csv / scoreboard_2026.csv: exploit flags (snapshot month),no
+txt_path_traversal,0.0003,"vulnerabilities.csv: description (stripped), regex",no
+txt_edge_device,0.0002,"vulnerabilities.csv: description (stripped), regex",no
+txt_sqli,0.0001,"vulnerabilities.csv: description (stripped), regex",no
+txt_deserialization,0.0,"vulnerabilities.csv: description (stripped), regex",no
+metasploit,0.0,exploit_signals_Y.csv / scoreboard_2026.csv: exploit flags (snapshot month),no
+exploitdb,0.0,exploit_signals_Y.csv / scoreboard_2026.csv: exploit flags (snapshot month),no
+txt_wordpress,0.0,"vulnerabilities.csv: description (stripped), regex",no

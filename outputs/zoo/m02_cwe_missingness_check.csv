@@ -1,0 +1,15 @@
+pool,nvd_status,n,cwe_missing_share,positives
+2024,Analyzed,12208,0.048,27.0
+2024,Deferred,4355,0.0218,0.0
+2024,Modified,12268,0.0668,0.0
+2024,Undergoing Analysis,8,0.0,0.0
+2025,Analyzed,17690,0.0403,48.0
+2025,Deferred,12350,0.0092,0.0
+2025,Modified,5231,0.1323,0.0
+2025,Undergoing Analysis,9,0.0,0.0
+scoreboard 2026,Analyzed,31265,0.0226,
+scoreboard 2026,Awaiting Analysis,5108,0.0237,
+scoreboard 2026,Deferred,27207,0.0113,
+scoreboard 2026,Modified,5118,0.0543,
+scoreboard 2026,Received,3614,0.9507,
+scoreboard 2026,Undergoing Analysis,358,0.2849,

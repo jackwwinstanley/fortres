@@ -1,0 +1,13 @@
+test,variant,k,hits,diff_vs_v5,diff_vs_v5_90,status,repos,cves,missing_created_at,coverage_2026,positives_flagged,v5,candidate,params,forward,stability,pooled_gain,noise_floor
+forward (train 2024 -> test 2025),v5 frozen,243.0,12.0,,,,,,,,,,,,,,,
+forward (train 2024 -> test 2025),v5 + poc_repo_count_by_snapshot + days_from_first_poc_to_snapshot + epss_pct_change_month,243.0,9.0,-3.0,"[-7, +1]",,,,,,,,,,,,,
+stability (train 2025 -> test 2024),v5 frozen,198.0,9.0,,,,,,,,,,,,,,,
+stability (train 2025 -> test 2024),v5 + poc_repo_count_by_snapshot + days_from_first_poc_to_snapshot + epss_pct_change_month,198.0,9.0,0.0,"[+0, +0]",,,,,,,,,,,,,
+pooled,v5 frozen,,21.0,,,,,,,,,,,,,,,
+pooled,v5 + poc_repo_count_by_snapshot + days_from_first_poc_to_snapshot + epss_pct_change_month,,18.0,-3.0,"[-7, +1]",,,,,,,,,,,,,
+run log,PoC load,,,,,ok,8575.0,4508.0,0.0,,,,,,,,,
+run log,PoC gate,,,,,passed,,,,1523.0,30.0,,,,,,,
+run log,EPSS gate,,,,,passed,,,,23408.0,36.0,,,,,,,
+run log,candidate forward (train 2024 -> test 2025),,,,,ok,,,,,,12.0,9.0,"{""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}",,,,
+run log,candidate stability (train 2025 -> test 2024),,,,,ok,,,,,,9.0,9.0,"{""num_leaves"": 4, ""min_child_samples"": 100, ""n_estimators"": 150, ""reg_lambda"": 1, ""scale_pos_weight"": 10}",,,,
+run log,adoption check,,,,,v5 stays,,,,,,,,,9 vs 12,9 vs 9,-3.0,4.0
