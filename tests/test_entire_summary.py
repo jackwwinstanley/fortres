@@ -181,3 +181,29 @@ def test_the_script_is_not_part_of_the_pipeline_or_the_dashboard():
 def test_the_cleanliness_check_fails_on_dirty_text(dirty):
     with pytest.raises(AssertionError):
         assert_clean(dirty)
+
+
+def test_label_writes_the_per_machine_file_in_outputs(repo):
+    add_checkpoint(repo, "aa11bb22cc33", [("s1", "2026-11-08T03:00:00Z", "Claude Code")])
+    assert es.main(["--repo", str(repo), "--label", "aba"], version_fn=lambda: "9.9.9", now=NOW) == 0
+    out = repo / "outputs" / "entire_summary_aba.json"
+    d = json.loads(out.read_text())
+    assert list(d) == es.KEYS and d["n_checkpoints"] >= 1
+    assert not (repo / "outputs" / "entire_summary.json").exists()      # the default file is left alone
+    text = out.read_text()
+    assert not any(p.lower() in text.lower() for p in POISON) and not re.search(r"[\\/@]", text)
+
+
+def test_out_wins_over_label(repo, tmp_path):
+    add_checkpoint(repo, "aa11bb22cc33", [("s1", "2026-11-08T03:00:00Z", "Claude Code")])
+    out = tmp_path / "elsewhere.json"
+    assert es.main(["--repo", str(repo), "--label", "aba", "--out", str(out)], version_fn=lambda: "9.9.9", now=NOW) == 0
+    assert out.exists() and not (repo / "outputs" / "entire_summary_aba.json").exists()
+
+
+@pytest.mark.parametrize("label", ["a/b", "x@y", "users", "Gmail", "../up", "", "a" * 40])
+def test_a_label_that_could_leak_or_escape_is_refused(repo, label, capsys):
+    add_checkpoint(repo, "aa11bb22cc33", [("s1", "2026-11-08T03:00:00Z", "Claude Code")])
+    assert es.main(["--repo", str(repo), "--label", label], version_fn=lambda: "9.9.9", now=NOW) == 1
+    assert "refusing the label" in capsys.readouterr().err
+    assert not list((repo / "outputs").glob("entire_summary_*.json")) if (repo / "outputs").exists() else True

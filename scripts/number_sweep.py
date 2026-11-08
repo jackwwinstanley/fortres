@@ -27,7 +27,9 @@ README.md. Checks:
      LOCAL clause from outputs/gov_metrics_summary.json, so one file can never feed the other's claim. A number claimed
      without its summary file is an error. The summaries' own `claim` must say "hosted on IBM watsonx.governance" (hosted)
      and must not say "hosted" (local);
- 12. docs/entire.md: every row `| item | N | `field` |` must equal that field of outputs/entire_summary.json, and every other number
+ 12. docs/entire.md: every row `| item | N | `field` |` must equal that field of outputs/entire_summary.json (a field written
+     `label:field` is read from that machine's outputs/entire_summary_<label>.json, and a missing file is reported as missing),
+     and every other number
      in its prose (outside code spans, code blocks, links and list markers) must be a value, date, timestamp or the version
      stored in that file; the doc without the file is an error;
  13. on any line that mentions Entire, "N checkpoints" and "N sessions" must equal n_checkpoints and n_sessions in that file.
@@ -93,6 +95,8 @@ def expected(out=OUT) -> dict:
     es = out / "entire_summary.json"
     if es.exists():
         e["entire"] = json.loads(es.read_text())
+    e["entire_machines"] = {p.stem.removeprefix("entire_summary_"): json.loads(p.read_text())
+                            for p in sorted(out.glob("entire_summary_*.json"))}
     for kind, name in GOV_SUMMARIES.items():
         if (out / name).exists():
             e[kind] = json.loads((out / name).read_text())
@@ -188,7 +192,7 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
     if rel == MODEL_CARD:
         probs += check_guardian_table(rel, text, e)
     if rel == ENTIRE_DOC:
-        probs += check_entire_doc(rel, text, e.get("entire"))
+        probs += check_entire_doc(rel, text, e.get("entire"), e.get("entire_machines", {}))
     probs += check_gov_numbers(rel, text, e)
     return probs
 
@@ -325,23 +329,32 @@ def _strip_entire_prose(text: str) -> str:
 ENTIRE_TOKEN = re.compile(r"(?<![\w.#/-])(\d{4}-\d\d-\d\dT[\d:]+Z|\d{4}-\d\d-\d\d|\d+\.\d+\.\d+|\d[\d,]*)(?![\w-])")
 
 
-def check_entire_doc(rel: str, text: str, summary: dict | None) -> list[str]:
-    """docs/entire.md: table rows tie a number to a named field; every other number in the prose must be a value in the summary."""
+def check_entire_doc(rel: str, text: str, summary: dict | None, machines: dict | None = None) -> list[str]:
+    """docs/entire.md: table rows tie a number to a named field (`label:field` = that machine's own summary file); every other
+    number in the prose must be a value in one of the summaries."""
     if summary is None:
         return [f"{rel}: this document needs outputs/entire_summary.json to check its numbers against"]
+    machines = machines or {}
     probs = []
     for n, line in enumerate(text.splitlines(), 1):                    # rows like  | label | 30 | `n_checkpoints` |
         m = re.match(r"^\|[^|]*\|\s*(\d[\d,]*)\s*\|([^|]*`[^|]*)\|\s*$", line)
         if not m:
             continue
-        for f in re.findall(r"`([A-Za-z_][\w.\-]*)`", m.group(2)):
-            want = _field(summary, f)
+        for f in re.findall(r"`((?:[a-z0-9][a-z0-9_-]*:)?[A-Za-z_][\w.\-]*)`", m.group(2)):
+            label, _, name = f.rpartition(":")
+            src, fname = (machines.get(label), f"outputs/entire_summary_{label}.json") if label else (summary, "outputs/entire_summary.json")
+            if src is None:
+                probs.append(f"{rel}:{n}: table names `{f}`, but {fname} is missing")
+                continue
+            want = _field(src, name)
             if want is None:
-                probs.append(f"{rel}:{n}: table names `{f}`, which is not in outputs/entire_summary.json")
+                probs.append(f"{rel}:{n}: table names `{name}`, which is not in {fname}")
             elif int(m.group(1).replace(",", "")) != want:
-                probs.append(f"{rel}:{n}: table says {m.group(1)} for `{f}`, summary has {want}")
-    allowed_ints, allowed_dates = _numbers_in(summary), _dates_in(summary)
-    stamps = {summary.get(k) for k in ("generated_at", "first_checkpoint_at", "last_checkpoint_at")}
+                probs.append(f"{rel}:{n}: table says {m.group(1)} for `{f}`, {fname} has {want}")
+    every = [summary, *machines.values()]
+    allowed_ints = set().union(*(_numbers_in(s) for s in every))
+    allowed_dates = set().union(*(_dates_in(s) for s in every))
+    stamps = {s.get(k) for s in every for k in ("generated_at", "first_checkpoint_at", "last_checkpoint_at")}
     for n, line in enumerate(_strip_entire_prose(text).splitlines(), 1):
         for tok in ENTIRE_TOKEN.findall(line):
             if re.fullmatch(r"\d{4}-\d\d-\d\dT[\d:]+Z", tok):
@@ -349,7 +362,7 @@ def check_entire_doc(rel: str, text: str, summary: dict | None) -> list[str]:
             elif re.fullmatch(r"\d{4}-\d\d-\d\d", tok):
                 ok = tok in allowed_dates
             elif tok.count(".") == 2:
-                ok = tok == summary.get("entire_version")
+                ok = tok in {s.get("entire_version") for s in every}
             else:
                 ok = int(tok.replace(",", "")) in allowed_ints
             if not ok:
@@ -362,7 +375,7 @@ def main(root=ROOT) -> int:
     probs = gov_summary_problems(e)
     for f in files(root):
         probs += check_text(str(f.relative_to(root)), f.read_text(errors="ignore"), e)
-    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", "entire", *GOV_SUMMARIES)}
+    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", "entire", "entire_machines", *GOV_SUMMARIES)}
     shown["gov_summaries"] = sorted(k for k in GOV_SUMMARIES if k in e)
     if "guardian" in e:
         shown["passed_guardian"] = e["guardian"].get("passed_guardian")

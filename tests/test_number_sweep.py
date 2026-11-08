@@ -179,3 +179,24 @@ def test_explanation_counts_in_prose(line, needle):
 def test_correct_explanation_counts_pass():
     line = "347 of 500 reasons passed a groundedness check; the other 153 use the plain template; 0 pending."
     assert ns.check_text(FINAL, line, E) == []
+
+
+ENTIRE_MAIN = {"n_checkpoints": 30, "n_sessions": 2, "entire_version": "0.13.1", "checkpoints_by_origin": {"imported": 27, "live": 3}}
+ENTIRE_ABA = {"n_checkpoints": 12, "n_sessions": 1, "entire_version": "0.13.1", "checkpoints_by_origin": {"imported": 0, "live": 12}}
+
+
+def test_entire_per_machine_rows_read_their_own_file():
+    text = "| checkpoints, Jack's laptop | 30 | `n_checkpoints` |\n| checkpoints, Aba's laptop | 12 | `aba:n_checkpoints` |\n"
+    assert ns.check_entire_doc("docs/entire.md", text, ENTIRE_MAIN, {"aba": ENTIRE_ABA}) == []
+
+
+def test_entire_per_machine_row_with_the_wrong_value_fails():
+    text = "| checkpoints, Aba's laptop | 30 | `aba:n_checkpoints` |\n"
+    probs = ns.check_entire_doc("docs/entire.md", text, ENTIRE_MAIN, {"aba": ENTIRE_ABA})
+    assert any("entire_summary_aba.json has 12" in p for p in probs), probs
+
+
+def test_entire_per_machine_row_without_its_file_says_missing():
+    text = "| checkpoints, Aba's laptop | 12 | `aba:n_checkpoints` |\n"
+    probs = ns.check_entire_doc("docs/entire.md", text, ENTIRE_MAIN, {})
+    assert any("entire_summary_aba.json is missing" in p for p in probs), probs

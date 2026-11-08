@@ -2,6 +2,7 @@
 
 Run:  python scripts/entire_summary.py            # writes outputs/entire_summary.json
       python scripts/entire_summary.py --out /tmp/x.json --repo /path/to/clone
+      python scripts/entire_summary.py --label aba   # this machine's snapshot -> outputs/entire_summary_aba.json
 
 Reads, with read-only git commands, Entire's local checkpoint refs (refs/entire/checkpoints/<xx>/<id>, the CLI's default
 "one git ref per checkpoint" backend; see `entire configure --help`) and, from each one, only the small JSON files that list its
@@ -33,7 +34,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REF_PREFIX = "refs/entire/checkpoints"
 SETTINGS = (".entire/settings.json", ".entire/settings.local.json")   # later files override earlier ones
 AGENT_OK = re.compile(r"^[A-Za-z][A-Za-z0-9 ._-]{0,39}$")
-FORBIDDEN = ("users", "gmail", "uwaterloo")             # personal markers (lower case) that must never reach the file
+FORBIDDEN = ("users", "gmail", "uwaterloo")
+LABEL_OK = re.compile(r"^[a-z0-9][a-z0-9_-]{0,30}$")             # personal markers (lower case) that must never reach the file
 KEYS = ["generated_at", "entire_version", "n_checkpoints", "n_sessions", "first_checkpoint_at", "last_checkpoint_at",
         "checkpoints_by_day", "agents", "push_sessions", "contains_transcripts", "checkpoints_by_origin", "time_basis",
         "n_checkpoints_unparsed"]
@@ -167,8 +169,14 @@ def main(argv=None, version_fn=entire_version, now: datetime | None = None) -> i
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--repo", type=Path, default=ROOT)
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--label", default=None, help="machine label for a per-machine snapshot: outputs/entire_summary_<label>.json")
     a = ap.parse_args(argv)
-    out = a.out or a.repo / "outputs" / "entire_summary.json"
+    if a.label is not None and (not LABEL_OK.match(a.label) or clean_problems(a.label)):
+        print(f"entire_summary: refusing the label {a.label!r}: use 1-31 lower-case letters, digits, '-' or '_', "
+              "and no path, address or personal marker", file=sys.stderr)
+        return 1
+    default = f"entire_summary_{a.label}.json" if a.label else "entire_summary.json"
+    out = a.out or a.repo / "outputs" / default
     summary = build(a.repo, version_fn(), now)
     if summary is None:
         print(f"entire_summary: no local Entire checkpoints ({REF_PREFIX}) in this clone, nothing written; "
