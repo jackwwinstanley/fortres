@@ -37,6 +37,7 @@ def main(text=False, priors=False, explanations=False):
         step("text features", ["-m", "src.b.text_features"])
     step("drift check", ["-m", "src.b.drift"])
     step("leakage + v5 blind spots", ["-m", "src.b.leakage"])
+    step("leakage numbers into headline.json", ["-m", "src.b.headline_leakage"])   # train_v5 rewrites headline.json without this key
     if priors:
         step("track-record priors", ["-m", "src.b.priors"])
         step("priors evaluation on v5", ["-m", "src.b.eval_priors"])

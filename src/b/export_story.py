@@ -13,7 +13,7 @@ import pandas as pd
 
 from src.b import runlog
 from src.b.charts import blind_spot_counts, diff90, mechanism_file
-from src.b.explain import cna_name, nearest_kev
+from src.b.explain import cna_name
 from src.b.text_features import FLAGS
 from src.common.paths import DATA_DIR, OUT_DIR, REPO_ROOT
 
@@ -110,6 +110,53 @@ def latest_top():
     return files[-1].stem, pd.read_csv(files[-1])
 
 
+def nearest_kev_one(cve: str, year: int, out_dir=OUT_DIR, data_dir=DATA_DIR) -> dict:
+    """Closest past KEV entry (cosine similarity of the Granite embeddings) for one CVE under the prior-Dec-31 cutoff.
+    Needs outputs/emb_small.npy and outputs/emb_ids.csv (untracked; built by `python -m src.b.refresh_all --text`)."""
+    emb = np.load(out_dir / "emb_small.npy")
+    eid = pd.read_csv(out_dir / "emb_ids.csv")["cve_id"]
+    row = pd.Series(np.arange(len(eid)), index=eid)
+    kev = pd.read_csv(data_dir / "known_exploited.csv", usecols=["cve_id", "vendor", "product", "date_added"])
+    kev["date_added"] = pd.to_datetime(kev["date_added"])
+    kev = kev[kev["cve_id"].isin(row.index) & (kev["date_added"] <= pd.Timestamp(f"{year - 1}-12-31")) & (kev["cve_id"] != cve)]
+    sims = emb[row.loc[kev["cve_id"]].to_numpy()] @ emb[row.loc[cve]]
+    best = kev.iloc[int(sims.argmax())]
+    return {"kev_match": best["cve_id"], "kev_match_vendor": best["vendor"], "kev_match_product": best["product"],
+            "kev_match_year": int(best["date_added"].year), "kev_match_sim": float(sims.max())}
+
+
+def example_block(tf, pool_ids, out_dir=OUT_DIR, data_dir=DATA_DIR, site_data=SITE_DATA) -> dict:
+    """Section 5 of the story: one real description and its nearest past KEV entry. It needs outputs/b_texts.parquet, emb_small.npy and
+    emb_ids.csv (untracked; `refresh_all --text` builds them). When any is absent the committed block in site/data/story.json is kept as it is,
+    and a message says so: nothing is silently dropped or recomputed from partial inputs."""
+    needed = [out_dir / n for n in ("b_texts.parquet", "emb_small.npy", "emb_ids.csv")]
+    missing = [p.name for p in needed if not p.exists()]
+    if missing:
+        story_path = site_data / "story.json"
+        old = json.loads(story_path.read_text()).get("example") if story_path.exists() else None
+        if old is None:
+            raise SystemExit(f"export_story: {', '.join(missing)} missing and no committed 'example' block in {story_path} to keep. "
+                             "Run `python -m src.b.refresh_all --text` first.")
+        print(f"NOTE export_story: {', '.join(missing)} not present (built by `python -m src.b.refresh_all --text`). "
+              f"Keeping the committed 'example' block of {story_path.name} (CVE {old.get('cve')}) unchanged.")
+        return old
+    texts = pd.read_parquet(out_dir / "b_texts.parquet").set_index("cve_id")
+    ex_year = int(EXAMPLE[4:8])
+    nk = nearest_kev_one(EXAMPLE, ex_year, out_dir, data_dir)
+    kev = pd.read_csv(data_dir / "known_exploited.csv", usecols=["cve_id", "name"]).set_index("cve_id")["name"]
+    pool_scores = tf.loc[tf.index.isin(pool_ids), "kev_text_score"]
+    desc = texts.loc[EXAMPLE, "description"]
+    return {
+        "cve": EXAMPLE, "description": desc,
+        "highlights": [{"phrase": p, "label": l} for p, l in HIGHLIGHTS if p in desc],
+        "tags": [TAG[f] for f in FLAGS if tf.loc[EXAMPLE, f] == 1],
+        "kev_text_pct": float((pool_scores < tf.loc[EXAMPLE, "kev_text_score"]).mean()),
+        "nearest": {"cve": nk["kev_match"], "vendor": nk["kev_match_vendor"], "product": nk["kev_match_product"],
+                    "name": kev.get(nk["kev_match"], ""), "year_added": int(nk["kev_match_year"]),
+                    "similarity": round(float(nk["kev_match_sim"]), 3)},
+    }
+
+
 def main():
     P = pools()
     res = runlog.results()
@@ -147,23 +194,9 @@ def main():
         "ours_blind_cves": blind_cves(),
     }
 
-    # 5. what Granite reads: one real description
-    texts = pd.read_parquet(OUT_DIR / "b_texts.parquet").set_index("cve_id")
+    # 5. what Granite reads: one real description (kept as committed when the untracked embeddings/texts are absent)
     tf = pd.read_parquet(OUT_DIR / "text_features.parquet").set_index("cve_id")
-    ex_year = int(EXAMPLE[4:8])
-    nk = nearest_kev(pd.Series([EXAMPLE]), pd.Series([ex_year])).iloc[0]
-    kev = pd.read_csv(DATA_DIR / "known_exploited.csv", usecols=["cve_id", "name"]).set_index("cve_id")["name"]
-    pool_scores = tf.loc[tf.index.isin(P[ex_year]["cve_id"]), "kev_text_score"]
-    desc = texts.loc[EXAMPLE, "description"]
-    story["example"] = {
-        "cve": EXAMPLE, "description": desc,
-        "highlights": [{"phrase": p, "label": l} for p, l in HIGHLIGHTS if p in desc],
-        "tags": [TAG[f] for f in FLAGS if tf.loc[EXAMPLE, f] == 1],
-        "kev_text_pct": float((pool_scores < tf.loc[EXAMPLE, "kev_text_score"]).mean()),
-        "nearest": {"cve": nk["kev_match"], "vendor": nk["kev_match_vendor"], "product": nk["kev_match_product"],
-                    "name": kev.get(nk["kev_match"], ""), "year_added": int(nk["kev_match_year"]),
-                    "similarity": round(float(nk["kev_match_sim"]), 3)},
-    }
+    story["example"] = example_block(tf, P[int(EXAMPLE[4:8])]["cve_id"])
 
     # 6. 2026 is different: median EPSS per reporter x month
     vuln = pd.read_csv(DATA_DIR / "vulnerabilities.csv", usecols=["cve_id", "assigner"])
