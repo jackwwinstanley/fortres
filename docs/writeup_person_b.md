@@ -1,12 +1,16 @@
 # Write-up sections: Person B (final draft)
 
-For Jack to merge into the main README write-up (#23). Numbers: v6 headline model, `outputs/v6_headline_candidate.json`,
+For Jack to merge into the main README write-up (#23). Numbers: v6 headline model, `outputs/headline.json`,
 `outputs/b_*_report.md`. Each section is short on purpose: lead with the finding, then how we know.
 
-## 0. Results (v6 headline model, `outputs/v6_headline_candidate.json`)
+## 0. Results (v6 headline model, `outputs/headline.json`)
 - **Forward test (train 2024 → test 2025): 18 vs 13**, five ahead of the best simple rule (90% range 0 to +10).
 - Stability check (train 2025 → test 2024): 9 vs 6.
 - Pooled over both: **27 vs 19** (+8, 90% range +2 to +14). Low power: 75 positives, and on matched seeds v6 beats v5 by only +2 to +5.
+- v6 was chosen from seven declared variants by a rule fixed before any result (`outputs/rank_report.md`). The previous
+  model, v5, scored 12 + 9 = 21 (`docs/considered_not_adopted.md`).
+- Caveat: holding out whole vendors roughly halves v5's 2025 in-year hits (19 → 10), so part of the skill is vendor
+  familiarity (`outputs/rank_vendor_cv.csv`).
 - Leakage test: adding after-the-fact columns lifts the same model from 27 to **33** (21 + 12).
 - Blind spots: 44 of 75 CVEs added to KEV had no public exploit code and a low EPSS; the simple rule catches 0 of them,
   the v6 bag 5 (three of them one Ivanti EPM event).
@@ -53,7 +57,7 @@ so the model drops raw EPSS and ranks it within each snapshot month (v4/v5). Ass
 also moved. *Figures: `drift_psi.png`, `drift_epss.png`.*
 
 ## 4. Leakage experiment: what cheating would look like
-Same v5 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
+Same v6 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
 counts, blank-vs-filled CVSS/CWE, exploit-tagged links): pooled hits jump from **27 to 33** (2025: 18 → 21;
 2024: 9 → 12; on v5 it was 21 to 28, and 29 was the earlier v4 run). The reason is stark: **every** CVE added to KEV in both practice years is "Analyzed" in today's NVD,
 against about half of the rest, because NVD analyses KEV-listed CVEs first. None of these columns are in our model;

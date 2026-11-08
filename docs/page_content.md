@@ -89,7 +89,7 @@ keywords; groups overlap, and each CVE is counted once, in its first matching gr
 In the strictest test (train on 2024, test on 2025) we were five ahead: 18 vs 13. With 75 positives it is still a small
 sample.
 - v6 20-seed bag: 18 (2025) + 9 (2024) = 27 vs 13 + 6 = 19; pooled difference +8, 90% range +2 to +14;
-  forward 18 vs 13 (0 to +10); stability 9 vs 6 (`outputs/v6_headline_candidate.json`)
+  forward 18 vs 13 (0 to +10); stability 9 vs 6 (`outputs/headline.json`)
 - What we're sure of: the blind spots are real, EPSS jumped from July 2026, and we didn't use leaking data.
 
 ## 8. Granite reason examples (fill from the final list)

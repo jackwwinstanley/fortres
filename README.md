@@ -14,10 +14,14 @@ pip install -r requirements.txt                         # pinned versions
 cp outputs/top500_v5.csv /tmp/top500_v5_committed.csv   # keep the committed list for the comparison
 python -m src.replicas                                  # practice pools (2024, 2025)
 python -m src.features.build                            # features
-python -m src.models.train_v5                           # final model -> outputs/top500_v5.csv
+python -m src.models.train_v5                           # previous model (v5) -> outputs/top500_v5.csv
 python scripts/check_top500.py outputs/top500_v5.csv    # format check: PASS
 cmp outputs/top500_v5.csv /tmp/top500_v5_committed.csv && echo "identical"   # byte-for-byte
+python -m src.models.train_v6                           # primary model (v6) -> outputs/top500_v6.csv and its checks
+python scripts/check_top500.py outputs/top500_v6.csv    # format check: PASS
 ```
+v6 is the primary model (`src/common/primary.py`); `train_v6` reuses v5's features and data steps above. The v5 timing
+below is for the v5 steps; `train_v6` adds its own checks (placebo, leakage, seed sets) on top.
 - **Time:** a full rebuild takes about 10 minutes on a laptop CPU. In a fresh clone it took 8 min 38 s: replicas 1 s,
   features 6 s, train_v5 8 min 30 s (most of it hyper-parameter grids and the placebo). Allow up to ~30 minutes on a
   slower machine.
@@ -44,15 +48,27 @@ cmp outputs/top500_v5.csv /tmp/top500_v5_committed.csv && echo "identical"   # b
 Not used by the model: `nvd_status`, `n_affected_cpes`, `n_references`, CVSS (baseline only), `cwe_ids`, references, affected products, any 2026 KEV information.
 Results and caveats (low power: 75 positives): `outputs/v1_report.md`. Run: `python -m src.replicas && python -m src.features.build && python -m src.models.train_v1`.
 
-## Results (v6, `outputs/v6_headline_candidate.json`; low power: 75 CVEs added to KEV in the two practice years)
-| test | v6 (20-seed bag) | best simple rule (public exploit, then EPSS) |
-|---|---|---|
-| forward: train 2024 → test 2025 | 18 | 13 |
-| stability: train 2025 → test 2024 | 9 | 6 |
-| pooled | 27 | 19 (+8, 90% range +2 to +14) |
+## Results (v6, `outputs/headline.json`; low power: 75 CVEs added to KEV in the two practice years)
+v6 is a 20-seed LightGBM bag on the v5 features with regularised settings, **chosen from seven declared variants by a rule
+fixed before any result** (`outputs/rank_report.md`, `outputs/v6_report.md`). v5 is kept as the previous model.
 
-Leakage test (after-the-fact NVD columns added, never submitted): 27 → 33 (`outputs/v6_leakage_results.csv`). Blind spots: 44 of 75 KEV additions had no
-public exploit code and a low EPSS; the simple rule catches 0 of them, the v6 bag 5, three of them one Ivanti EPM event (`outputs/v6_blindspots.csv`). Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
+| test | v6 (20-seed bag) | best simple rule (public exploit, then EPSS) | v5 (previous) | v6 − rule, 90% CVE-level / event-clustered | v6 − v5, 90% CVE-level / event-clustered |
+|---|---|---|---|---|---|
+| forward: train 2024 → test 2025 | 18 | 13 | 12 | +5 [0, +10] / [−2, +12] | +6 [+2, +10] / [+1, +12] |
+| stability: train 2025 → test 2024 | 9 | 6 | 9 | +3 | +0 [−2, +2] / [−2, +2] |
+| pooled | 27 | 19 | 21 | +8 [+2, +14] / [+1, +15] | +6 [+2, +11] / [+1, +13] |
+
+- **Seeds:** forward is 18 on all four seed sets and pooled 26 to 28 (`outputs/v6_seed_spread.csv`). Against v5 on the same
+  seeds the gain is only +2 to +5.
+- **Placebo:** real labels 27.0 vs labels shuffled within each month 0.57 pooled hits, 30 bags each (`outputs/v6_placebo.csv`).
+- **Leakage test** (after-the-fact NVD columns added, never submitted): 27 → 33 (`outputs/v6_leakage_results.csv`).
+- **Blind spots:** 44 of 75 KEV additions had no public exploit code and a low EPSS. The simple rule catches 0 of them,
+  v5 2 and v6 5; three of v6's five are one Ivanti EPM event (`outputs/v6_blindspots.csv`).
+- **The 2026 list:** 498 of v6's 500 have public exploit code; 193 are also in the simple rule's top 500 and 429 in v5's
+  (`outputs/v6_overlap.csv`).
+- **Caveat:** in a diagnostic that holds out whole vendors, v5's 2025 in-year hits roughly halve (19 → 10), so part of the
+  in-year skill is familiarity with vendors already seen (`outputs/rank_vendor_cv.csv`).
+Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
 IBM Granite and IBM Granite Guardian are open models run locally; nothing here runs on watsonx. Ideas tested and not adopted: `docs/considered_not_adopted.md`.
 Regenerate Person B outputs with `python -m src.b.refresh_all`; `python scripts/number_sweep.py` checks every number in docs/site/app/README against the outputs.
 

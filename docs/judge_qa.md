@@ -22,7 +22,7 @@ check" (not "verified").
 **Jack (the "how and how honest", for technical and IBM judges)**
 > We rebuilt 2024 and 2025 exactly the way 2026 is scored, used only information available at the time, and trained on
 > one year to test on the other. Our final model is a 20-seed LightGBM bag with text features, including IBM Granite
-> similarity scores. On the strictest forward test it's five ahead of the best simple rule, 18 vs 13; the other direction
+> similarity scores, chosen from seven declared variants by a rule fixed before any result. On the strictest forward test it's five ahead of the best simple rule, 18 vs 13; the other direction
 > is 9 vs 6, so across both years 27 vs 19. That's +8, with a 90% range from +2 to +14, on only 75 positives. Two things make us trust the
 > setup. First, EPSS jumped about 6× from the July 2026 snapshot, so we rank within each month. Second, a leakage test:
 > adding database fields that are filled in after the fact lifts us to 33. Every CVE added to KEV is marked "Analyzed"
@@ -53,6 +53,12 @@ Partly, maybe. In the strictest test (train on 2024, test on 2025) we're five ah
 9 vs 6. With only 75 CVEs added to KEV across the two practice years, the pooled +8 has a 90% range of +2 to +14, and
 rerun with other random seeds our gain over the previous model shrinks to +2 to +5. What *is* solid: the blind spots (44 of 75),
 the July 2026 EPSS jump, and the leakage result.
+
+**Did you pick the model after seeing the results?**
+No. Seven variants were declared, with an adoption rule fixed before any result: at least as good as the previous model in
+both directions, and a pooled gain of at least 2 and at least the seed noise (4). Only one passed, so it became v6.
+One caveat we found ourselves: if whole vendors are held out, the previous model's 2025 in-year hits roughly halve, so
+part of the skill is recognising vendors it has seen before.
 
 **Why 500?**
 That's the challenge rule: a team can realistically patch about 500 per year. On the smaller practice pools we scale it

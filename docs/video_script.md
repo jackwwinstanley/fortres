@@ -2,7 +2,7 @@
 
 Target: about 290 spoken words, roughly 2:00 at a calm pace. Judges score Discovery 35%, Data use 25%,
 Communication 25% and Impact 15%, so we lead with findings, not code.
-Numbers are from the v6 headline model (`outputs/v6_headline_candidate.json`), `outputs/v6_leakage_results.csv` (leaky arm 33 on v6; 28 on v5 and 29 on the earlier v4 run) and `outputs/explanations_summary.json` (Guardian count, PR #35); recheck them if the final list changes. **[Bracketed text] = what's on screen.**
+Numbers are from the v6 headline model (`outputs/headline.json`), `outputs/v6_leakage_results.csv` (leaky arm 33 on v6; 28 on v5 and 29 on the earlier v4 run) and `outputs/explanations_summary.json` (Guardian count, PR #35); recheck them if the final list changes. **[Bracketed text] = what's on screen.**
 
 ---
 

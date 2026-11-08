@@ -26,6 +26,7 @@ from joblib import Parallel, delayed
 
 from src.b import leakage as lk
 from src.b import rank as R
+from src.common import primary
 from src.common.paths import DATA_DIR, OUT_DIR
 from src.common.schema import MONOTONE_UP, SHARE_FEATURES
 from src.common.scoring import clustered_paired_bootstrap_hits, paired_bootstrap_hits, rank_order
@@ -63,6 +64,7 @@ def bag_of(params, feats, Xtr, ytr, Xte, seeds):
 
 
 def main():
+    R.CACHE.mkdir(parents=True, exist_ok=True)   # untracked cache of bag scores; absent in a fresh clone
     data, ctx = R.load()
     _, sb, sb2, _ = st.prepare(OUT_DIR, DATA_DIR)
     sb2s = pd.concat([sb2.reset_index(drop=True), sb[SHARE_FEATURES].reset_index(drop=True)], axis=1)
@@ -103,7 +105,8 @@ def main():
     pd.DataFrame([overlap]).to_csv(OUT_DIR / "v6_overlap.csv", index=False)
 
     # ---------------------------------------------------------------- 2b. directional scores (I settings per direction from b/rank)
-    pI = {d: json.loads((R.CACHE / f"sel_I_{d[0]}.json").read_text())["params"] for d in DIRS}
+    # I's per-direction settings, chosen in b/rank inside each training year (recorded in src/common/primary.py)
+    pI = {d: primary.direction_params(d[0], ctx[d]["tr"]["X5"], ctx[d]["tr"]["y"], ctx[d]["tr"]["groups"], F5, model="v6") for d in DIRS}
     sc6 = {d: R.bag_scores(f"I_{d[0]}", R.V5_SPEC, pI[d], ctx[d], SEEDS) for d in DIRS}
     sc5 = {d: R.bag_scores(f"v5_0-19_{d[0]}", R.V5_SPEC, ctx[d]["p5"], ctx[d], SEEDS) for d in DIRS}
     h6 = [st.hits_of(ctx[d], sc6[d]) for d in DIRS]
@@ -138,7 +141,7 @@ def main():
             br.append({"year": a["year"], "group": a["group"], "exploited": a["exploited"], "simple_rule_caught": a["baseline_caught"],
                        "v5_caught": a["ours_caught"], "v6_caught": b["ours_caught"], "v6_caught_cves": b["ours_caught_cves"]})
     blind = pd.DataFrame(br)
-    blind.to_csv(OUT_DIR / "v6_blindspots.csv", index=False)
+    blind.to_csv(OUT_DIR / "v6_blindspots_compare.csv", index=False)  # rule vs v5 vs v6; v6_blindspots.csv is src.b.leakage's
 
     # ---------------------------------------------------------------- 2e. placebo: real vs shuffled labels (like-for-like)
     real, null = [], []
@@ -174,7 +177,7 @@ def main():
             s = bag_of(pI[d], feats, XL[tr], data[tr]["y"], XL[te], SEEDS)
             lrows.append({"direction": DN[d], "model": arm, "hits": st.hits_of(ctx[d], s), "k": ctx[d]["k"], "settings": json.dumps(pI[d])})
     lres = pd.DataFrame(lrows)
-    lres.to_csv(OUT_DIR / "v6_leakage_results.csv", index=False)
+    lres.to_csv(OUT_DIR / "v6_leakage_check.csv", index=False)  # quick check; the full table is src.b.leakage's v6_leakage_results.csv
     run("leakage", "ok", table=lres[["direction", "model", "hits"]].to_dict("records"))
 
     # ---------------------------------------------------------------- 2g. spread over the 4 seed sets
@@ -211,7 +214,7 @@ def main():
                      for k in ("forward", "stability", "pooled")},
         "placebo_bootstrap_p": p_boot,
         "positives": {"2024": int(data[2024]["y"].sum()), "2025": int(data[2025]["y"].sum())},
-        "leakage": {"source": "outputs/v6_leakage_results.csv", **lk_sum},
+        "leakage": {"source": "outputs/v6_leakage_check.csv", **lk_sum},
         "final_params": p6,
         "note": "CANDIDATE ONLY. LOW POWER (75 positives). headline.json (v5) is unchanged until Jack's verdict."}
     (OUT_DIR / "v6_headline_candidate.json").write_text(json.dumps(head, indent=1))

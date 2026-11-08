@@ -1,7 +1,7 @@
 # Devpost submission text (DRAFT, for Aba or Jack to paste)
 
 Claude can't log in to Devpost; paste each section into the matching Devpost field. Numbers match `outputs/headline.json`
-(v5) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
+(v6) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
 
 ---
 
@@ -33,7 +33,9 @@ description, the way an analyst would, can help.
   From that we derive a KEV-likeness score (a classifier trained only on earlier years) and the similarity to the
   closest past KEV entry. Phrases that only appear after exploitation ("exploited in the wild", …) are removed first.
 - **Model:** a 20-seed LightGBM bag on exploit signals, EPSS rank within the month, vendor and reporter history, and
-  the Granite text features.
+  the Granite text features, with regularised settings chosen from seven declared variants by a rule fixed before any
+  result. On matched random seeds it beats our previous model by +2 to +5 catches, and part of its in-year skill is
+  recognising vendors it has already seen.
 - **Reasons:** `granite-3.3-2b-instruct` rewrites a fact list into one sentence. A local checker blocks invented
   numbers, products, CVE ids and claims, and IBM Granite Guardian (`granite3-guardian:2b`, via Ollama) checks the rest is
   supported by the facts.
