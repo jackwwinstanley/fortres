@@ -7,6 +7,8 @@ Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and s
 `top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
 CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
 
+**Live site:** https://fortres.us, served from a Vultr server (every response carries `X-Served-By: Vultr`; setup in [deploy/README.md](deploy/README.md)).
+
 ## What we found
 All four are from files in this repository; the full list of ten, with sources, is in [docs/findings.md](docs/findings.md).
 1. **Most holes on CISA's list gave no warning.** In our 2024 and 2025 test, 44 of the 75 had no public attack code and a low EPSS score. The usual rule catches 0 of them, and fortres caught 5, three of which come from one Ivanti event.
