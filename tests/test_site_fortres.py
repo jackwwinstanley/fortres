@@ -68,3 +68,26 @@ def test_full_picks_and_lookup_list_equal_the_outputs():
     ranks = (SITE / "data" / "ranks.txt").read_text().strip().split(",")
     assert len(ranks) == 72670
     assert ["CVE-20" + x.split(".")[0] for x in ranks[:500]] == top
+
+
+@need
+def test_findings_charts_equal_the_outputs():
+    """The findings page draws its charts from site/data/findings.json; it must equal a fresh export from outputs/, and the
+    counts it shows must agree with the sentences beside them."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("export_site_findings", REPO_ROOT / "scripts" / "export_site_findings.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    on_page = json.loads((SITE / "data" / "findings.json").read_text())
+    assert on_page == json.loads(json.dumps(mod.build(), ensure_ascii=False))
+    h = json.loads((OUT_DIR / "headline.json").read_text())
+    assert on_page["leakage"] == {"honest": h["leakage"]["honest"]["pooled_hits"], "leaky": h["leakage"]["leaky"]["pooled_hits"]}
+    r = on_page["reasons"]
+    assert r["passed_guardian"] + r["guardian_rejected"] + r["local_failed"] == r["total"]
+    assert sum(n for _, _, n in on_page["events"]) == on_page["blind"]["total"]
+    html = re.sub(r"\s+", " ", (SITE / "index.html").read_text())
+    for sid in ["f-blind", "f-work", "f-sev", "f-leak", "f-reasons", "f-events", "f-vendor", "f-epss", "f-dates", "f-simple"]:
+        assert f'id="{sid}"' in html, sid
+    assert f"Granite Guardian rejected {r['guardian_rejected']} reasons, and {r['local_failed']} more failed our own checks" in html
+    assert f"{len(on_page['events'])} separate events" in html
+    assert f"from {on_page['vendor_cv_2025']['ungrouped']} to {on_page['vendor_cv_2025']['vendor_grouped']}" in html

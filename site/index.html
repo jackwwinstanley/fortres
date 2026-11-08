@@ -126,30 +126,140 @@
 
 <div id="found" class="gut">
   <div class="fwrap">
-    <h1>What is fortres?</h1>
-    <p class="def">Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.</p>
-    <ol class="pts">
-      <li><b>The ranking is 20 models that vote, each built from 150 small decision trees.</b> It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.</li>
-      <li><b>IBM Granite does the reading and the explaining.</b> Granite Embedding reads each description and gives the ranking one clue. Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts. If it fails, a plain template sentence is used instead. Then IBM watsonx.governance on IBM Cloud scored all 500 reasons: 0 were flagged for harm or personal data.</li>
-      <li><b>What it is not.</b> It doesn't predict who gets attacked. The language model never decides the ranking. And it still misses most holes that give no warning.</li>
-    </ol>
+    <header class="fhero">
+      <h2 class="fq">What is fortres?</h2>
+      <p class="def">Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.</p>
+      <ol class="flow">
+        <li><span class="fstep">read</span><b>IBM Granite Embedding</b><span>reads every description and gives the ranking one clue</span></li>
+        <li><span class="fstep">rank</span><b>The ranking is 20 models that vote, each built from 150 small decision trees.</b><span>Not a chatbot: fast, testable, runs on a laptop</span></li>
+        <li><span class="fstep">explain</span><b>Granite 3.3, checked by Granite Guardian</b><span>one plain reason per pick, or a template if the check fails. Then IBM watsonx.governance on IBM Cloud scored all 500 reasons: 0 were flagged for harm or personal data.</span></li>
+      </ol>
+      <p class="isnot">What it is not: it doesn't predict who gets attacked, the language model never decides the ranking, and it still misses most holes that give no warning.</p>
+    </header>
 
-    <h2>What we found</h2>
-    <p class="sub">Results come from our 2024 and 2025 test: we trained on one year and ranked the other, then checked which holes CISA later added to its list.</p>
-    <ol class="finds">
-      <li><span class="fn">44<small>of 75</small></span><div><h3>Most holes on CISA's list gave no warning.</h3><p>No public attack code and a low EPSS score. The usual rule catches 0 of them. Fortres caught 5, and three of those come from one Ivanti event. The gap is real, and most of it is still open.</p><code>outputs/v6_blindspots.csv</code></div></li>
-      <li><span class="fn">1 in 9<small>162 of 1,484</small></span><div><h3>Severity labels hide danger.</h3><p>Of the holes on CISA's list from 2021 to 2025, 1 in 9 was labelled only "Medium". A team that fixes Critical and High first reaches these last.</p><code>NVD severity labels on CISA KEV, 2021 to 2025</code></div></li>
-      <li><span class="fn">27<small>not 33</small></span><div><h3>Data that arrives after an attack makes results look better than they are.</h3><p>NVD reviews holes on CISA's list first: every one of them is marked "Analyzed", against 42 to 50% of the rest. Using that review status would raise 27 catches to 33, so we left it out.</p><code>outputs/v6_leakage_results.csv · docs/column_review.md</code></div></li>
-      <li><span class="fn">249<small>of 490</small></span><div><h3>Outside data can carry hindsight dates.</h3><p>In Metasploit, 249 of 490 links to a hole were added more than 30 days after the attack module itself. Some 2025 holes are new numbers for exploits from 2010. VulnCheck's list dates match the first attack report in 5,803 of 5,809 entries, which looks like backfilling. We rejected VulnCheck for this, dated Metasploit by when the link was added, and adopted neither.</p><code>outputs/newdata_provenance.md · outputs/outside_report.md</code></div></li>
-      <li><span class="fn">7 + 11<small>tried, one kept</small></span><div><h3>Simpler beat clever.</h3><p>We declared 7 model variants and 11 extra methods before seeing results. The winner was the more constrained model, and no extra method passed our pre-set rule. That restraint is also why rare signals, like Nuclei and Metasploit flags, add nothing.</p><code>outputs/rank_summary.csv · outputs/zoo_summary.md · outputs/newdata_report.md</code></div></li>
-      <li><span class="fn">19 → 10</span><div><h3>Attackers return to the same vendors.</h3><p>Hiding whole vendors from training halves the 2025 test's catches, from 19 to 10. A vendor's track record is a strong clue, and that's also a limit: a brand-new vendor gets less help.</p><code>outputs/rank_vendor_cv.csv</code></div></li>
-      <li><span class="fn">67<small>events behind 75</small></span><div><h3>Attacks come in bursts.</h3><p>The 75 holes come from 67 separate events, where one vendor's holes are added to CISA's list on the same day. Because they're linked, our ranges resample whole events, which makes them wider and more honest.</p><code>outputs/v4_report.md · outputs/headline.json</code></div></li>
-      <li><span class="fn">182<small>of 500</small></span><div><h3>The AI's reasons needed a referee.</h3><p>Granite Guardian rejected 90 reasons, and 92 more failed our own checks. The most common failure was a word that isn't in the facts. All 182 got a plain template sentence instead.</p><code>outputs/explanations_summary.json</code></div></li>
-      <li><span class="fn">441<small>fixes, not 10,026</small></span><div><h3>Less work for the same catch.</h3><p>Fortres's list of 441 holds all 27 catches (its 27th comes at position 353). To reach 27, you'd have to go 1,116 deep with the usual rule, 6,858 deep sorting by severity, and 10,026 deep with EPSS alone.</p><code>same 2024 and 2025 test as the 27 · docs/findings.md</code></div></li>
-      <li><span class="fn">6.37&times;<small>EPSS jump</small></span><div><h3>A warning score changed scale mid-year.</h3><p>From the July 2026 snapshots on, EPSS scores were 6.37 times the 2024 to 2025 median. So fortres compares each hole only with others scored in the same month, instead of trusting the raw score.</p><code>outputs/discovery_epss_jump.csv</code></div></li>
-    </ol>
+    <div class="fhead">
+      <h1>What we found</h1>
+      <p class="sub">Ten things we learned from our 2024 and 2025 test: we trained on one year, ranked the other, then checked which holes CISA later added to its list. Every chart below is drawn from a file in our repo.</p>
+      <nav class="fidx" aria-label="Findings"></nav>
+    </div>
 
-    <h2>Questions judges ask</h2>
+    <section class="fd tone-coral" id="f-blind" data-viz="blind" data-t="No warning">
+      <div class="ft">
+        <span class="fk">01</span>
+        <span class="fbig"><b class="cu" data-n="44">44</b><small>of 75</small></span>
+        <h3>Most holes on CISA's list gave no warning.</h3>
+        <p>No public attack code and a low EPSS score. The usual rule catches 0 of them. Fortres caught 5, and three of those come from one Ivanti event. The gap is real, and most of it is still open.</p>
+        <code>outputs/v6_blindspots.csv</code>
+      </div>
+      <figure class="fv"><div class="viz" role="img" aria-label="75 bricks, one per hole added to CISA's list in our test: 31 had warning signs, 44 had none, and fortres caught 5 of those 44"></div>
+        <figcaption class="key"><span class="k blue">had a warning sign</span><span class="k coral">no warning</span><span class="k mint">no warning, fortres caught it</span></figcaption></figure>
+    </section>
+
+    <section class="fd tone-mint" id="f-work" data-viz="work" data-t="Less work">
+      <div class="ft">
+        <span class="fk">02</span>
+        <span class="fbig"><b class="cu" data-n="441">441</b><small>fixes, not 10,026</small></span>
+        <h3>Less work for the same catch.</h3>
+        <p>Fortres's list of 441 holds all 27 catches (its 27th comes at position 353). To reach 27, you'd have to go 1,116 deep with the usual rule, 6,858 deep sorting by severity, and 10,026 deep with EPSS alone.</p>
+        <code>outputs/discovery_workload.csv</code>
+      </div>
+      <figure class="fv"><div class="viz bars" role="img" aria-label="Fixes needed to catch the same 27: fortres 441, usual rule 1,116, severity 6,858, EPSS alone 10,026"></div></figure>
+    </section>
+
+    <section class="fd tone-amber" id="f-sev" data-viz="sev" data-t="Medium labels">
+      <div class="ft">
+        <span class="fk">03</span>
+        <span class="fbig"><b>1 in 9</b><small>162 of 1,484</small></span>
+        <h3>Severity labels hide danger.</h3>
+        <p>Of the holes on CISA's list from 2021 to 2025, 1 in 9 was labelled only "Medium". A team that fixes Critical and High first reaches these last.</p>
+        <code>outputs/discovery_kev_severity.csv</code>
+      </div>
+      <figure class="fv"><div class="viz" role="img" aria-label="1,484 bricks, one per hole on CISA's list from 2021 to 2025, coloured by severity label; the Medium ones are lit"></div>
+        <figcaption class="key"><span class="k dim">Critical</span><span class="k dim2">High</span><span class="k amber">Medium</span><span class="k dim3">Low</span></figcaption></figure>
+    </section>
+
+    <section class="fd tone-mint" id="f-leak" data-viz="leak" data-t="27 not 33">
+      <div class="ft">
+        <span class="fk">04</span>
+        <span class="fbig"><b class="cu" data-n="27">27</b><small>not 33</small></span>
+        <h3>Data that arrives after an attack makes results look better than they are.</h3>
+        <p>NVD reviews holes on CISA's list first: every one of them is marked "Analyzed", against 42 to 50% of the rest. Using that review status would raise 27 catches to 33, so we left it out.</p>
+        <code>outputs/v6_leakage_results.csv · docs/column_review.md</code>
+      </div>
+      <figure class="fv"><div class="viz" role="img" aria-label="33 bricks: 27 caught honestly, 6 more only with after-the-fact data, which we left out"></div>
+        <figcaption class="key"><span class="k mint">caught honestly</span><span class="k ghost">only with after-the-fact data</span></figcaption></figure>
+    </section>
+
+    <section class="fd tone-coral" id="f-reasons" data-viz="reasons" data-t="AI referee">
+      <div class="ft">
+        <span class="fk">05</span>
+        <span class="fbig"><b class="cu" data-n="182">182</b><small>of 500</small></span>
+        <h3>The AI's reasons needed a referee.</h3>
+        <p>Granite Guardian rejected 90 reasons, and 92 more failed our own checks. The most common failure was a word that isn't in the facts. All 182 got a plain template sentence instead.</p>
+        <code>outputs/explanations_summary.json</code>
+      </div>
+      <figure class="fv"><div class="viz" role="img" aria-label="500 bricks, one per reason: 318 kept, 90 rejected by Granite Guardian, 92 stopped by our own checks"></div>
+        <figcaption class="key"><span class="k mint">Granite's sentence kept</span><span class="k coral">rejected by Guardian</span><span class="k amber">stopped by our checks</span></figcaption></figure>
+    </section>
+
+    <section class="fd tone-blue" id="f-events" data-viz="events" data-t="Bursts">
+      <div class="ft">
+        <span class="fk">06</span>
+        <span class="fbig"><b class="cu" data-n="67">67</b><small>events behind 75</small></span>
+        <h3>Attacks come in bursts.</h3>
+        <p>The 75 holes come from 67 separate events, where one vendor's holes are added to CISA's list on the same day. Because they're linked, our ranges resample whole events, which makes them wider and more honest.</p>
+        <code>outputs/discovery_events.csv · outputs/headline.json</code>
+      </div>
+      <figure class="fv"><div class="viz tl" role="img" aria-label="Timeline of the 75 holes from 2024 to 2025, stacked by event; most events are one hole, a few hold two or three"></div>
+        <figcaption class="key"><span class="k dim2">one hole</span><span class="k blue">several holes, same vendor, same day</span></figcaption></figure>
+    </section>
+
+    <section class="fd tone-blue" id="f-vendor" data-viz="vendor" data-t="Same vendors">
+      <div class="ft">
+        <span class="fk">07</span>
+        <span class="fbig"><b>19 → 10</b><small>2025 test catches</small></span>
+        <h3>Attackers return to the same vendors.</h3>
+        <p>Hiding whole vendors from training halves the 2025 test's catches, from 19 to 10. A vendor's track record is a strong clue, and that's also a limit: a brand-new vendor gets less help.</p>
+        <code>outputs/rank_vendor_cv.csv</code>
+      </div>
+      <figure class="fv"><div class="viz rows" role="img" aria-label="Catches in the 2025 test: 19 when vendors are seen in training, 10 when whole vendors are hidden"></div></figure>
+    </section>
+
+    <section class="fd tone-blue" id="f-epss" data-viz="epss" data-t="EPSS jump">
+      <div class="ft">
+        <span class="fk">08</span>
+        <span class="fbig"><b>6.37&times;</b><small>EPSS jump</small></span>
+        <h3>A warning score changed scale mid-year.</h3>
+        <p>From the July 2026 snapshots on, EPSS scores were 6.37 times the 2024 to 2025 median. So fortres compares each hole only with others scored in the same month, instead of trusting the raw score.</p>
+        <code>outputs/discovery_epss_jump.csv</code>
+      </div>
+      <figure class="fv"><div class="viz ep" role="img" aria-label="Median EPSS score by snapshot month: flat through 2024, 2025 and early 2026, then a jump from July 2026"></div></figure>
+    </section>
+
+    <section class="fd tone-amber" id="f-dates" data-viz="dates" data-n="490" data-hl="249" data-t="Hindsight dates">
+      <div class="ft">
+        <span class="fk">09</span>
+        <span class="fbig"><b class="cu" data-n="249">249</b><small>of 490</small></span>
+        <h3>Outside data can carry hindsight dates.</h3>
+        <p>In Metasploit, 249 of 490 links to a hole were added more than 30 days after the attack module itself. Some 2025 holes are new numbers for exploits from 2010. VulnCheck's list dates match the first attack report in 5,803 of 5,809 entries, which looks like backfilling. We rejected VulnCheck for this, dated Metasploit by when the link was added, and adopted neither.</p>
+        <code>outputs/newdata_provenance.md · outputs/outside_report.md</code>
+      </div>
+      <figure class="fv"><div class="viz" role="img" aria-label="490 bricks, one per Metasploit link; 249 were added more than a month after the module"></div>
+        <figcaption class="key"><span class="k amber">link added more than a month later</span><span class="k dim2">added with the module</span></figcaption></figure>
+    </section>
+
+    <section class="fd tone-mint" id="f-simple" data-viz="simple" data-a="7" data-b="11" data-t="Simpler won">
+      <div class="ft">
+        <span class="fk">10</span>
+        <span class="fbig"><b>7 + 11</b><small>tried, one kept</small></span>
+        <h3>Simpler beat clever.</h3>
+        <p>We declared 7 model variants and 11 extra methods before seeing results. The winner was the more constrained model, and no extra method passed our pre-set rule. That restraint is also why rare signals, like Nuclei and Metasploit flags, add nothing.</p>
+        <code>outputs/rank_summary.csv · outputs/zoo_summary.md · outputs/newdata_report.md</code>
+      </div>
+      <figure class="fv"><div class="viz tiles" role="img" aria-label="18 tiles: 7 model variants and 11 extra methods, declared in advance; one variant kept, no extra method passed"></div></figure>
+    </section>
+
+    <h2 class="qah">Questions judges ask</h2>
     <dl class="qa">
       <div><dt>Is fortres an LLM?</dt><dd>No. The ranking is 20 models that vote, each built from 150 small decision trees. IBM Granite reads the descriptions to give the ranking one clue, and writes the plain reason for each pick, which Granite Guardian checks against the facts.</dd></div>
       <div><dt>Why not use an LLM to rank?</dt><dd>A ranking model can be tested against known outcomes, and it gives the same answer every time. A language model can make things up, so we only let it explain.</dd></div>
@@ -190,5 +300,6 @@
 
 <script src="vendor/three.r128.min.js" defer></script>
 <script src="fortres.js" defer></script>
+<script src="findings.js" defer></script>
 </body>
 </html>
