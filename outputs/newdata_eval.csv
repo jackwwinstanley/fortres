@@ -1,0 +1,19 @@
+source,test,variant,hits,diff_vs_v6,cve_level_90,event_clustered_90
+nuclei-templates,forward (train 2024 -> test 2025),v6,18,,,
+nuclei-templates,forward (train 2024 -> test 2025),A: v6 + Nuclei features,18,0.0,"[0, 0]","[0, 0]"
+nuclei-templates,forward (train 2024 -> test 2025),B: Nuclei features alone,8,-10.0,"[-16, -4]","[-17, -3]"
+nuclei-templates,stability (train 2025 -> test 2024),v6,9,,,
+nuclei-templates,stability (train 2025 -> test 2024),A: v6 + Nuclei features,9,0.0,"[0, 0]","[0, 0]"
+nuclei-templates,stability (train 2025 -> test 2024),B: Nuclei features alone,3,-6.0,"[-11, -3]","[-10, -3]"
+nuclei-templates,pooled,v6,27,,,
+nuclei-templates,pooled,A: v6 + Nuclei features,27,0.0,"[0, 0]","[0, 0]"
+nuclei-templates,pooled,B: Nuclei features alone,11,-16.0,"[-24, -9]","[-25, -9]"
+nuclei-templates,forward (train 2024 -> test 2025),leakage: honest (v6 + Nuclei),18,,,
+nuclei-templates,stability (train 2025 -> test 2024),leakage: honest (v6 + Nuclei),9,,,
+nuclei-templates,forward (train 2024 -> test 2025),leakage: with banned columns,21,,,
+nuclei-templates,stability (train 2025 -> test 2024),leakage: with banned columns,12,,,
+nuclei-templates,pooled,leakage: honest (v6 + Nuclei),27,,,
+nuclei-templates,pooled,leakage: with banned columns,33,,,
+nuclei-templates,adoption rule,A: v6 + Nuclei features,27,0.0,fails,forward 18 / stability 9
+nuclei-templates,adoption rule,B: Nuclei features alone,11,-16.0,fails,forward 8 / stability 3
+nuclei-templates,placebo,"A, labels shuffled within month (10 x 5-seed bags)",27,,shuffled mean 0.6,"diff 26.4, p 0.0"
