@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fortres demo</title>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<div id="stage" class="stage" aria-live="polite">
+  <section id="s-start" class="scene start"><p class="press">Press Space</p></section>
+
+  <section id="s-hook" class="scene">
+    <p id="hook-big" class="huge num"></p>
+    <p id="hook-line" class="lead"></p>
+    <p id="hook-rate" class="sub"></p>
+  </section>
+
+  <section id="s-what" class="scene">
+    <h1 id="what-title" class="title"></h1>
+    <ol id="flow" class="flow"></ol>
+  </section>
+
+  <section id="s-replay" class="scene">
+    <h1 id="replay-title" class="title"></h1>
+    <p id="replay-label" class="tag"></p>
+    <div id="hist" class="hist" aria-hidden="true"></div>
+    <p id="replay-top" class="hist-top"></p>
+  </section>
+
+  <section id="s-lookup" class="scene">
+    <div class="search"><span class="search-label">Look up a CVE</span><span id="typed" class="typed num"></span><span id="caret" class="caret"></span></div>
+    <div id="cards" class="cards"></div>
+  </section>
+
+  <section id="s-result" class="scene">
+    <h1 id="result-title" class="title"></h1>
+    <div id="bars" class="bars"></div>
+    <p id="result-range" class="sub"></p>
+    <p id="result-split" class="small"></p>
+    <p id="result-workload" class="small"></p>
+    <div id="leak" class="leak"><p id="leak-big" class="leak-big"></p><p id="leak-note" class="sub"></p></div>
+  </section>
+
+  <section id="s-found" class="scene">
+    <div id="found" class="found"></div>
+  </section>
+
+  <section id="s-close" class="scene close">
+    <p id="close-big" class="close-big"></p>
+    <p id="close-links" class="close-links num"></p>
+    <p id="close-team" class="sub"></p>
+    <p id="close-built" class="small"></p>
+  </section>
+</div>
+<div id="hints" class="hints"><span id="hint-scene" class="num"></span> Space or → next · ← back · R restart · A autoplay · H hide</div>
+<script src="demo.js"></script>
+</body>
+</html>
