@@ -13,7 +13,7 @@ We rank 2026's 72,670 new vulnerabilities to find the ones most likely to be add
 known at the time, with a plain-English reason for each pick from IBM Granite.
 
 ## What it is
-Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
+Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 to fix first, ranked by the warning signs known at the time, and IBM Granite models help read the descriptions and explain every pick in plain language.
 
 The ranking is 20 models that vote, each built from 150 small decision trees, not a chatbot: it's fast, it can be tested against what really happened, and it runs on a laptop. Granite Embedding reads each description and gives the ranking one clue, Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts (a plain template is used if it fails). It doesn't predict who gets attacked, the language model never decides the ranking, and it still misses most holes that give no warning.
 

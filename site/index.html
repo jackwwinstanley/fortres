@@ -56,14 +56,14 @@
   <section class="step" data-s="picks"><div class="card">
     <span class="num blue">500</span>
     <h2>Fortres picks <mark>the 500 to fix first</mark>.</h2>
-    <p>Fortres is a triage system for security holes. A statistical model ranks all 72,670 and picks the 500 most likely to be attacked. IBM Granite helps read the descriptions and explains every pick in plain words.</p>
+    <p>Fortres is a triage system for security holes. A statistical model ranks all 72,670 and picks the 500 to fix first, ranked by the warning signs known at the time. IBM Granite helps read the descriptions and explains every pick in plain words.</p>
     <span class="note">6 of 855 bricks: the same share as 500 of 72,670</span>
   </div></section>
 
   <section class="step" data-s="towers"><div class="card">
     <span class="num mint">52&times;<small>better than chance</small></span>
     <h2>We flag <mark>under 1%</mark> of holes and find over a third of the ones that matter.</h2>
-    <p>Only 1 in 855 holes ever gets added to CISA's list. 1 in 16 of fortres's picks did. In our 2024 and 2025 test, fortres flagged 441 of 64,119 holes (0.69%) and caught 27 of the 75 that landed on the list (36%). The top of the list is sharpest: of its top 100 each year, 1 in 9 got added.</p>
+    <p>Only 1 in 855 holes ever gets added to CISA's list. 1 in 16 of fortres's picks did. In our 2024 and 2025 test, fortres caught 36% of the holes attackers later used (27 of 75), while flagging less than 1% of all holes (441 of 64,119). The usual rule (public attack code first, then EPSS) caught 25% (19 of 75). The top of the list is sharpest: of its top 100 each year, 1 in 9 got added.</p>
     <div class="vs sm"><div><span class="num mint">27</span><span class="l">fortres</span></div><div><span class="num" style="color:var(--mute)">19</span><span class="l">usual rule</span></div><div><span class="num blue">11</span><span class="l">EPSS score alone</span></div><div><span class="num amber">5</span><span class="l">by severity</span></div></div>
     <span class="note"><span class="count" data-to="27">27</span> vs <span class="count" data-to="19">19</span> for the usual rule: +8, 90% range from +2 to +14 · 18 to 13 in 2025, 9 to 6 in 2024 · 2.5&times; EPSS alone · 5.4&times; severity</span>
   </div></section>
@@ -71,7 +71,7 @@
   <section class="step" data-s="work"><div class="card">
     <span class="num mint">23&times;<small>less work</small></span>
     <h2>Fortres caught those 27 with a list of only <mark>441 fixes</mark>.</h2>
-    <p>To reach the same 27, the usual rule would have to go 1,116 deep. Sorting by severity, 6,858. EPSS alone, 10,026. Every fix costs a team time and money, so fewer, better-chosen fixes is the whole point.</p>
+    <p>Fortres reached those catches with 441 fixes; the usual rule needed 1,116, about 2.5 times the work. Sorting by severity took 6,858 and EPSS alone 10,026. Every fix costs a team time and money, so fewer, better-chosen fixes is the whole point.</p>
     <div class="vs sm"><div><span class="num mint">441</span><span class="l">fortres</span></div><div><span class="num" style="color:var(--mute)">1,116</span><span class="l">usual rule</span></div><div><span class="num amber">6,858</span><span class="l">by severity</span></div><div><span class="num blue">10,026</span><span class="l">EPSS alone</span></div></div>
     <span class="note">each brick is about 100 fixes · same 2024 and 2025 test as the 27 · fortres's 27th catch is at position 353</span>
   </div></section>
@@ -79,7 +79,7 @@
   <section class="step" data-s="blindRule"><div class="card">
     <span class="num coral">44<small>of 75</small></span>
     <h2>Most holes that end up on CISA's list <mark>give no warning first</mark>.</h2>
-    <p>For 44 of the 75, nobody had posted code to attack them, and their warning score was low. Most teams only rush to patch holes with those signs, so all 44 would slip past.</p>
+    <p>59% of exploited holes (44 of 75) gave no warning sign: nobody had posted code to attack them, and their warning score was low. The usual rule caught none of them; fortres caught 5.</p>
   </div></section>
 
   <section class="step" data-s="blindOurs"><div class="card">
@@ -114,6 +114,9 @@
     <span class="num mint">27<small>not 33</small></span>
     <h2>We could have claimed 33. <mark>We didn't.</mark></h2>
     <p>27 is how many holes fortres caught, out of the 75 that CISA later added to its list in our 2024 and 2025 test. Some data only shows up after an attack, like NVD marking a hole as reviewed. Using it would have taken us from 27 to 33, so we left it out. We also reran it with four sets of random seeds and got 26 to 28 every time. Trained on shuffled answers, it catches less than 1.</p>
+    <p><b>How we kept it fair.</b> We used only what was known at the end of each hole's snapshot month. Fields filled in after an attack, like NVD review status and product and reference counts, are banned. Using them would have raised our catch rate from 36% to 44% of exploited holes (27 to 33 of 75), a gain that would have been fake.</p>
+    <p>On an older year rebuilt from public data (2023), fortres caught 18% of the exploited holes (4 of 22) while flagging under 1% of all holes (144 of 20,969), about 26 times better than random. The usual rule caught 23% (5 of 22). We report it anyway.</p>
+    <p>Anyone with the data can rebuild the exact same 500, byte for byte, from a fresh copy of the code in about 6 minutes on a laptop.</p>
   </div></section>
 
   <section class="step" data-s="close"><div class="card">
@@ -128,7 +131,7 @@
   <div class="fwrap">
     <header class="fhero">
       <h2 class="fq">What is fortres?</h2>
-      <p class="def">Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.</p>
+      <p class="def">Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 to fix first, ranked by the warning signs known at the time, and IBM Granite models help read the descriptions and explain every pick in plain language.</p>
       <ol class="flow">
         <li><span class="fstep">read</span><b>Granite Embedding reads every description.</b></li>
         <li><span class="fstep">rank</span><b>20 models that vote, each built from 150 small decision trees.</b></li>
@@ -145,7 +148,7 @@
       <div class="ft">
         <span class="fk">01</span>
         <span class="fbig"><b class="cu" data-n="67">67</b><small>events</small></span>
-        <h3>Attacks come in bursts.</h3>
+        <h3>A few attacks come in bursts (75 holes, 67 separate events), so we count events, not holes, in our error ranges.</h3>
         <p>The 75 holes in our test came from 67 separate events, often one vendor's holes on the same day. So our error ranges count each event once, not each hole.</p>
         <code>outputs/discovery_events.csv</code>
       </div>

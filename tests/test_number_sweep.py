@@ -270,3 +270,54 @@ def test_the_2023_back_test_claim_is_checked():
     assert ns.check_text(FINAL, "On an older year the model never saw, 2023, it caught 4 of 22.", e) == []
     probs = ns.check_text(FINAL, "On an older year the model never saw, 2023, it caught 9 of 22.", e)
     assert any("2023 back-test claim" in p for p in probs), probs
+
+
+# ---- rule 17: percentages carry their raw count, and the count comes from its source file ------------------------------------------
+X = {**E, "pooled": (27, 19), "honest": 27, "leaky": 33, "blind": (44, 75), "blind_ours": 5, "blind_rule": 0, "rebuild_minutes": 6,
+     "findings": {"workload": {"usual": 1116, "fortres_list": 441}},
+     "extra_year": {"hits": 4, "positives": 22, "simple_hits": 5, "k": 144, "pool": 20969, "lift": 26.5}}
+RESULT = ("In our 2024 and 2025 test, fortres caught 36% of the holes attackers later used (27 of 75), while flagging less than 1% of "
+          "all holes (441 of 64,119). The usual rule (public attack code first, then EPSS) caught 25% (19 of 75).")
+OLDER = ("On an older year rebuilt from public data (2023), fortres caught 18% of the exploited holes (4 of 22) while flagging under 1% of "
+         "all holes (144 of 20,969), about 26 times better than random. The usual rule caught 23% (5 of 22). We report it anyway.")
+
+
+@pytest.mark.parametrize("line", [
+    RESULT,
+    "Fortres reached those catches with 441 fixes; the usual rule needed 1,116, about 2.5 times the work.",
+    "59% of exploited holes (44 of 75) gave no warning sign. The usual rule caught none of them; fortres caught 5.",
+    "Using them would have raised our catch rate from 36% to 44% of exploited holes (27 to 33 of 75), a gain that would have been fake.",
+    OLDER,
+    "Anyone with the data can rebuild the exact same 500, byte for byte, in about 6 minutes on a laptop.",
+])
+def test_rule_17_correct_claims_pass(line):
+    assert ns.check_text(FINAL, line, X) == []
+
+
+@pytest.mark.parametrize("line,needle,env", [
+    (RESULT.replace("36% of the holes attackers later used (27 of 75)", "37% of the holes attackers later used (27 of 75)"), "but 27 of 75 is 36.0%", X),
+    (RESULT.replace("caught 25% (19 of 75)", "caught 27% (20 of 75)"), "outputs/headline.json (baseline_pooled_hits) has 19 of 75", X),
+    (RESULT.replace("(441 of 64,119)", "(500 of 64,119)"), "the flagged list has 441", X),
+    (RESULT.replace("(441 of 64,119)", "(441 of 20,000)"), "must be under 1% of the pool", X),
+    ("Fortres needed 441 fixes and the usual rule 1,116, about 3 times the work.", "outputs/discovery_workload.csv gives 1116 / 441", X),
+    ("59% of exploited holes (43 of 75) gave no warning sign.", "the blind-spot file has 44 of 75", X),
+    ("The usual rule caught none of them; fortres caught 5.", "'usual rule caught none'", {**X, "blind_rule": 3}),
+    ("It would have raised our catch rate from 36% to 45% of exploited holes (27 to 34 of 75).", "the leakage files have 27 to 33 of 75", X),
+    (OLDER.replace("(4 of 22)", "(5 of 22)"), "outputs/extra_year_eval.csv has 4 of 22", X),
+    (OLDER.replace("(144 of 20,969)", "(150 of 20,969)"), "the flagged list has 144", X),
+    (OLDER.replace("about 26 times", "about 30 times"), "lift_vs_chance is 26.5", X),
+    ("Anyone can rebuild the exact same 500 in about 10 minutes on a laptop.", "README.md says train_v6 took 6 min", X),
+])
+def test_rule_17_wrong_claims_are_caught(line, needle, env):
+    probs = ns.check_text(FINAL, line, env)
+    assert any(needle in p for p in probs), probs
+
+
+def test_rule_17_percentages_without_a_known_subject_are_only_checked_for_arithmetic():
+    assert ns.check_text(FINAL, "Some other group was 50% (3 of 6).", X) == []
+    assert any("but 3 of 6 is 50.0%" in p for p in ns.check_text(FINAL, "Some other group was 40% (3 of 6).", X))
+
+
+def test_the_definition_is_the_fix_first_wording():
+    assert "to fix first, ranked by the warning signs known at the time" in ns.DEFINITION
+    assert "most likely to be attacked" not in ns.DEFINITION

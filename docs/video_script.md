@@ -13,7 +13,7 @@ CISA's list of known-exploited vulnerabilities. We set out to find those few bef
 
 **0:15–0:32 · What is fortres?** *(Aba)*
 [The one sentence on screen]
-"Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language."
+"Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 to fix first, ranked by the warning signs known at the time, and IBM Granite models help read the descriptions and explain every pick in plain language."
 
 **0:32–0:52 · How we tested honestly** *(Jack)*
 [replica diagram or baselines.png]
