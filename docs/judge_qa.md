@@ -131,8 +131,9 @@ replacement for analyst judgement, no.
 **Why did you use Entire, and what does it show?**
 Two of us built this with AI coding assistants (Claude Code), and a ranking model is easy to tune by accident. We pre-declared
 the evaluation protocol and logged the negative results; Entire adds a record of how the AI-assisted changes were made. Its
-snapshot (`outputs/entire_summary.json`) holds 30 checkpoints from 2 sessions, as counts and timestamps. Most of them are
-imports of earlier history, because we switched Entire on part-way through, and the page says so (`docs/entire.md`). It shows
+snapshot (`outputs/entire_summary.json`) holds 30 checkpoints from 2 sessions, as counts and timestamps. 27 of them are
+imports of earlier history and 3 were captured live, because we switched Entire on part-way through; the snapshot covers
+only Jack's laptop (`docs/entire.md`). It shows
 that AI-assisted changes happened and when; it does not show that a result is right. We do not publish the checkpoints,
-prompts or transcripts: they stay on one laptop, `push_sessions` is off, the remote has no Entire refs, and transcripts
-contain personal data. The commands to check all of this are in `docs/entire.md`.
+prompts or transcripts: they stay on that laptop, `push_sessions` is off, and the remote has no Entire refs. The reason is simple: the
+repository is public and transcripts contain personal data. The commands to check all of this are in `docs/entire.md`.
