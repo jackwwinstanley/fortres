@@ -1,26 +1,27 @@
 {
  "total": 500,
- "passed_guardian": 262,
- "rewritten": 295,
- "template_fallback": 238,
- "pending": 204,
+ "passed_guardian": 426,
+ "rewritten": 497,
+ "template_fallback": 74,
+ "pending": 0,
  "guardian_ran": true,
  "guardian_model": "granite3-guardian:2b",
  "granite_model": "ibm-granite/granite-3.3-2b-instruct",
  "guardian_verdicts": {
-  "No": 262,
-  "pending": 204,
-  "Yes": 33,
-  "not_run": 1
+  "No": 426,
+  "Yes": 71,
+  "not_run": 3
  },
- "guardian_calls_answered": 295,
+ "guardian_calls_answered": 497,
  "notes": "passed_guardian = Granite sentences kept because Guardian answered No; rewritten = Granite drafts that passed the local checks and were sent to Guardian; template_fallback = template sentences used (draft failed a local check, Guardian did not clearly say No, or Granite was not run). guardian_ran is true only if the Guardian model returned a Yes or No at least once; template rows whose guardian_verdict is not_run were never shown to Guardian.",
- "generated_at": "2026-11-08T01:56:39+00:00",
+ "generated_at": "2026-11-08T02:25:20+00:00",
  "prompt_version": "2026-11-08-restate-v6",
- "rows_regenerated_for_new_prompt": 296,
+ "rows_regenerated_for_new_prompt": 500,
  "local_check_failures": {
+  "blocked phrase 'due to'": 2,
+  "number not in facts": 1,
   "cve id not in facts": 1,
-  "number not in facts": 1
+  "blocked phrase 'highly'": 1
  },
  "invalidated_by_new_checks": 0,
  "invalidated_by_class": {},
