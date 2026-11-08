@@ -11,7 +11,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 
-from src.common.paths import DATA_DIR, OUT_DIR
+from src.common.paths import DATA_DIR, OUT_DIR, require_data
 from src.common.schema import SHARE_FEATURES, V1_FEATURES
 
 SMOOTH = 20  # pseudo-count for the smoothed assigner KEV rate
@@ -147,6 +147,7 @@ def build_features(pool: pd.DataFrame, vuln: pd.DataFrame, kev: pd.DataFrame, cu
 
 
 def main(data_dir=DATA_DIR, out_dir=OUT_DIR):
+    require_data(data_dir / "vulnerabilities.csv")
     con = duckdb.connect()
     vuln = con.execute(f"SELECT cve_id, CAST(published AS DATE) AS published, assigner, description "
                        f"FROM read_csv_auto('{data_dir}/vulnerabilities.csv', all_varchar=true)").df()

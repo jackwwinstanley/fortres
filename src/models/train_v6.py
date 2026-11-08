@@ -27,7 +27,7 @@ from joblib import Parallel, delayed
 from src.b import leakage as lk
 from src.b import rank as R
 from src.common import primary
-from src.common.paths import DATA_DIR, OUT_DIR
+from src.common.paths import DATA_DIR, OUT_DIR, require_data
 from src.common.schema import MONOTONE_UP, SHARE_FEATURES
 from src.common.scoring import clustered_paired_bootstrap_hits, paired_bootstrap_hits, rank_order
 from src.features import drift_fix as dfx
@@ -64,6 +64,7 @@ def bag_of(params, feats, Xtr, ytr, Xte, seeds):
 
 
 def main():
+    require_data(DATA_DIR / "vulnerabilities.csv")
     R.CACHE.mkdir(parents=True, exist_ok=True)   # untracked cache of bag scores; absent in a fresh clone
     data, ctx = R.load()
     _, sb, sb2, _ = st.prepare(OUT_DIR, DATA_DIR)

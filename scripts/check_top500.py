@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd  # noqa: E402
 
-from src.common.paths import SCOREBOARD_CSV  # noqa: E402
+from src.common.paths import SCOREBOARD_CSV, require_data  # noqa: E402
 
 
 def check(path, scoreboard=SCOREBOARD_CSV, n=500) -> list[str]:
@@ -39,6 +39,7 @@ def main():
     ap.add_argument("path")
     ap.add_argument("--scoreboard", default=SCOREBOARD_CSV)
     a = ap.parse_args()
+    require_data(a.scoreboard)
     problems = check(a.path, a.scoreboard)
     if problems:
         print(f"FAIL {a.path}")

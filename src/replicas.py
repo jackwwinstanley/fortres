@@ -17,7 +17,7 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
-from src.common.paths import DATA_DIR, OUT_DIR, SCOREBOARD_CSV
+from src.common.paths import DATA_DIR, OUT_DIR, SCOREBOARD_CSV, require_data
 from src.common.schema import FEATURE_COLS, REPLICA_COLS
 from src.common.scoring import TOTAL_SCOREBOARD
 
@@ -120,6 +120,7 @@ def build_scoreboard_features(scoreboard_csv=SCOREBOARD_CSV, con=None, expected_
 
 
 def main(data_dir: Path = DATA_DIR, out_dir: Path = OUT_DIR):
+    require_data(data_dir / "vulnerabilities.csv")
     out_dir.mkdir(exist_ok=True)
     con = duckdb.connect()
     all_stats, rate_rows = {}, []
