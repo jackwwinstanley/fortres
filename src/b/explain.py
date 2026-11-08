@@ -85,6 +85,13 @@ BLOCKED_PHRASES = [
     r"significant risk", r"significant(?:ly)?", r"evidenced", r"patterns?", r"imminent", r"strong(?:ly|er|est)?",
     r"placing", r"placed", r"thereby", r"therefore", r"thus", r"hence", r"reflecting", r"suggest(?:s|ing)?", r"impl(?:y|ies|ying)",
     r"as evidenced", r"resulting", r"leading to", r"due to",
+    # patterns found when auditing the sentences that had passed Guardian: each states or implies something the facts do not
+    r"history of exploiting",                                                  # reverses the fact "history of exploited CVEs"
+    r"(?:indicated|identified)\s+(?:by|as)\s+CVE-\d{4}-\d+",                      # claims the CVE id is the source of the facts
+    r"specifically targeting", r"specific templates?",
+    r"allow(?:s|ed|ing)?", r"affect(?:s|ed|ing)?", r"pos(?:es|ed|ing)", r"highlight(?:s|ed|ing)?", r"consider(?:s|ed|ing)?",
+    r"shar(?:es|ed|ing)\b[^.;]*\bwith",                                        # 'shares X with Y' links two facts
+    r"proof of exploit", r"weakness hints? of", r"related",                    # garbled wording, '-related'
 ]
 MAX_WORDS = 45
 # real tokens that contain a lowercase-then-uppercase letter pair; any other such token is treated as two words glued together
@@ -92,6 +99,12 @@ CAMEL_OK = {"GitHub", "ExploitDB", "WordPress", "LightGBM"}
 # domain words that are legitimate but not in the general English word list (lower case)
 DOMAIN_WORDS = {"github", "exploitdb", "wordpress", "lightgbm", "epss", "kev", "cve", "cves", "ibm", "granite", "nuclei", "metasploit",
                 "vpn", "sql", "xss", "cisa", "db", "plugin", "plugins", "poc", "prioritised", "prioritized"}
+# Content-word allowlist: every word of a sentence must appear in that CVE's OWN facts text (no stemming: 'exploiting' is not 'exploited',
+# 'weaknesses' is not 'weakness') or be one of these words that carry no fact. Words such as high, similarity, past, top, month and pool are
+# deliberately NOT listed: they are allowed only when the facts contain them, so the sentence cannot state a fact the CVE does not have.
+CONNECTIVE_WORDS = {"prioritised", "prioritized", "because", "it", "its", "has", "have", "is", "are", "in", "the", "a", "an", "and", "of", "for",
+                    "to", "with", "within", "by", "on", "as", "at", "this", "that"}
+NEUTRAL_WORDS = {"flaw", "vulnerability", "involves", "exhibits", "shows", "holds", "ranked", "list"}   # name the CVE or relate it to a fact; add nothing
 IRREGULAR_OK = {"has"}  # forms missing from the base-form word list (checked: the only common function word it lacks)
 WORDS_PATH = Path(__file__).with_name("english_words.txt.gz")  # general English word list (Webster's Second, public domain), base forms only
 MAX_ATTEMPTS = 3  # attempt 0 = original prompt (greedy); 1 = prompt with an avoid-list (greedy); 2 = same, sampled with a fixed seed
@@ -316,11 +329,18 @@ def percentage_problems(reason: str, facts: str) -> list[str]:
     return list(dict.fromkeys(probs))
 
 
+def content_word_problems(text: str, facts: str) -> list[str]:
+    """Words that are neither in the sentence's own facts text nor in CONNECTIVE_WORDS / NEUTRAL_WORDS (exact words, no stemming)."""
+    allowed = set(re.findall(r"[a-z]+", facts.lower())) | CONNECTIVE_WORDS | NEUTRAL_WORDS
+    words = dict.fromkeys(re.findall(r"[a-z]+", re.sub(r"'s\b", "", text.lower())))
+    return [f"word not in the facts '{w}'" for w in words if w not in allowed]
+
+
 def local_problems(draft: str, facts: str) -> list[str]:
     """Completeness, length, unsupported-claims, phrase and glue checks; an empty draft is a problem."""
     if not draft or not draft.strip():
         return ["empty"]
-    probs = check_reason(draft, facts) + glue_problems(draft, facts)
+    probs = check_reason(draft, facts) + glue_problems(draft, facts) + content_word_problems(draft, facts)
     if not re.match(r"prioriti[sz]ed because\b", draft.strip(), re.I):
         probs.append("format: must start with 'Prioritised because'")
     if re.search(r"[.!?]\s+\S", draft.strip()):
@@ -384,9 +404,12 @@ EXAMPLE_FACTS = ("- CVE: CVE-0000-0000\n- Public exploit code: Exploit-DB\n- EPS
                  "- Weakness hints: path traversal")
 EXAMPLE_SENTENCE = ("Prioritised because it has public exploit code in Exploit-DB, its EPSS percentile within its month is in the top 7% "
                     "and it is a path traversal flaw.")
-RETRY_ADDENDUM = (" Start with the words 'Prioritised because'. Use plain, neutral words with normal spacing and spelling. Do not use any of these words or "
-                  "phrases: likelihood, likely, indicating, risk of exploitation, potential for exploitation, strong, mirroring, placing, due to, "
-                  "high-impact, highly, serious, dangerous, widespread, widely, actively, in the wild, ransomware, zero-day, confirmed, critical, severe.")
+RETRY_ADDENDUM = (" Start with the words 'Prioritised because'. Use ONLY words that appear in the facts above, plus these connecting words: because, it, has, its, "
+                  "is, are, in, the, a, an, and, of, for, to, with, within, by, on, as, at, this, that, flaw, vulnerability, involves, exhibits, shows, holds. "
+                  "Copy the facts' own words exactly (write 'weakness', not 'weaknesses'; 'exploited', not 'exploiting'). Never write: allows, affecting, shares, "
+                  "specific, related, targeting, identified, indicated, considers, highlights, poses, history of exploiting, proof of exploit, or any of: "
+                  "likelihood, likely, indicating, risk, strong, significant, mirroring, placing, due to, high-impact, highly, serious, dangerous, widespread, "
+                  "widely, actively, in the wild, ransomware, zero-day, confirmed, critical, severe.")
 
 
 class GraniteRewriter:
@@ -493,11 +516,22 @@ def write_atomic(df: pd.DataFrame, path) -> None:
     os.replace(tmp, path)
 
 
+AUDIT_LABELS = {r"(?:indicated|identified)\s+(?:by|as)\s+CVE-\d{4}-\d+": "claims the CVE id indicates the facts", r"shar(?:es|ed|ing)\b[^.;]*\bwith": "shares ... with (links two facts)",
+                r"allow(?:s|ed|ing)?": "allows", r"affect(?:s|ed|ing)?": "affecting / affects", r"pos(?:es|ed|ing)": "poses", r"highlight(?:s|ed|ing)?": "highlights",
+                r"consider(?:s|ed|ing)?": "considers", r"specific templates?": "specific template", r"weakness hints? of": "weakness hint of"}
+
+
 def problem_class(p: str) -> str:
-    """Group a local-check problem for the summary ('number 7' -> 'number not in facts')."""
+    """Group a local-check problem for the summary ('number 7' -> 'number not in facts'; audit patterns get one label each)."""
+    m = re.match(r"blocked phrase '(.*)'$", p)
+    if m:
+        for pat, label in AUDIT_LABELS.items():
+            if re.fullmatch(pat, m.group(1), re.I) or re.search(pat, m.group(1), re.I):
+                return f"blocked phrase: {label}"
+        return p
     for prefix, label in (("number ", "number not in facts"), ("name ", "name not in facts"), ("cve ", "cve id not in facts"),
                           ("unknown or joined word", "unknown or joined word"), ("glued words", "glued words"), ("stray letter", "stray letter"),
-                          ("percentage", "percentage not on its own fact"), ("mentions ", "mentions a fact that is not in the facts"), ("format:", "format (not 'Prioritised because ...')")):
+                          ("word not in the facts", "word not in the facts"), ("percentage", "percentage not on its own fact"), ("mentions ", "mentions a fact that is not in the facts"), ("format:", "format (not 'Prioritised because ...')")):
         if p.startswith(prefix):
             return label
     return p
@@ -536,7 +570,8 @@ def run_stats(items: list[dict], recs: dict, history: list[dict]) -> dict:
                 fails[c] = fails.get(c, 0) + 1
     first = {}
     for r in history:
-        first.setdefault(r["cve_id"], r)
+        if r["cve_id"] in by_id and r["key"] == by_id[r["cve_id"]]["key"]:   # the earliest record under the CURRENT prompt version
+            first.setdefault(r["cve_id"], r)
     inv_classes, regen, passed = {}, 0, 0
     for c, r0 in first.items():
         it, r = by_id.get(c), recs.get(c)

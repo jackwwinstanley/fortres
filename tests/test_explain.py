@@ -36,7 +36,7 @@ FACTS = ("- CVE: CVE-2026-1\n- Weakness hints: remote code execution\n- Public e
          "- EPSS percentile within its month: top 3%\n- Description similarity to past exploited CVEs: high")
 PROSE = "CVE-2026-1 is a vulnerability. Public exploit code exists: Metasploit. Its EPSS percentile within its month is in the top 3%."
 TEMPLATE = "A remote code execution flaw; public exploit code already exists (Metasploit)."
-GOOD = "Prioritised because it is a remote code execution flaw with public exploit code in Metasploit and an EPSS rank in the top 3%."
+GOOD = "Prioritised because it is a remote code execution flaw, it has public exploit code in Metasploit and its EPSS percentile within its month is in the top 3%."
 
 
 def never_called(facts, draft):
@@ -206,6 +206,16 @@ PHRASE_SENTENCES = {
                                        "Mirroring past CVEs.", "A significant risk exists.", "A strong signal.", "Strongly similar text.", "The strongest signal.",
                                        "A significant flaw.", "It matters significantly.", "Evidenced by the code.", "A known pattern.",
                                        "Recurring patterns.", "Exploitation is imminent."],
+    "audit patterns": ["Prioritised because it has a GitHub proof of concept and the reporting organisation's history of exploiting similar CVEs.",
+                       "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, as indicated by CVE-2026-16723.",
+                       "Prioritised because it is a flaw, identified as CVE-2026-19650.", "Prioritised because it is a flaw, identified by CVE-2026-2636.",
+                       "It is an unauthenticated CVE, specifically targeting VPN/firewall/edge-devices.", "It is a vulnerability with a specific template for exploitation.",
+                       "It allows unauthenticated exploitation.", "It is allowed.", "It is an unauthenticated vulnerability affecting VPN/firewall/edge-devices.",
+                       "It affects web-browsers.", "It poses a path traversal risk.", "As highlighted by its main drivers.", "It highlights the history.",
+                       "The ranking model considers the history.", "It shares high similarity to past exploited CVEs with a top 1% IBM Granite KEV-likeness.",
+                       "It shares a top 7% KEV-likeness with other 2026 descriptions.", "It has a GitHub proof of concept for a proof of exploit.",
+                       "It is a weakness hint of unauthenticated vulnerability.", "It is unauthenticated enterprise-software related.",
+                       "It is an enterprise-software-related flaw."],
     "causal links": ["Placing it in the top group.", "It is placed first.", "Thereby ranking it higher.", "Therefore it ranks high.", "Thus it ranks high.",
                      "Hence it ranks high.", "Reflecting its history.", "Suggesting a pattern.", "It implies a pattern.", "Resulting in a high rank.",
                      "Leading to a high rank.", "It matters due to its exploit code.", "As evidenced by the code."],
@@ -306,7 +316,7 @@ def test_cached_sentences_failing_the_new_checks_are_regenerated_with_guardian(t
     assert df.loc[1, "explanation"] == GOOD
     s = json.loads((tmp_path / "explanations_summary.json").read_text())
     assert (s["invalidated_by_new_checks"], s["regenerated_passed_guardian"], s["regenerated_template_fallback"]) == (1, 1, 0)
-    assert s["invalidated_by_class"] == {"blocked phrase 'high-impact'": 1}
+    assert s["invalidated_by_class"] == {"blocked phrase 'high-impact'": 1, "word not in the facts": 1}
     again = ex.process(its, draft, lambda f, t: "No", out_dir=tmp_path, log=lambda *_: None)    # resume keeps the recorded numbers
     assert asked == [("CVE-2026-1", 1)] and again["source"].tolist() == ["granite"] * 3
     assert json.loads((tmp_path / "explanations_summary.json").read_text())["invalidated_by_new_checks"] == 1
@@ -333,7 +343,7 @@ def test_retries_only_after_local_failures_never_after_a_guardian_verdict(tmp_pa
     third.mkdir()
     df = ex.process(items(1), lambda it, attempt=0: "Prioritised because it is a critical flaw.", never_called, out_dir=third, log=lambda *_: None)
     assert df["source"].tolist() == ["template"] and df["guardian_verdict"].tolist() == ["not_run"]
-    assert json.loads((third / "explanations_summary.json").read_text())["local_check_failures"] == {"blocked phrase 'critical'": 1}
+    assert json.loads((third / "explanations_summary.json").read_text())["local_check_failures"] == {"blocked phrase 'critical'": 1, "word not in the facts": 1}
 
 
 def test_cached_template_rows_show_todays_template_text(tmp_path):
@@ -457,3 +467,53 @@ def test_template_only_run_then_granite_run_drafts_every_item(tmp_path):
     d2 = ex.process(items, draft_fn, guardian=lambda f, d: "No", out_dir=tmp_path, log=quiet)   # run 2: Granite on, same out_dir
     assert sorted(calls) == sorted(i["cve_id"] for i in items)                      # every item drafted
     assert (d2["source"] == "granite").all() and (d2["guardian_verdict"] == "No").all()
+
+
+# ---- content-word allowlist and the audit fixtures -------------------------------------------------------
+import json as _json  # noqa: E402
+
+AUDIT = _json.loads((Path(__file__).parent / "fixtures" / "explanation_audit.json").read_text())
+
+
+def test_content_words_must_be_in_the_cves_own_facts_or_the_whitelist_without_stemming():
+    facts = "- CVE: CVE-2026-1\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated"
+    assert ex.content_word_problems("Prioritised because it has high similarity to past exploited CVEs and it is an unauthenticated flaw.", facts) == []
+    assert ex.content_word_problems("Prioritised because its history of exploiting CVEs is high.", facts)             # exploiting is not exploited
+    assert ex.content_word_problems("Prioritised because it is an unauthenticated weaknesses.", facts)               # weaknesses is not weakness
+    assert ex.content_word_problems("Prioritised because it has public exploit code.", facts)                       # a fact the CVE does not have
+    # 'high similarity to past exploited CVEs' is NOT whitelisted: without that fact the sentence may not say it
+    no_sim = "- CVE: CVE-2026-1\n- Weakness hints: unauthenticated"
+    assert ex.content_word_problems("Prioritised because it has high similarity to past exploited CVEs.", no_sim)
+    assert ex.content_word_problems("Prioritised because it is a flaw and it involves unauthenticated.", no_sim) == []   # connectives and neutral words
+    for w in ex.CONNECTIVE_WORDS | ex.NEUTRAL_WORDS:
+        assert ex.content_word_problems(w, "") == []
+
+
+def test_every_audited_sentence_that_stated_something_not_in_its_facts_is_now_rejected():
+    assert len(AUDIT["flagged"]) >= 100
+    for x in AUDIT["flagged"]:
+        assert ex.local_problems(x["sentence"], x["facts"]), (x["cve_id"], x["sentence"])
+        d = ex.decide(x["sentence"], x["facts"], "", "TEMPLATE", guardian=never_called)       # never reaches Guardian
+        assert d["source"] == "template" and d["guardian_verdict"] == "not_run", x["cve_id"]
+
+
+def test_clean_audited_sentences_still_pass_every_check():
+    assert len(AUDIT["clean"]) >= 50
+    for x in AUDIT["clean"]:
+        assert ex.local_problems(x["sentence"], x["facts"]) == [], (x["cve_id"], x["sentence"])
+
+
+def test_unflagged_sentences_with_words_outside_their_facts_are_rejected_by_the_allowlist():
+    assert len(AUDIT["allowlist_rejects"]) >= 30
+    for x in AUDIT["allowlist_rejects"]:
+        assert any(p.startswith("word not in the facts") for p in ex.local_problems(x["sentence"], x["facts"])), (x["cve_id"], x["sentence"])
+
+
+def test_fallback_template_passes_the_new_checks_and_contains_none_of_the_audited_phrases_for_all_500():
+    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / "top500_v5.csv"))
+    assert len(f) == 500
+    for _, r in f.iterrows():
+        t, facts = ex.template(r), ex.facts_text(r)
+        assert ex.local_problems(t, facts) == [], (r["cve_id"], t, ex.local_problems(t, facts))
+        for phrase in ex.BLOCKED_PHRASES:
+            assert not re.search(rf"\b(?:{phrase})\b", t, re.I), (r["cve_id"], phrase)
