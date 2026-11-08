@@ -22,6 +22,7 @@ from src.b import runlog  # noqa: E402
 from src.b.charts import blind_spot_counts  # noqa: E402
 from src.b.style import ACCENT, ACCENT_LIGHT, GREYS, WARN  # noqa: E402
 from src.common import primary  # noqa: E402
+from app import style as ui  # noqa: E402
 
 OUT = ROOT / "outputs"
 FLAG_LABELS = {
@@ -34,12 +35,22 @@ FLAG_LABELS = {
     "txt_wordpress": "WordPress plugin", "txt_xss": "cross-site scripting",
 }
 
-st.set_page_config(page_title="Before the Breach", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="fortres", page_icon=str(ui.FAVICON), layout="wide", initial_sidebar_state="collapsed")
+st.markdown(ui.CSS, unsafe_allow_html=True)
 
-page = st.sidebar.radio("Page", ["Team dashboard", "Rank a dataset"], index=0)
+_bar = st.columns([3, 4, 3], vertical_alignment="center")
+_bar[0].markdown(ui.brand(), unsafe_allow_html=True)
+with _bar[1], st.container(key="fx-tabs"):
+    _picked = st.segmented_control("Page", ["Rank a dataset", "Overview"], default="Rank a dataset", label_visibility="collapsed", key="fx_tab")
+_bar[2].markdown(ui.meta("v6 · 20 models · runs locally"), unsafe_allow_html=True)
+st.markdown('<hr class="fx-rule">', unsafe_allow_html=True)
+if _picked is not None:
+    st.session_state["fx_page"] = _picked
+page = st.session_state.get("fx_page", "Rank a dataset")
 if page == "Rank a dataset":
     from app.rank_page import render
     render()
+    st.markdown(ui.footer(OUT), unsafe_allow_html=True)
     st.stop()
 
 
@@ -303,3 +314,5 @@ st.divider()
 st.caption("Sheridan Datathon 2026 · IBM 'Before the Breach' track · Text features by IBM Granite, open models run "
            "locally (granite-embedding-30m-english), reasons by granite-3.3-2b-instruct (local). Only information available "
            "at each snapshot is used.")
+
+st.markdown(ui.footer(OUT), unsafe_allow_html=True)
