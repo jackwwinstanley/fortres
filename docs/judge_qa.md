@@ -54,6 +54,32 @@ Partly, maybe. In the strictest test (train on 2024, test on 2025) we're five ah
 rerun with other random seeds our gain over the previous model shrinks to +2 to +5. What *is* solid: the blind spots (44 of 75),
 the July 2026 EPSS jump, and the leakage result.
 
+**Did you use outside data?**
+We tested four outside sources and adopted none. VulnCheck KEV failed our date rule: its "date added" is the earliest
+exploitation report, filled in afterwards. CISA Vulnrichment follows the date rule, but almost nothing is rated "active"
+before the snapshot (one practice CVE, none in 2026). GitHub proof-of-concept creation dates mostly repeat our own GitHub
+flag (about 92% overlap). Adding them together with the monthly EPSS change lowered the score (18 against 21), so we
+left them out. Links, licences and date rules are in the README.
+
+**Why v6 over v5? How was it chosen?**
+Seven variants were declared, each with settings chosen only inside the training year, and the adoption rule was fixed
+before any result: at least as good as v5 in both directions, and a pooled gain of at least 2 and at least the seed noise.
+The seed noise was measured first: v5 itself moves between 21 and 25 with other random seeds, so the bar was 4. Only the
+regularised variant passed (27 against 21), so it became v6. Re-run on the same seeds as v5, its gain is +2 to +5. A later
+round of eleven more methods found nothing better (`docs/considered_not_adopted.md`).
+
+**Does it just learn vendors?**
+Partly. If whole vendors are held out in cross-validation, v5's 2025 in-year hits roughly halve (19 → 10); 2024 shows no
+gap. So part of the in-year skill is recognising vendors already associated with KEV additions. Our headline tests train
+on one year and test on the other, and the vendor history features use only KEV entries from before the previous
+31 December.
+
+**Why are 498 of the 500 flagged with public exploit code?**
+Public exploit code is strongly associated with being added to CISA KEV, and the 2026 scoreboard has far more than 500
+flagged CVEs, so the model fills its list with them. Its value is in the order *within* the flagged CVEs: only 193 of its
+500 are also in the simple rule's top 500. The other side of the trade-off is that only 2 of the 500 have no public exploit
+code, so the 2026 list itself barely reaches the blind spots (`outputs/v6_overlap.csv`).
+
 **Did you pick the model after seeing the results?**
 No. Seven variants were declared, with an adoption rule fixed before any result: at least as good as the previous model in
 both directions, and a pooled gain of at least 2 and at least the seed noise (4). Only one passed, so it became v6.
@@ -77,7 +103,7 @@ make the model compare each flaw only with others from the same month, so the ju
 Groundedness: whether each sentence is supported by the facts we gave Granite. It does **not** check that the
 sentence is true about the world, and it doesn't judge style. On top of it we run our own checks (no invented numbers,
 products or CVE ids; no words like "critical" or "actively exploited"). Anything that fails gets a plain template
-sentence instead. Count: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges (`passed_guardian` of `total`).
+sentence instead. Count: 318 of 500 reasons passed the groundedness check; the other 182 use the template (`outputs/explanations_summary.json`).
 
 **What's the most interesting thing you found?**
 That the standard signals can't see most of the flaws that end up on KEV. 44 of 75 had no public attack code and a low
@@ -101,3 +127,12 @@ government software. They're widely attacked in practice; they're just not what 
 **Could this be used for real?**
 As a triage aid, yes, alongside EPSS rather than instead of it. The reasons make each pick checkable by a human. As a
 replacement for analyst judgement, no.
+
+**Why did you use Entire, and what does it show?**
+Two of us built this with AI coding assistants (Claude Code), and a ranking model is easy to tune by accident. We pre-declared
+the evaluation protocol and logged the negative results; Entire adds a record of how the AI-assisted changes were made. Its
+snapshot (`outputs/entire_summary.json`) holds 30 checkpoints from 2 sessions, as counts and timestamps. Most of them are
+imports of earlier history, because we switched Entire on part-way through, and the page says so (`docs/entire.md`). It shows
+that AI-assisted changes happened and when; it does not show that a result is right. We do not publish the checkpoints,
+prompts or transcripts: they stay on one laptop, `push_sessions` is off, the remote has no Entire refs, and transcripts
+contain personal data. The commands to check all of this are in `docs/entire.md`.

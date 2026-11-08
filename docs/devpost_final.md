@@ -1,7 +1,7 @@
 # Devpost submission text (DRAFT, for Aba or Jack to paste)
 
 Claude can't log in to Devpost; paste each section into the matching Devpost field. Numbers match `outputs/headline.json`
-(v6) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
+(v6) and the Person B reports. Guardian counts are from `outputs/explanations_summary.json`.
 
 ---
 
@@ -58,8 +58,8 @@ description, the way an analyst would, can help.
 - **An honest result:** on the strictest forward test (train 2024, test 2025) we're five ahead of the best simple rule,
   18 vs 13. The stability check is 9 vs 6, so pooled over both years it's 27 vs 19 (+8, 90% range +2 to +14). With
   only 75 positives that is still a small sample, and we say so.
-- **Reasons people can check:** [TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges] Granite-written reasons passed a groundedness check;
-  the rest use a plain
+- **Reasons people can check:** 318 of 500 Granite-written reasons passed a groundedness check;
+  the other 182 use a plain
   template.
 
 ## What we learned
@@ -77,8 +77,16 @@ description, the way an analyst would, can help.
   priors from similar past CVEs) on more practice years; see `docs/considered_not_adopted.md`.
 - Run the Granite steps on watsonx so they're governed and repeatable.
 
+## Best Use of Entire
+We used Entire as an audit trail for the AI-assisted part of the work: Claude Code sessions captured as checkpoints and linked to
+commits, inside our own repository. The evidence we publish is a counts-and-timestamps file (30 checkpoints from 2 sessions in
+`outputs/entire_summary.json`) made by a script that never reads a prompt or transcript, with tests that fail if a path or an
+address ever reaches it. The checkpoints themselves stay on one laptop with `push_sessions` off, because transcripts contain
+personal data; the remote has no Entire refs, and the page `docs/entire.md` has the read-only commands to check that. Most
+checkpoints are imports of earlier history, since we enabled Entire part-way through, and we say so.
+
 ## Built with
-python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly
+python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly, entire
 
 ## Links
 - Code: https://github.com/jackwwinstanley/ibm-breach
