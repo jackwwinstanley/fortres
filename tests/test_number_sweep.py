@@ -1,0 +1,53 @@
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import number_sweep as ns  # noqa: E402
+
+E = {"pooled": (21, 19), "forward": (12, 13), "stability": (9, 6), "ranges": {(-4, 8), (-6, 3)},
+     "honest": 21, "leaky": 28, "leaky_split": (17, 11), "blind": (44, 75)}
+FINAL = "docs/writeup_person_b.md"
+
+
+@pytest.mark.parametrize("line,needle", [
+    ("Guardian verified every reason.", "banned wording"),
+    ("The model predicts which CVEs get exploited.", "banned wording"),
+    ("Our model uses IBM Granite to read each description.", "banned wording"),
+    ("The leakage test jumps from 23 to 30.", "stale '23 to 30'"),
+    ("With banned columns the leaky arm gets 29.", "29 used as the leaky number"),
+    ("Leakage: pooled hits jump from 21 to 30.", "leaky claim"),
+    ("Leakage arm 28 (17 + 12).", "leaky split"),
+    ("We caught 22 vs 19 for the simple rule.", "result pair"),
+    ("Our edge is +2, 90% range −5 to +8.", "range"),
+    ("43 of the 75 were blind spots.", "blind-spot claim"),
+    ("419 of 500 reasons passed a groundedness check.", "typed by hand"),
+])
+def test_each_problem_is_caught(line, needle):
+    probs = ns.check_text(FINAL, line, E)
+    assert any(needle in p for p in probs), probs
+
+
+@pytest.mark.parametrize("line", [
+    'Guardian reasons "passed a groundedness check", never "verified".',
+    "Leaky arm 28 (17 + 11); 29 was the earlier v4 run.",
+    "Leakage: pooled hits jump from 21 to 28.",
+    "We caught 21 vs 19 for the best simple rule; forward 12 vs 13; stability 9 vs 6.",
+    "Pooled +2, 90% range −4 to +8; forward −6 to +3.",
+    "44 of the 75 were blind spots.",
+    "The 2026 list has 72,670 CVEs; KEV as of 2025-12-29.",
+])
+def test_correct_lines_pass(line):
+    assert ns.check_text(FINAL, line, E) == []
+
+
+def test_research_notes_may_quote_other_results():
+    # considered_not_adopted.md is not a final document: a 15 vs 13 blend result there is fine
+    assert ns.check_text("docs/considered_not_adopted.md", "The blend caught 15 vs 13 for the simple rule.", E) == []
+
+
+@pytest.mark.skipif(not (ns.OUT / "headline.json").exists() or not (ns.OUT / "leakage_results.csv").exists(),
+                    reason="needs the tracked outputs")
+def test_the_repository_passes_the_sweep():
+    assert ns.main() == 0

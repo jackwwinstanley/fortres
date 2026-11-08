@@ -1,6 +1,6 @@
 """Person B: regenerate every Person B output from Person A's final files, in the right order.
 
-Run:  python -m src.b.refresh_all                  # fast path (~1.5 min): drift, leakage + blind spots, charts, story data, checks
+Run:  python -m src.b.refresh_all                  # fast path (~1.5 min): drift, leakage + blind spots, charts, story data, checks, number sweep
       python -m src.b.refresh_all --text           # also rebuild descriptions, Granite embeddings and text_features first
       python -m src.b.refresh_all --priors         # also rebuild the #12 track-record priors and their v5 evaluation
       python -m src.b.refresh_all --explanations   # also regenerate the Granite reasons with Person A's explain.py
@@ -47,6 +47,7 @@ def main(text=False, priors=False, explanations=False):
     step("story / dashboard data", ["-m", "src.b.export_story"])
     step("tests", ["-m", "pytest", "-q"])
     step("contract check", ["scripts/check_contract.py"])
+    step("number sweep (docs vs outputs)", ["scripts/number_sweep.py"])
     print("\nAll Person B outputs refreshed. Review `git status`, then commit the tracked files listed in docs/person_b_runbook.md.")
 
 
