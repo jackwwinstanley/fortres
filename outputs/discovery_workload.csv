@@ -1,0 +1,13 @@
+test_pool,method,k,hits_at_k,fortres_hits,fixes_to_match
+2025,fortres (v6),243,18,18,167
+2025,"usual rule (public code, then EPSS)",243,13,18,547
+2025,EPSS only (within-month rank),243,8,18,2598
+2025,severity (CVSS 3 score),243,5,18,4669
+2024,fortres (v6),198,9,9,186
+2024,"usual rule (public code, then EPSS)",198,6,9,569
+2024,EPSS only (within-month rank),198,3,9,7428
+2024,severity (CVSS 3 score),198,0,9,2189
+pooled,fortres (v6),441,27,27,353
+pooled,"usual rule (public code, then EPSS)",441,19,27,1116
+pooled,EPSS only (within-month rank),441,11,27,10026
+pooled,severity (CVSS 3 score),441,5,27,6858

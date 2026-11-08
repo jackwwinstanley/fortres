@@ -32,7 +32,12 @@ README.md. Checks:
      and every other number
      in its prose (outside code spans, code blocks, links and list markers) must be a value, date, timestamp or the version
      stored in that file; the doc without the file is an error;
- 13. on any line that mentions Entire, "N checkpoints" and "N sessions" must equal n_checkpoints and n_sessions in that file.
+ 13. on any line that mentions Entire, "N checkpoints" and "N sessions" must equal n_checkpoints and n_sessions in that file;
+ 14. the findings (docs/findings.md, and any final document that repeats one): the phrases of each finding must match its source
+     file, including which method each workload number belongs to (see `discovery_values`, `check_findings`);
+ 15. every number in the prose of docs/findings.md must be a value from those source files;
+ 16. the one-sentence definition of fortres must appear word for word in README.md, docs/findings.md, docs/devpost_final.md,
+     docs/video_script.md, and in site/index.html once that page has a "What we found" section.
 """
 import json
 import re
@@ -44,10 +49,15 @@ sys.path.insert(0, str(ROOT))
 OUT = ROOT / "outputs"
 # documents that state final results (research notes like considered_not_adopted.md legitimately quote other numbers)
 FINAL_DOCS = {"docs/writeup_person_b.md", "docs/devpost_final.md", "docs/judge_qa.md", "docs/video_script.md",
-              "docs/page_content.md", "README.md", "site/index.html"}
+              "docs/page_content.md", "README.md", "site/index.html", "docs/findings.md"}
 MINUS = "[−-]"
 MODEL_CARD = "docs/model_card.md"
 ENTIRE_DOC = "docs/entire.md"
+FINDINGS_DOC = "docs/findings.md"
+DEFINITION = ("Fortres is a triage system for security holes: a statistical model ranks all {scoreboard:,} of 2026's new vulnerabilities "
+              "and picks the {picks} most likely to be attacked, and IBM Granite models help read the descriptions and explain every "
+              "pick in plain language.")
+DEFINITION_DOCS = {"README.md", FINDINGS_DOC, "docs/devpost_final.md", "docs/video_script.md"}
 GOV_SUMMARIES = {"watsonx_gov": "watsonx_gov_summary.json", "gov_local": "gov_metrics_summary.json"}
 GOV_NAME = re.compile(r"watsonx[ .]?governance", re.I)
 GOV_LOCAL = re.compile(r"\blocal(?:ly)?\b|no ibm service|token[- ]overlap|word[- ]overlap|bert ?score|readab|flesch|"
@@ -104,7 +114,57 @@ def expected(out=OUT) -> dict:
     if bs.exists():
         b = pd.read_csv(bs)
         e["blind"] = (int(b.loc[b["group"] == "blind-spot", "exploited"].sum()), int(b["exploited"].sum()))
+        e["blind_ours"] = int(b.loc[b["group"] == "blind-spot", "ours_caught"].sum())
+    if (out / "discovery_workload.csv").exists():
+        e["findings"] = discovery_values(out, e)
     return e
+
+
+def _search_int(path: Path, pattern: str) -> tuple[int, ...]:
+    m = re.search(pattern, path.read_text())
+    if not m:
+        raise SystemExit(f"number sweep: {path.name} no longer has the text it is read from: {pattern}")
+    return tuple(int(x.replace(",", "")) for x in m.groups())
+
+
+def discovery_values(out: Path, e: dict) -> dict:
+    """The values behind docs/findings.md, each read from its source file."""
+    import pandas as pd
+    sev = pd.read_csv(out / "discovery_kev_severity.csv").set_index("year").loc["total"]
+    w = pd.read_csv(out / "discovery_workload.csv")
+    pooled = w[w["test_pool"] == "pooled"].set_index("method")
+    meth = {"fortres": "fortres (v6)", "usual": "usual rule (public code, then EPSS)", "epss": "EPSS only (within-month rank)",
+            "severity": "severity (CVSS 3 score)"}
+    work = {k: int(pooled.loc[v, "fixes_to_match"]) for k, v in meth.items()}
+    work["fortres_list"], work["fortres_depth"] = int(pooled.loc[meth["fortres"], "k"]), work.pop("fortres")
+    ev = pd.read_csv(out / "discovery_events.csv")
+    cv = pd.read_csv(out / "rank_vendor_cv.csv")
+    cvh = {(int(r.replica), r.scheme.startswith("vendor")): int(r.oof_hits_top_k) for r in cv.itertuples()}
+    g = e.get("guardian", {})
+    top_fail = next(iter(g.get("local_check_failures", {}).items()), (None, None))
+    jump = pd.read_csv(out / "discovery_epss_jump.csv")["jump_factor_from_2026_07"].iloc[0]
+    h = json.loads((out / "headline.json").read_text())
+    return {
+        "kev_medium": (int(sev["Medium"]), int(sev["entries"])), "one_in": round(int(sev["entries"]) / int(sev["Medium"])),
+        "workload": work, "events": len(ev), "largest_event": int(ev["n_cves"].max()),
+        "vendor_cv": (cvh[2025, False], cvh[2025, True]), "vendor_cv_2024": (cvh[2024, False], cvh[2024, True]),
+        "guardian_rejected": g.get("guardian_verdicts", {}).get("Yes"), "local_failed": g.get("guardian_verdicts", {}).get("not_run"),
+        "top_failure": top_fail, "epss_jump": float(jump),
+        "msf": _search_int(out / "newdata_provenance.md", r"\*\*(\d+) of the (\d+)\*\* pool CVE"),
+        "vulncheck": _search_int(out / "outside_report.md", r"\*\*([\d,]+) of ([\d,]+)\*\* entries"),
+        "min_leaf": h["final_params"]["min_child_samples"], "trees": h["final_params"]["n_estimators"],
+        "template_rows": _search_int(out / "newdata_report.md", r"only about (\d+) practice")[0],
+        "analyzed_rest": _search_int(out.parent / "docs" / "column_review.md", r"against (\d+)% \(2024\) and (\d+)% \(2025\)"),
+        "variants": 7 if "seven declared variants" in h["primary"] else None,
+        "extra_methods": len(set(re.findall(r"\bm\d\d\b", _tie_break_line(out / "zoo_summary.md")))),
+        "scoreboard": sum(1 for _ in (out / "v6_scores.csv").open()) - 1, "picks": 500,
+        "seeds": h["seeds"]["bag_seeds"], "event_range": tuple(int(x) for x in h["pooled"]["diff_event_clustered_90"]),
+        "cve_range": tuple(int(x) for x in h["pooled"]["diff_cve_level_90"]),
+    }
+
+
+def _tie_break_line(path: Path) -> str:
+    return next(l for l in path.read_text().splitlines() if l.lstrip("- ").startswith("Tie-break"))
 
 
 def files(root=ROOT):
@@ -121,7 +181,7 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
         where = f"{rel}:{n}"
         low = line.lower()
         # 1. banned words (but not when the line is stating the rule: never "verified")
-        for m in re.finditer(r"\bverified\b|\bpredicts\b|uses (?:ibm )?granite to read each description", low):
+        for m in re.finditer(r"\bverified\b|\bpredicts\b|\bdetects\b|\bproves\b|\bguarantees\b|uses (?:ibm )?granite to read each description", low):
             if not re.search(r"(never|not)\W{0,4}$", low[:m.start()]):
                 probs.append(f"{where}: banned wording '{m.group(0)}'")
         # 2. stale numbers
@@ -194,6 +254,105 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
     if rel == ENTIRE_DOC:
         probs += check_entire_doc(rel, text, e.get("entire"), e.get("entire_machines", {}))
     probs += check_gov_numbers(rel, text, e)
+    if "findings" in e and final:
+        probs += check_findings(rel, text, e)
+    return probs
+
+
+def _n(s: str) -> int:
+    return int(s.replace(",", ""))
+
+
+NUM = r"(\d[\d,]*\d|\d)"
+WORKLOAD_LABELS = {"usual": r"usual rule", "severity": r"(?:by |for )?severity", "epss": r"epss(?: alone| only)?"}
+
+
+def check_findings(rel: str, text: str, e: dict) -> list[str]:
+    """Rule 14 on every final document, rule 15 on docs/findings.md and rule 16 on the documents that carry the definition."""
+    f, probs = e["findings"], []
+    for n, line in enumerate(text.splitlines(), 1):
+        where, low = f"{rel}:{n}", line.lower()
+        if "medium" in low:
+            for m in re.finditer(rf"\b{NUM} of {NUM}\b", line):
+                if (_n(m.group(1)), _n(m.group(2))) != f["kev_medium"] and _n(m.group(2)) > 1000:
+                    probs.append(f"{where}: Medium claim {m.group(0)}, outputs/discovery_kev_severity.csv has {f['kev_medium']}")
+            for m in re.finditer(r"\b1 in (\d+)\b", line):
+                if int(m.group(1)) != f["one_in"]:
+                    probs.append(f"{where}: {m.group(0)}, the Medium share is 1 in {f['one_in']}")
+        if re.search(r"(?:catch|reach) the same", low) or re.search(r"\bfixes\b", low):             # each workload number must sit with its own method
+            for key, label in WORKLOAD_LABELS.items():
+                for clause in re.split(r",\s|;| and (?=epss|sorting|the usual)", low):
+                    m = re.search(rf"{label}\b[^.\d]{{0,25}}?{NUM}\b", clause) or re.search(rf"\b{NUM} \(?(?:fixes )?(?:for )?{label}\b", clause)
+                    if m and _n(m.group(1)) >= 100 and _n(m.group(1)) != f["workload"][key]:
+                        probs.append(f"{where}: workload for {key} is {m.group(1)}, outputs/discovery_workload.csv has {f['workload'][key]:,}")
+            for m in re.finditer(rf"fortres(?:'s list of| needs)? {NUM}\b|list of (?:only )?{NUM} fixes", low):
+                if _n(m.group(1) or m.group(2)) not in (f["workload"]["fortres_list"], f["workload"]["fortres_depth"]):
+                    probs.append(f"{where}: fortres workload {m.group(1) or m.group(2)}, expected {f['workload']['fortres_list']}")
+        if "metasploit" in low and "30 days" in low:
+            for m in re.finditer(rf"\b{NUM} of (?:the )?{NUM}\b", line):
+                if (_n(m.group(1)), _n(m.group(2))) not in (f["msf"], f["vulncheck"]):
+                    probs.append(f"{where}: Metasploit claim {m.group(0)}, outputs/newdata_provenance.md has {f['msf']}")
+        if "vendor" in low and re.search(r"holding out|hold out|held out|hiding whole", low):
+            for m in re.finditer(r"\b(\d+) (?:catches )?(?:to|→) (\d+)\b", line):
+                if (int(m.group(1)), int(m.group(2))) not in (f["vendor_cv"], f["vendor_cv_2024"]):
+                    probs.append(f"{where}: vendor hold-out {m.group(0)}, outputs/rank_vendor_cv.csv has {f['vendor_cv']}")
+        if "75" in line:
+            for m in re.finditer(r"\b(\d+) (?:separate |distinct |kev )?events\b", low):
+                if int(m.group(1)) != f["events"]:
+                    probs.append(f"{where}: {m.group(1)} events, outputs/discovery_events.csv has {f['events']}")
+        for pat, key, src in ((r"guardian rejected (\d+)", "guardian_rejected", "guardian_verdicts.Yes"),
+                              (r"(\d+) rejected by guardian", "guardian_rejected", "guardian_verdicts.Yes"),
+                              (r"(\d+) (?:more )?failed (?:our own|local)", "local_failed", "guardian_verdicts.not_run"),
+                              (r"own checks stopped (\d+)", "local_failed", "guardian_verdicts.not_run")):
+            for m in re.finditer(pat, low):
+                if int(m.group(1)) != f[key]:
+                    probs.append(f"{where}: {m.group(0)}, outputs/explanations_summary.json {src} is {f[key]}")
+        if "blind_ours" in e and re.search(r"no warning|blind|of the 44|44 of", low):
+            for m in re.finditer(r"fortres (?:caught|found) (\d+)", low):
+                if int(m.group(1)) != e["blind_ours"]:
+                    probs.append(f"{where}: {m.group(0)}, the blind-spot file has {e['blind_ours']}")
+        if "epss" in low and re.search(r"jump|2024 to 2025 median", low):
+            for m in re.finditer(r"(\d+(?:\.\d+)?) ?(?:×|x\b|times)", low):
+                k = len(m.group(1).split(".")[1]) if "." in m.group(1) else 0
+                if float(m.group(1)) != round(f["epss_jump"], k):
+                    probs.append(f"{where}: EPSS jump {m.group(0)}, outputs/discovery_epss_jump.csv has {f['epss_jump']}")
+    for n, line in enumerate(text.splitlines(), 1):                     # the ranking's size, wherever it is described
+        for m in re.finditer(r"\b(\d+) models that vote\b[^.]*?\b(\d+) small decision trees\b", line):
+            if (int(m.group(1)), int(m.group(2))) != (f["seeds"], f["trees"]):
+                probs.append(f"{rel}:{n}: {m.group(0)}, outputs/headline.json has {f['seeds']} models of {f['trees']} trees")
+    needs_definition = rel in DEFINITION_DOCS or (rel == "site/index.html" and "what we found" in text.lower())
+    if needs_definition and DEFINITION.format(**f) not in " ".join(text.split()):
+        probs.append(f"{rel}: the one-sentence definition of fortres is missing or has been reworded")
+    if rel == FINDINGS_DOC:
+        probs += check_findings_numbers(rel, text, e)
+    return probs
+
+
+FINDINGS_TOKEN = re.compile(r"(?<![\w.#/-])(\d+\.\d+|\d[\d,]*\d|\d)(?![\w-])")
+FINDINGS_YEARS = {2010, 2021, 2024, 2025, 2026}   # the years the findings talk about
+
+
+def findings_allowed(e: dict) -> set[float]:
+    """Every value docs/findings.md may state; each comes from a source file (the years and the 30-day cut-off are stated in them)."""
+    f = e["findings"]
+    w = f["workload"]
+    leak = (e["honest"], e["leaky"])
+    return {float(x) for x in (*FINDINGS_YEARS, *e["blind"], e["blind_ours"], *f["kev_medium"], f["one_in"], *leak, *f["analyzed_rest"],
+                               *f["msf"], *f["vulncheck"], 30, f["variants"], f["extra_methods"], f["min_leaf"], f["template_rows"], *f["vendor_cv"],
+                               *f["vendor_cv_2024"], f["events"], f["largest_event"], *e["pooled"], e["pooled"][0] - e["pooled"][1],
+                               *f["event_range"], *f["cve_range"], f["guardian_rejected"], f["local_failed"],
+                               f["guardian_rejected"] + f["local_failed"], f["top_failure"][1], *w.values(), f["epss_jump"],
+                               f["scoreboard"], f["picks"], f["seeds"], f["trees"], e["guardian"]["total"], 1, 0)}
+
+
+def check_findings_numbers(rel: str, text: str, e: dict) -> list[str]:
+    allowed, probs = findings_allowed(e), []
+    prose = re.sub(r"(?m)^(#+\s*)\d+\.\s", r"\1", _strip_entire_prose(text))
+    prose = re.sub(r"Granite \d\.\d|CVSS \d|CVE-\d+-\d+", " ", prose)          # names, not results
+    for n, line in enumerate(prose.splitlines(), 1):
+        for tok in FINDINGS_TOKEN.findall(line):
+            if float(tok.replace(",", "")) not in allowed:
+                probs.append(f"{rel}: the number {tok!r} is not in any of the findings' source files (fix it, or add its source to the sweep)")
     return probs
 
 
@@ -375,7 +534,7 @@ def main(root=ROOT) -> int:
     probs = gov_summary_problems(e)
     for f in files(root):
         probs += check_text(str(f.relative_to(root)), f.read_text(errors="ignore"), e)
-    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", "entire", "entire_machines", *GOV_SUMMARIES)}
+    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", "entire", "entire_machines", "findings", *GOV_SUMMARIES)}
     shown["gov_summaries"] = sorted(k for k in GOV_SUMMARIES if k in e)
     if "guardian" in e:
         shown["passed_guardian"] = e["guardian"].get("passed_guardian")

@@ -33,6 +33,12 @@ check" (not "verified").
 
 ## Likely questions
 
+**Is fortres an LLM?**
+No. The ranking is 20 models that vote, each built from 150 small decision trees. IBM Granite reads the descriptions to give the ranking one clue, and writes the plain reason for each pick, which Granite Guardian checks against the facts.
+
+**Why not use an LLM to rank?**
+A ranking model can be tested against known outcomes, and it gives the same answer every time. A language model can make things up, so we only let it explain.
+
 **Where is IBM technology used? Does anything run on watsonx?**
 IBM Granite does the text work: `granite-embedding-30m-english` turns every description into numbers, and
 `granite-3.3-2b-instruct` writes the one-line reasons. IBM Granite Guardian (`granite3-guardian:2b`) checks those reasons.

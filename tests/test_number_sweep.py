@@ -200,3 +200,66 @@ def test_entire_per_machine_row_without_its_file_says_missing():
     text = "| checkpoints, Aba's laptop | 12 | `aba:n_checkpoints` |\n"
     probs = ns.check_entire_doc("docs/entire.md", text, ENTIRE_MAIN, {})
     assert any("entire_summary_aba.json is missing" in p for p in probs), probs
+
+
+# ---- the findings: docs/findings.md and every final document that repeats one ----------------------------------------------
+F = {"kev_medium": (162, 1484), "one_in": 9, "workload": {"usual": 1116, "epss": 10026, "severity": 6858, "fortres_list": 441, "fortres_depth": 353},
+     "events": 67, "largest_event": 3, "vendor_cv": (19, 10), "vendor_cv_2024": (7, 6), "guardian_rejected": 90, "local_failed": 92,
+     "top_failure": ("word not in the facts", 91), "epss_jump": 6.37, "msf": (249, 490), "vulncheck": (5803, 5809), "min_leaf": 200,
+     "template_rows": 140, "analyzed_rest": (42, 50), "variants": 7, "extra_methods": 11, "scoreboard": 72670, "picks": 500, "seeds": 20,
+     "event_range": (1, 15), "cve_range": (2, 14), "trees": 150}
+EF = {**E, "pooled": (27, 19), "forward": (18, 13), "stability": (9, 6), "ranges": {(2, 14)}, "honest": 27, "leaky": 33, "leaky_split": (21, 12),
+      "blind_ours": 5, "findings": F}
+GOOD_WORK = "To catch the same 27, the usual rule needs 1,116 fixes, sorting by severity needs 6,858, and EPSS alone needs 10,026."
+
+
+def test_correct_findings_lines_pass():
+    for line in (GOOD_WORK, "1 in 9 entries (162 of 1,484) is rated only Medium.", "Granite Guardian rejected 90 reasons and 92 more failed our own checks.",
+                 "In Metasploit, for 249 of the 490 pairs, the link was added more than 30 days after the module.",
+                 "Holding out whole vendors cuts it from 19 catches to 10.", "The 75 holes come from 67 separate events."):
+        assert ns.check_findings("docs/judge_qa.md", line, EF) == [], line
+
+
+@pytest.mark.parametrize("line,needle", [
+    ("To catch the same 27, sorting by severity needs 10,026, and EPSS alone needs 6,858.", "workload for severity"),
+    ("To catch the same 27, the usual rule needs 1,200 fixes.", "workload for usual"),
+    ("To reach the same 27, sorting by severity 10,026, and EPSS alone 6,858.", "workload for severity"),
+    ("Fortres caught those 27 with a list of only 500 fixes.", "fortres workload 500"),
+    ("EPSS scores were 7 times the 2024 to 2025 median.", "EPSS jump"),
+    ("1 in 8 entries (162 of 1,484) is rated only Medium.", "the Medium share"),
+    ("161 of 1,484 entries are rated only Medium.", "Medium claim"),
+    ("In Metasploit, 250 of the 490 pairs were added more than 30 days later.", "Metasploit claim"),
+    ("Holding out whole vendors cuts it from 19 catches to 11.", "vendor hold-out"),
+    ("The 75 holes come from 60 separate events.", "60 events"),
+    ("Granite Guardian rejected 91 reasons.", "guardian rejected 91"),
+    ("Of the 44 with no warning, fortres caught 6.", "fortres caught 6"),
+    ("EPSS jumped about 7× from July.", "EPSS jump"),
+])
+def test_each_findings_error_is_caught(line, needle):
+    probs = ns.check_findings("docs/judge_qa.md", line, EF)
+    assert any(needle in p for p in probs), probs
+
+
+def test_definition_must_be_word_for_word():
+    good = ns.DEFINITION.format(**F)
+    assert not [p for p in ns.check_findings("README.md", good, EF) if "definition" in p]
+    assert any("definition" in p for p in ns.check_findings("README.md", good.replace("triage system", "ranking system"), EF))
+    assert not [p for p in ns.check_findings("site/index.html", "No section yet.", EF) if "definition" in p]
+    assert any("definition" in p for p in ns.check_findings("site/index.html", "<h2>What we found</h2>", EF))
+
+
+def test_findings_page_may_only_state_sourced_numbers():
+    d = ns.DEFINITION.format(**F)
+    assert not ns.check_findings_numbers("docs/findings.md", d + " Granite 3.3 and CVSS 4; 162 of 1,484.", EF)
+    assert any("'163'" in p for p in ns.check_findings_numbers("docs/findings.md", "It was 163.", EF))
+
+
+@pytest.mark.parametrize("line", ["It detects attacks.", "This proves the point.", "It guarantees a catch."])
+def test_new_banned_words(line):
+    assert any("banned wording" in p for p in ns.check_text(FINAL, line, E))
+
+
+def test_model_size_wording_is_checked():
+    assert ns.check_findings("docs/judge_qa.md", "The ranking is 20 models that vote, each built from 150 small decision trees.", EF) == []
+    probs = ns.check_findings("docs/judge_qa.md", "The ranking is 20 models that vote, each built from 100 small decision trees.", EF)
+    assert any("150 trees" in p for p in probs), probs
