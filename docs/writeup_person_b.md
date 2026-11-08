@@ -12,7 +12,7 @@ where text and vendor history add signal the standard feeds don't have.
 *Figure: `docs/figures/blindspots.png`.*
 
 ## 2. IBM Granite text features
-- **Embeddings:** `ibm-granite/granite-embedding-30m-english` (384 dimensions) embeds 178,175 descriptions in
+- **Embeddings:** IBM Granite (open models, run locally): `ibm-granite/granite-embedding-30m-english` (384 dimensions) embeds 178,175 descriptions in
   about a minute on a laptop.
 - **`kev_text_score`:** for pool year Y, a logistic regression on the embeddings, trained only on CVEs published
   before Y with KEV labels as of Dec 31 of Y−1. Held-out ROC AUC 0.82 (2024) and 0.80 (2025).

@@ -213,9 +213,9 @@ with tabs[2]:
         st.caption("Reasons are written by IBM Granite from facts our pipeline supplies; a checker rejects any "
                    "sentence that mentions a product, number or CVE not in those facts.")
         if expl_summary and expl_summary.get("guardian_ran"):
-            st.caption(f"IBM Granite Guardian ({expl_summary.get('guardian_model', '')}) checked every rewritten reason for "
-                       f"groundedness: {expl_summary.get('passed_guardian', 0)} of {expl_summary.get('total', 0)} passed; the rest "
-                       "use the plain fact template.")
+            st.caption(f"IBM Granite Guardian ({expl_summary.get('guardian_model', '')}, run locally via Ollama) checked every "
+                       f"rewritten reason: {expl_summary.get('passed_guardian', 0)} of {expl_summary.get('total', 0)} passed a "
+                       "groundedness check (supported by the facts given, not 'verified'); the rest use the plain fact template.")
 
 # ---- vs simple rules ----------------------------------------------------------------------------
 with tabs[3]:
@@ -293,6 +293,6 @@ with tabs[5]:
                     "look great on paper and fail on 2026. We never use these columns.")
 
 st.divider()
-st.caption("Sheridan Datathon 2026 · IBM 'Before the Breach' track · Text features by IBM Granite "
-           "(granite-embedding-30m-english), reasons by granite-3.3-2b-instruct. Only information available "
+st.caption("Sheridan Datathon 2026 · IBM 'Before the Breach' track · Text features by IBM Granite, open models run "
+           "locally (granite-embedding-30m-english), reasons by granite-3.3-2b-instruct (local). Only information available "
            "at each snapshot is used.")

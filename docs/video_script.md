@@ -25,7 +25,7 @@ information available at that moment. A model is trained on one year and tested 
 
 **0:55–1:15 · IBM Granite** *(Aba)*
 [Top 500 tab: reasons column]
-"IBM Granite reads every description. It scores how much each one sounds like past known-exploited
+"IBM Granite, IBM's open models running right on our laptop, reads every description. It scores how much each one sounds like past known-exploited
 vulnerabilities and finds its closest match. Granite also writes a one-line reason for each pick, and a checker
 rejects any sentence that mentions a fact we didn't give it."
 

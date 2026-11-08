@@ -5,7 +5,7 @@ judges: one plain sentence first, numbers second. Every number names its source 
 by `python -m src.b.export_story` (→ `site/data/story.json`) unless another script is named. The visual design is
 deliberately undecided.
 
-**Wording rules (team):** "added to CISA KEV" (CVEs CISA lists as known-exploited), never "attacked"; "is associated
+**Wording rules (team):** nothing may imply watsonx unless a step actually ran there; say "IBM Granite (open models, run locally)" and "IBM Granite Guardian (run locally via Ollama)". "added to CISA KEV" (CVEs CISA lists as known-exploited), never "attacked"; "is associated
 with", never "causes" or "leads to"; Granite Guardian reasons "passed a groundedness check", never "verified".
 
 ---
@@ -49,7 +49,7 @@ KEV in our practice years: 25%. 44 of the 75 had no public attack code and a low
   (`outputs/v5_blindspots.csv`, from `python -m src.b.leakage`, which reproduces the v5 headline bag: 12 + 9).
   **Say it honestly: small.**
 
-## 3. What IBM Granite reads
+## 3. What IBM Granite reads (open models, run locally)
 **Message:** Granite reads the description the way an analyst would and recognises "this sounds like a past KEV entry."
 - Example: CVE-2025-24472 (FortiOS, 2025): no public attack code, low risk score, so a blind spot. Granite's score
   puts it above 98% of 2025's CVEs. Its closest past KEV entry is CVE-2022-40684, the Fortinet authentication bypass
@@ -91,7 +91,7 @@ That's a small edge, and the uncertainty range says it could be luck. In the str
 - What we're sure of: the blind spots are real, EPSS jumped from July 2026, and we didn't use leaking data.
 
 ## 8. Granite reason examples (fill from the final list)
-Two or three sentences from `outputs/explanations.csv` after Person A's Granite Guardian gate (PR #35) is merged: one that
+Two or three sentences from `outputs/explanations.csv` after Person A's IBM Granite Guardian gate (run locally via Ollama, PR #35) is merged: one that
 passed the groundedness check and one that fell back to the plain template. Say that a checker rejects any sentence
 mentioning a fact we didn't give it, and that Guardian checks groundedness (support by the facts), not truth.
 - _[to fill once #35 is merged]_
