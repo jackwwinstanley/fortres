@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 from scripts.check_top500 import check
-from src.common.paths import OUT_DIR
+from src.common.paths import OUT_DIR, SCOREBOARD_CSV
 from src.common.scoring import expected_hits_at_k
 from src.models.stress_v2 import shuffle_text_within_month, smd, topk_hits, within_month_permutation
 from src.models.train_v2 import FEATURES_V2
@@ -58,6 +58,7 @@ def test_smd():
 
 
 @pytest.mark.skipif(not (OUT_DIR / "top500_v3.csv").exists(), reason="top500_v3.csv not produced yet")
+@pytest.mark.skipif(not SCOREBOARD_CSV.exists(), reason="needs the untracked datathon data (data/scoreboard_2026.csv) to validate the IDs")
 def test_top500_v3_format_and_contributions():
     assert check(OUT_DIR / "top500_v3.csv") == []
     ids = pd.read_csv(OUT_DIR / "top500_v3.csv")["cve_id"].tolist()
