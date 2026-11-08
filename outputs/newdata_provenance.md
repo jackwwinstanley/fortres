@@ -80,3 +80,55 @@ Largest commits by CVE templates added:
 
 **Usable for the experiment:** yes. Its dates are point-in-time git records, and the invalid and bulk dates are excluded as
 missing.
+
+
+---
+
+# Secondary source: Metasploit modules (provenance audit, written before evaluation)
+
+- **Source:** https://github.com/rapid7/metasploit-framework
+- **Licence:** BSD-3-Clause (Copyright 2006-2026, Rapid7, Inc.; the LICENSE file in the clone).
+- **How we got it:** a FULL clone, 83695 commits, taken 2026-11-07T15:22:02Z (HEAD `7673832c3065`). It is kept outside the repository
+  (`~/ibm/ext/`) and deleted after the run.
+- **What a record is:** a module file (`modules/**/*.rb`). It maps to CVEs only through its References field
+  (`['CVE', 'YYYY-N']`), because Metasploit file names carry no CVE id.
+
+| item | count |
+|---|---|
+| module files ever added | 5,638 |
+| at HEAD | 5,154 |
+| with at least one CVE reference | 3,120 |
+| without one (not used) | 2,518 |
+| distinct CVEs | 3,178 |
+| CVEs with several modules (earliest date used) | 231 |
+| invalid dates | 0 |
+| bulk commits (at least 100 module files; the largest adds 26) | 0 |
+
+## Dates: point-in-time or hindsight?
+- **The module's first-added date is hindsight for its CVE, so it is not used.** Many CVEs published in 2025 are new numbers
+  for old exploits, for example CVE-2010-10015 for a module from 2010. The CVE reference was written into the module years
+  later.
+  - The pickaxe (`git log --follow -S <number>`) dates when each CVE's number was first added to that module.
+  - For **249 of the 490** pool CVE–module pairs, that was more than
+    30 days after the module itself.
+  - With module dates, the 2025 pool would get 265 flagged CVEs; with reference dates it gets 34.
+  - **Decision: the record date is the author date of the commit that added the CVE reference.**
+- **Spot check of the one-pass file dates against `git log --follow --diff-filter=A`:** 13 of 20 agree. In every mismatch the
+  one-pass date is the later one: `--follow` can jump to a similar, older file. The error can only make a module absent,
+  never early.
+- **Author versus commit date:** 268 modules have an author date more than 30 days before their commit
+  (11 more than a year), because modules wait in pull requests. So the author date can come before the
+  module was public. **Declared variant C** uses the later of the two dates, to the same effect as the restricted version.
+- **Hindsight check against KEV:** for 7 flagged CVEs in KEV, the reference date minus the KEV date runs from
+  -203 to -13 days (median -41). **0 mirrored.**
+
+**Verdict:** usable with reference dates. The module dates fail (hindsight) and are not used.
+
+## Join audit (counted by the snapshot-month end, reference dates)
+| pool | CVEs | any module ever | flagged (reference date) | flagged (variant C) | datathon `metasploit` flag | both |
+|---|---|---|---|---|---|---|
+| 2024 | 28,839 | 94 | 34 | 30 | 18 | 18 |
+| 2025 | 35,280 | 303 | 34 | 34 | 22 | 22 |
+| 2026 | 72,670 | 82 | 43 | 39 | 15 | 15 |
+
+**Practice positives flagged:** 2024 4 of 27, 2025 3 of 48.

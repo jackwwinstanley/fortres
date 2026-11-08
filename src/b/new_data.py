@@ -28,6 +28,7 @@ import re
 import subprocess
 import sys
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -36,6 +37,12 @@ import pandas as pd
 from src.common.paths import DATA_DIR, OUT_DIR
 
 NUCLEI_REPO = Path(os.environ.get("NUCLEI_REPO", DATA_DIR / "outside" / "nuclei-templates"))
+MSF_REPO = Path(os.environ.get("MSF_REPO", Path.home() / "ibm" / "ext" / "metasploit-framework"))
+# Secondary source (same rules): Metasploit modules (github.com/rapid7/metasploit-framework, BSD-3-Clause). A module is a
+# modules/**/*.rb file; it maps to CVEs only through its References field (['CVE', 'YYYY-N']) at HEAD (Metasploit file
+# names carry no CVE id). Bulk = a commit adding or renaming in >= BULK_MIN module files.
+SOURCES = {"nuclei": dict(ext=".yaml", top=None, prefix="nuclei"), "metasploit": dict(ext=".rb", top="modules/", prefix="msf")}
+MSF_CVE_RE = re.compile(r"""\[\s*['"]CVE['"]\s*,\s*['"](\d{4}-\d{4,7})['"]\s*\]""", re.I)
 POOLS = {2024: "replica_2024.parquet", 2025: "replica_2025.parquet", 2026: "scoreboard_features.parquet"}
 BULK_MIN = 100
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
@@ -45,7 +52,16 @@ NOISE_FLOOR = 4
 
 
 # ---------------------------------------------------------------------------------------------------- provenance (git history)
-def first_added(repo: Path) -> pd.DataFrame:
+def _kept(p: str, src: str) -> bool:
+    cfg = SOURCES[src]
+    return p.endswith(cfg["ext"]) and (cfg["top"] is None or p.startswith(cfg["top"]))
+
+
+def _counts_for_bulk(p: str, src: str) -> bool:
+    return _kept(p, src) and (src != "nuclei" or bool(CVE_RE.search(Path(p).name)))
+
+
+def first_added(repo: Path, src: str = "nuclei") -> pd.DataFrame:
     """One pass over the full history, oldest first. Returns one row per path ever added: path at HEAD (after renames),
     first author date, the commit that added it, and how many CVE templates that commit added or renamed in."""
     fmt = "__C__%H|%aI|%cI"
@@ -66,17 +82,21 @@ def first_added(repo: Path) -> pd.DataFrame:
         st = parts[0]
         if st.startswith("A") and len(parts) >= 2:
             p = parts[1]
-            if p.endswith(".yaml") and CVE_RE.search(Path(p).name):
+            if _counts_for_bulk(p, src):
                 commit_adds[commit] += 1
-            first.setdefault(p, (date, commit))
+            prev = first.get(p)          # added again (another branch, or after a deletion): keep the EARLIEST author date
+            if prev is None or datetime.fromisoformat(date) < datetime.fromisoformat(prev[0]):
+                first[p] = (date, commit)
         elif st.startswith("R") and len(parts) >= 3:
             old, new = parts[1], parts[2]
-            if new.endswith(".yaml") and CVE_RE.search(Path(new).name):
+            if _counts_for_bulk(new, src):
                 commit_adds[commit] += 1
-            first[new] = first.pop(old, (date, commit))
+            cand = first.pop(old, (date, commit))
+            prev = first.get(new)
+            first[new] = cand if prev is None or datetime.fromisoformat(cand[0]) < datetime.fromisoformat(prev[0]) else prev
         elif st.startswith("D") and len(parts) >= 2:
             pass   # a deleted template keeps its first date: it existed from that date on
-    rows = [{"path": p, "first_date": d, "commit": c} for p, (d, c) in first.items() if p.endswith(".yaml")]
+    rows = [{"path": p, "first_date": d, "commit": c} for p, (d, c) in first.items() if _kept(p, src)]
     df = pd.DataFrame(rows)
     df["commit_cve_adds"] = df["commit"].map(commit_adds).fillna(0).astype(int)
     df["first_date"] = pd.to_datetime(df["first_date"], utc=True)
@@ -104,9 +124,40 @@ def cve_ids_for(repo: Path, paths: pd.Series) -> pd.Series:
     return pd.Series(out, index=paths.index)
 
 
-def templates(repo: Path = NUCLEI_REPO) -> pd.DataFrame:
-    df = first_added(repo)
-    df["cve_id"] = cve_ids_for(repo, df["path"])
+def msf_cve_ids(repo: Path, paths: pd.Series) -> pd.Series:
+    """All CVE ids in a module's References at HEAD (a deleted module cannot be mapped: None)."""
+    out = []
+    for p in paths:
+        f = repo / p
+        ids = sorted({f"CVE-{m}".upper() for m in MSF_CVE_RE.findall(f.read_text(errors="ignore"))}) if f.exists() else []
+        out.append(ids or None)
+    return pd.Series(out, index=paths.index)
+
+
+def reference_added(repo: Path, pairs: pd.DataFrame) -> pd.Series:
+    """Metasploit: the author date of the earliest commit whose diff adds the CVE's number to that module (git pickaxe
+    `log -S`, renames followed). A module written before a CVE number existed only gets the CVE when the reference is added,
+    so the module's own first-added date would be hindsight for that CVE."""
+    from joblib import Parallel, delayed
+
+    def one(cve, path):
+        num = cve.split("-", 1)[1]
+        r = subprocess.run(["git", "-C", str(repo), "log", "--follow", "--format=%aI|%cI", "-S", num, "--", path],
+                           capture_output=True, text=True)
+        lines = [ln for ln in r.stdout.split("\n") if ln]
+        return lines[-1] if lines else None
+    res = Parallel(n_jobs=8, prefer="threads")(delayed(one)(c, p) for c, p in zip(pairs["cve_id"], pairs["path"]))
+    return pd.Series(res, index=pairs.index)
+
+
+def templates(repo: Path = NUCLEI_REPO, src: str = "nuclei") -> pd.DataFrame:
+    df = first_added(repo, src)
+    if src == "metasploit":
+        df["cve_id"] = msf_cve_ids(repo, df["path"])
+        df["n_cves_in_file"] = df["cve_id"].map(lambda v: len(v) if v else 0)
+        df = df.explode("cve_id").reset_index(drop=True)
+    else:
+        df["cve_id"] = cve_ids_for(repo, df["path"])
     df["bulk"] = df["commit_cve_adds"] >= BULK_MIN
     df["at_head"] = [(repo / p).exists() for p in df["path"]]
     return df
@@ -118,7 +169,7 @@ def snap_end(months) -> pd.Series:
             + pd.Timedelta(hours=23, minutes=59, seconds=59))
 
 
-def features_for(pool: pd.DataFrame, tpl: pd.DataFrame, published: pd.Series) -> pd.DataFrame:
+def features_for(pool: pd.DataFrame, tpl: pd.DataFrame, published: pd.Series, prefix: str = "nuclei") -> pd.DataFrame:
     """pool: cve_id, snapshot_month. tpl: cve_id, first_date, bulk. Only templates dated <= the CVE's snapshot-month end and not
     from a bulk commit count."""
     d = pool[["cve_id", "snapshot_month"]].copy().reset_index(drop=True)
@@ -132,9 +183,9 @@ def features_for(pool: pd.DataFrame, tpl: pd.DataFrame, published: pd.Series) ->
     pub = pd.to_datetime(published.reindex(d["cve_id"]).to_numpy(), utc=True)
     days = ((first - pub) / pd.Timedelta(days=1)).to_numpy(dtype=float)
     out = pd.DataFrame({"cve_id": d["cve_id"],
-                        "nuclei_has_template_by_snapshot": (n > 0).astype(int),
-                        "nuclei_days_published_to_first_template": np.where(n > 0, np.nan_to_num(days, nan=-1.0), -1.0),
-                        "nuclei_n_templates_by_snapshot": n})
+                        f"{prefix}_has_template_by_snapshot": (n > 0).astype(int),
+                        f"{prefix}_days_published_to_first_template": np.where(n > 0, np.nan_to_num(days, nan=-1.0), -1.0),
+                        f"{prefix}_n_templates_by_snapshot": n})
     return out
 
 
@@ -159,7 +210,11 @@ def _positions(c, score):
     return pos
 
 
-def evaluate(feat: dict, runs: list) -> pd.DataFrame:
+def new_cols(prefix: str) -> list:
+    return [c.replace("nuclei", prefix, 1) for c in NEW]
+
+
+def evaluate(feat: dict, runs: list, prefix: str = "nuclei", label_name: str = "Nuclei") -> pd.DataFrame:
     """feat: {year: DataFrame(cve_id, NEW...)} for 2024 and 2025. Variants: v6, A = v6 + NEW, B = NEW alone."""
     from joblib import Parallel, delayed
     from src.b import leakage as lk
@@ -172,15 +227,17 @@ def evaluate(feat: dict, runs: list) -> pd.DataFrame:
     from src.models.train_v5 import FEATURES_V5, bootstrap_p
 
     F5 = list(FEATURES_V5)
+    NEWC = new_cols(prefix)
+    A, B = f"A: v6 + {label_name} features", f"B: {label_name} features alone"
     data, ctx = R.load()
     kev = pd.read_csv(DATA_DIR / "known_exploited.csv", usecols=["cve_id", "vendor", "date_added"]).drop_duplicates("cve_id").set_index("cve_id")
     for y in (2024, 2025):
         ids = data[y]["meta"]["cve_id"].reset_index(drop=True)
         f = feat[y].set_index("cve_id").reindex(ids)
-        assert f[NEW].notna().all().all()
-        for c in NEW:
+        assert f[NEWC].notna().all().all()
+        for c in NEWC:
             data[y]["X5"][c] = f[c].to_numpy()
-    variants = {"v6": F5, "A: v6 + Nuclei features": F5 + NEW, "B: Nuclei features alone": list(NEW)}
+    variants = {"v6": F5, A: F5 + NEWC, B: list(NEWC)}
 
     def fit(params, feats, Xtr, ytr, Xte, s):
         return primary.lgbm(params, feats, s).fit(Xtr[feats], ytr).predict_proba(Xte[feats])[:, 1]
@@ -223,14 +280,14 @@ def evaluate(feat: dict, runs: list) -> pd.DataFrame:
         r_, n_ = 0, 0
         for d in st.DIRS:
             c = ctx[d]
-            r_ += st.hits_of(c, bag_of(P[d], variants["A: v6 + Nuclei features"], c["tr"]["X5"], c["tr"]["y"], c["te"]["X5"], range(100 + 5 * j, 105 + 5 * j)))
+            r_ += st.hits_of(c, bag_of(P[d], variants[A], c["tr"]["X5"], c["tr"]["y"], c["te"]["X5"], range(100 + 5 * j, 105 + 5 * j)))
             rng = np.random.default_rng(j)
             y = np.asarray(c["tr"]["y"]).copy()
             months = np.asarray(c["tr_months"])
             for m in np.unique(months):
                 ix = np.where(months == m)[0]
                 y[ix] = y[rng.permutation(ix)]
-            n_ += st.hits_of(c, bag_of(P[d], variants["A: v6 + Nuclei features"], c["tr"]["X5"], y, c["te"]["X5"], range(1000 + 5 * j, 1005 + 5 * j)))
+            n_ += st.hits_of(c, bag_of(P[d], variants[A], c["tr"]["X5"], y, c["te"]["X5"], range(1000 + 5 * j, 1005 + 5 * j)))
         real.append(r_)
         null.append(n_)
     d_obs, d_ci, p_boot = bootstrap_p(real, null)
@@ -246,12 +303,12 @@ def evaluate(feat: dict, runs: list) -> pd.DataFrame:
             idsy = data[y]["meta"]["cve_id"]
             b = lk.banned_columns(idsy, DATA_DIR).set_index("cve_id").reindex(idsy).reset_index(drop=True)
             XL[y] = pd.concat([data[y]["X5"].reset_index(drop=True), b], axis=1)
-        honest = variants["A: v6 + Nuclei features"]
+        honest = variants[A]
         leaky = honest + [c for c in XL[tr].columns if c.startswith("leak_")]
-        for arm, feats in (("honest (v6 + Nuclei)", honest), ("with banned columns", leaky)):
+        for arm, feats in ((f"honest (v6 + {label_name})", honest), ("with banned columns", leaky)):
             leak[(arm, d)] = st.hits_of(ctx[d], bag_of(P[d], feats, XL[tr], data[tr]["y"], XL[te], SEEDS))
-    lrows = [{"test": label[d], "variant": f"leakage: {arm}", "hits": leak[(arm, d)]} for arm in ("honest (v6 + Nuclei)", "with banned columns") for d in st.DIRS]
-    lrows += [{"test": "pooled", "variant": f"leakage: {arm}", "hits": sum(leak[(arm, d)] for d in st.DIRS)} for arm in ("honest (v6 + Nuclei)", "with banned columns")]
+    lrows = [{"test": label[d], "variant": f"leakage: {arm}", "hits": leak[(arm, d)]} for arm in (f"honest (v6 + {label_name})", "with banned columns") for d in st.DIRS]
+    lrows += [{"test": "pooled", "variant": f"leakage: {arm}", "hits": sum(leak[(arm, d)] for d in st.DIRS)} for arm in (f"honest (v6 + {label_name})", "with banned columns")]
     res = pd.concat([res, pd.DataFrame(lrows)], ignore_index=True)
     return res, placebo
 

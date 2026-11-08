@@ -1,19 +1,52 @@
 source,test,variant,hits,diff_vs_v6,cve_level_90,event_clustered_90
-nuclei-templates,forward (train 2024 -> test 2025),v6,18,,,
-nuclei-templates,forward (train 2024 -> test 2025),A: v6 + Nuclei features,18,0.0,"[0, 0]","[0, 0]"
-nuclei-templates,forward (train 2024 -> test 2025),B: Nuclei features alone,8,-10.0,"[-16, -4]","[-17, -3]"
-nuclei-templates,stability (train 2025 -> test 2024),v6,9,,,
-nuclei-templates,stability (train 2025 -> test 2024),A: v6 + Nuclei features,9,0.0,"[0, 0]","[0, 0]"
-nuclei-templates,stability (train 2025 -> test 2024),B: Nuclei features alone,3,-6.0,"[-11, -3]","[-10, -3]"
-nuclei-templates,pooled,v6,27,,,
-nuclei-templates,pooled,A: v6 + Nuclei features,27,0.0,"[0, 0]","[0, 0]"
-nuclei-templates,pooled,B: Nuclei features alone,11,-16.0,"[-24, -9]","[-25, -9]"
-nuclei-templates,forward (train 2024 -> test 2025),leakage: honest (v6 + Nuclei),18,,,
-nuclei-templates,stability (train 2025 -> test 2024),leakage: honest (v6 + Nuclei),9,,,
-nuclei-templates,forward (train 2024 -> test 2025),leakage: with banned columns,21,,,
-nuclei-templates,stability (train 2025 -> test 2024),leakage: with banned columns,12,,,
-nuclei-templates,pooled,leakage: honest (v6 + Nuclei),27,,,
-nuclei-templates,pooled,leakage: with banned columns,33,,,
-nuclei-templates,adoption rule,A: v6 + Nuclei features,27,0.0,fails,forward 18 / stability 9
-nuclei-templates,adoption rule,B: Nuclei features alone,11,-16.0,fails,forward 8 / stability 3
-nuclei-templates,placebo,"A, labels shuffled within month (10 x 5-seed bags)",27,,shuffled mean 0.6,"diff 26.4, p 0.0"
+nuclei-templates,forward (train 2024 -> test 2025),v6,18.0,,,
+nuclei-templates,forward (train 2024 -> test 2025),A: v6 + Nuclei features,18.0,0.0,"[0, 0]","[0, 0]"
+nuclei-templates,forward (train 2024 -> test 2025),B: Nuclei features alone,8.0,-10.0,"[-16, -4]","[-17, -3]"
+nuclei-templates,stability (train 2025 -> test 2024),v6,9.0,,,
+nuclei-templates,stability (train 2025 -> test 2024),A: v6 + Nuclei features,9.0,0.0,"[0, 0]","[0, 0]"
+nuclei-templates,stability (train 2025 -> test 2024),B: Nuclei features alone,3.0,-6.0,"[-11, -3]","[-10, -3]"
+nuclei-templates,pooled,v6,27.0,,,
+nuclei-templates,pooled,A: v6 + Nuclei features,27.0,0.0,"[0, 0]","[0, 0]"
+nuclei-templates,pooled,B: Nuclei features alone,11.0,-16.0,"[-24, -9]","[-25, -9]"
+nuclei-templates,forward (train 2024 -> test 2025),leakage: honest (v6 + Nuclei),18.0,,,
+nuclei-templates,stability (train 2025 -> test 2024),leakage: honest (v6 + Nuclei),9.0,,,
+nuclei-templates,forward (train 2024 -> test 2025),leakage: with banned columns,21.0,,,
+nuclei-templates,stability (train 2025 -> test 2024),leakage: with banned columns,12.0,,,
+nuclei-templates,pooled,leakage: honest (v6 + Nuclei),27.0,,,
+nuclei-templates,pooled,leakage: with banned columns,33.0,,,
+nuclei-templates,adoption rule,A: v6 + Nuclei features,27.0,0.0,fails,forward 18 / stability 9
+nuclei-templates,adoption rule,B: Nuclei features alone,11.0,-16.0,fails,forward 8 / stability 3
+nuclei-templates,placebo,"A, labels shuffled within month (10 x 5-seed bags)",27.0,,shuffled mean 0.6,"diff 26.4, p 0.0"
+metasploit-framework (dates: author date of the reference),forward (train 2024 -> test 2025),v6,18.0,,,
+metasploit-framework (dates: author date of the reference),forward (train 2024 -> test 2025),A: v6 + Metasploit features,18.0,0.0,"[0, 0]","[0, 0]"
+metasploit-framework (dates: author date of the reference),forward (train 2024 -> test 2025),B: Metasploit features alone,8.0,-10.0,"[-16, -4]","[-17, -3]"
+metasploit-framework (dates: author date of the reference),stability (train 2025 -> test 2024),v6,9.0,,,
+metasploit-framework (dates: author date of the reference),stability (train 2025 -> test 2024),A: v6 + Metasploit features,9.0,0.0,"[0, 0]","[0, 0]"
+metasploit-framework (dates: author date of the reference),stability (train 2025 -> test 2024),B: Metasploit features alone,3.0,-6.0,"[-11, -3]","[-10, -3]"
+metasploit-framework (dates: author date of the reference),pooled,v6,27.0,,,
+metasploit-framework (dates: author date of the reference),pooled,A: v6 + Metasploit features,27.0,0.0,"[0, 0]","[0, 0]"
+metasploit-framework (dates: author date of the reference),pooled,B: Metasploit features alone,11.0,-16.0,"[-24, -9]","[-25, -9]"
+metasploit-framework (dates: author date of the reference),forward (train 2024 -> test 2025),leakage: honest (v6 + Metasploit),18.0,,,
+metasploit-framework (dates: author date of the reference),stability (train 2025 -> test 2024),leakage: honest (v6 + Metasploit),9.0,,,
+metasploit-framework (dates: author date of the reference),forward (train 2024 -> test 2025),leakage: with banned columns,21.0,,,
+metasploit-framework (dates: author date of the reference),stability (train 2025 -> test 2024),leakage: with banned columns,12.0,,,
+metasploit-framework (dates: author date of the reference),pooled,leakage: honest (v6 + Metasploit),27.0,,,
+metasploit-framework (dates: author date of the reference),pooled,leakage: with banned columns,33.0,,,
+metasploit-framework (dates: author date of the reference),adoption rule,A: v6 + Metasploit features,27.0,0.0,fails,forward 18 / stability 9
+metasploit-framework (dates: author date of the reference),adoption rule,B: Metasploit features alone,11.0,-16.0,fails,forward 8 / stability 3
+metasploit-framework (dates: author date of the reference),placebo,"A, labels shuffled within month (10 x 5-seed bags)",27.0,,shuffled mean 0.6,"diff 26.4, p 0.0"
+metasploit-framework (dates: later of author/commit),forward (train 2024 -> test 2025),A: v6 + Metasploit (later of author/commit date) features,18.0,0.0,"[0, 0]","[0, 0]"
+metasploit-framework (dates: later of author/commit),forward (train 2024 -> test 2025),B: Metasploit (later of author/commit date) features alone,8.0,-10.0,"[-16, -4]","[-17, -3]"
+metasploit-framework (dates: later of author/commit),stability (train 2025 -> test 2024),A: v6 + Metasploit (later of author/commit date) features,9.0,0.0,"[0, 0]","[0, 0]"
+metasploit-framework (dates: later of author/commit),stability (train 2025 -> test 2024),B: Metasploit (later of author/commit date) features alone,3.0,-6.0,"[-11, -3]","[-10, -3]"
+metasploit-framework (dates: later of author/commit),pooled,A: v6 + Metasploit (later of author/commit date) features,27.0,0.0,"[0, 0]","[0, 0]"
+metasploit-framework (dates: later of author/commit),pooled,B: Metasploit (later of author/commit date) features alone,11.0,-16.0,"[-24, -9]","[-25, -9]"
+metasploit-framework (dates: later of author/commit),forward (train 2024 -> test 2025),leakage: honest (v6 + Metasploit (later of author/commit date)),18.0,,,
+metasploit-framework (dates: later of author/commit),stability (train 2025 -> test 2024),leakage: honest (v6 + Metasploit (later of author/commit date)),9.0,,,
+metasploit-framework (dates: later of author/commit),forward (train 2024 -> test 2025),leakage: with banned columns,21.0,,,
+metasploit-framework (dates: later of author/commit),stability (train 2025 -> test 2024),leakage: with banned columns,12.0,,,
+metasploit-framework (dates: later of author/commit),pooled,leakage: honest (v6 + Metasploit (later of author/commit date)),27.0,,,
+metasploit-framework (dates: later of author/commit),pooled,leakage: with banned columns,33.0,,,
+metasploit-framework (dates: later of author/commit),adoption rule,A: v6 + Metasploit (later of author/commit date) features,27.0,0.0,fails,forward 18 / stability 9
+metasploit-framework (dates: later of author/commit),adoption rule,B: Metasploit (later of author/commit date) features alone,11.0,-16.0,fails,forward 8 / stability 3
+metasploit-framework (dates: later of author/commit),placebo,"A, labels shuffled within month (10 x 5-seed bags)",27.0,,shuffled mean 0.6,"diff 26.4, p 0.0"
