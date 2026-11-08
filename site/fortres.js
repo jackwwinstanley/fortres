@@ -214,7 +214,7 @@ function pages(PICKS) {
     const T = (x, y, z, ry) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ry || 0, 0)), new THREE.Vector3(1, 1, 1));
     let cs = 91; const cr = () => ((cs = (cs * 16807) % 2147483647) / 2147483647);
 
-    // the city behind the wall: dark towers, sparse windows, fading into the distance
+    // the city behind the wall: blocks of dark towers with cobbled streets between them, fading into the distance
     const wc = document.createElement('canvas'); wc.width = wc.height = 128; const wx = wc.getContext('2d');
     wx.fillStyle = '#000'; wx.fillRect(0, 0, 128, 128);
     for (let gy = 0; gy < 8; gy++) for (let gx = 0; gx < 8; gx++) { const v = cr(); if (v < 0.62) continue; wx.fillStyle = v > 0.95 ? '#e8edf3' : v > 0.8 ? '#4589ff' : '#1c2632'; wx.fillRect(gx * 16 + 3, gy * 16 + 4, 10, 8); }
@@ -222,9 +222,12 @@ function pages(PICKS) {
     const cityItems = [], edgePts = [];
     const addEdges = (g, x, y, z) => { const e = new THREE.EdgesGeometry(g).attributes.position.array; for (let k = 0; k < e.length; k += 3) edgePts.push(e[k] + x, e[k + 1] + y, e[k + 2] + z); };
     const blank = g => { const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, 0.01, 0.01); return g; };
-    for (let k = 0; k < 140; k++) {
-      const x = (cr() - 0.5) * 110, z = -16 - cr() * 38, w = 1.6 + cr() * 3.2, d = 1.6 + cr() * 3, h = 3 + Math.pow(cr(), 1.6) * 15;
-      if (Math.abs(x) < 4 && z > -22) continue;
+    // street plan: avenues run away from the wall (along z), cross streets run along it (along x); the main road comes
+    // through the gate and becomes the centre avenue
+    const CITY_X = 60, CITY_Z0 = -11, CITY_Z1 = -60;
+    const AVES = [[0, 3], [-16, 1.8], [16, 1.8], [-32, 1.8], [32, 1.8], [-48, 1.8], [48, 1.8]];   // [centre x, half width]
+    const STREETS = [[-13, 2.2], [-27, 1.8], [-41, 1.8]];                                            // [centre z, half width]
+    const building = (x, z, w, d, h) => {
       const g = new THREE.BoxGeometry(w, h, d), uv = g.attributes.uv, S = 0.5, ox = cr(), oy = cr();
       const dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
       for (let f = 0; f < 6; f++) for (let v = 0; v < 4; v++) { const n = f * 4 + v; uv.setXY(n, uv.getX(n) * dims[f][0] * S + ox, uv.getY(n) * dims[f][1] * S + oy); }
@@ -234,6 +237,23 @@ function pages(PICKS) {
       if (kind < 0.35) { const sw = w * 0.62, sh = 0.8 + cr() * 2.2, sd = d * 0.62, sg = blank(new THREE.BoxGeometry(sw, sh, sd)); addEdges(sg, x, top + sh / 2, z); cityItems.push({ g: sg, m: T(x, top + sh / 2, z) }); }
       else if (kind < 0.55 && h > 7) cityItems.push({ g: blank(new THREE.CylinderGeometry(0.05, 0.09, 3.2, 6)), m: T(x, top + 1.6, z) });
       else if (kind < 0.68) { const cg = blank(new THREE.ConeGeometry(Math.min(w, d) * 0.72, 1.4 + cr(), 4)); cg.rotateY(Math.PI / 4); addEdges(cg, x, top + 0.7, z); cityItems.push({ g: cg, m: T(x, top + 0.7, z) }); }
+    };
+    const trees = [];
+    // blocks are the gaps between streets; each is split into lots, and a few lots stay open as small squares with a tree
+    const xs = [-CITY_X, ...AVES.flatMap(([c, h]) => [c - h, c + h]).sort((a, b) => a - b), CITY_X];
+    const zs = [CITY_Z0, ...STREETS.flatMap(([c, h]) => [c + h, c - h]).sort((a, b) => b - a), CITY_Z1];
+    const SIDE = 0.9;   // pavement between the street and the buildings
+    for (let i = 0; i + 1 < xs.length; i += 2) for (let j = 0; j + 1 < zs.length; j += 2) {
+      const x0 = xs[i] + SIDE, x1 = xs[i + 1] - SIDE, z0 = zs[j] - SIDE, z1 = zs[j + 1] + SIDE;
+      if (j === 0) continue;                                   // the strip between the wall and the first street stays open
+      const W = x1 - x0, D = z0 - z1; if (W < 2 || D < 2) continue;
+      const nx = Math.max(1, Math.round(W / 5)), nz = Math.max(1, Math.round(D / 4.6)), lw = W / nx, ld = D / nz;
+      for (let a = 0; a < nx; a++) for (let b = 0; b < nz; b++) {
+        const cx = x0 + lw * (a + 0.5), cz = z0 - ld * (b + 0.5);
+        if (cr() < 0.12) { trees.push([cx, cz, 1.1 + cr() * 0.4]); continue; }
+        const w = lw * (0.72 + cr() * 0.2), d = ld * (0.72 + cr() * 0.2), far = Math.min(1, (-cz - 12) / 40);
+        building(cx + (cr() - 0.5) * (lw - w), cz + (cr() - 0.5) * (ld - d), w, d, 3 + Math.pow(cr(), 1.6) * (9 + far * 8));
+      }
     }
     const city = new THREE.Mesh(merge(cityItems), new THREE.MeshStandardMaterial({ color: tok('#0e141c'), metalness: 0.2, roughness: 0.7, emissive: '#ffffff', emissiveMap: winTex, emissiveIntensity: 0.14 }));
     scene.add(city);
@@ -269,13 +289,100 @@ function pages(PICKS) {
     const moonTex = new THREE.CanvasTexture(mc); moonTex.encoding = THREE.sRGBEncoding;
     const moon = new THREE.Mesh(new THREE.SphereGeometry(4.2, 24, 12), new THREE.MeshBasicMaterial({ map: moonTex, fog: false })); moon.position.set(22, 30, -125); scene.add(moon);
 
-    // road under the wall, running into the city
-    const cc = document.createElement('canvas'); cc.width = cc.height = 256; const cx = cc.getContext('2d');
-    cx.fillStyle = '#080c12'; cx.fillRect(0, 0, 256, 256);
-    for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const v = 0.75 + cr() * 0.4, ox = (r % 2) * 16; cx.fillStyle = `rgb(${15 * v | 0},${20 * v | 0},${27 * v | 0})`; const x0 = c * 32 + ox + 2, y0 = r * 32 + 2; cx.fillRect(x0, y0, 28, 28); if (x0 + 28 > 256) cx.fillRect(x0 - 256, y0, 28, 28); }
-    const roadTex = new THREE.CanvasTexture(cc); roadTex.wrapS = roadTex.wrapT = THREE.RepeatWrapping; roadTex.repeat.set(3, 58); roadTex.encoding = THREE.sRGBEncoding; roadTex.anisotropy = 4;
-    const road = new THREE.Mesh(new THREE.PlaneGeometry(12, 116), new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.95 }));
-    road.rotation.x = -Math.PI / 2; road.position.set(0, -0.245, 2); road.receiveShadow = true; scene.add(road);
+    // cobbled streets: the road through the gate and every street of the city share one material. The stones are drawn
+    // once as a height map; the colour keeps the old road tones and a normal map built from the heights makes each
+    // stone round, so the key light picks out their tops and the joints fall dark
+    const RS = 512, hc = document.createElement('canvas'); hc.width = hc.height = RS; const hx = hc.getContext('2d');
+    const cc = document.createElement('canvas'); cc.width = cc.height = RS; const cx = cc.getContext('2d');
+    hx.fillStyle = '#000'; hx.fillRect(0, 0, RS, RS); cx.fillStyle = '#080c12'; cx.fillRect(0, 0, RS, RS);
+    const ROWSN = 10, rh = RS / ROWSN;
+    for (let r = 0; r < ROWSN; r++) {
+      let x = -cr() * 40;
+      while (x < RS) {
+        const w = 38 + cr() * 26, h = rh * (0.78 + cr() * 0.12), cxp = x + w / 2, cyp = r * rh + rh / 2 + (cr() - 0.5) * 4, v = 0.75 + cr() * 0.4;
+        for (const ox of [-RS, 0, RS]) {                      // draw wrapped copies so the tile repeats without a seam
+          const px = cxp + ox, rx = w / 2 - 3, ry = h / 2;
+          const gr = hx.createRadialGradient(px, cyp, 1, px, cyp, Math.max(rx, ry));
+          gr.addColorStop(0, '#fff'); gr.addColorStop(0.55, '#d8d8d8'); gr.addColorStop(1, '#202020');
+          hx.fillStyle = gr; hx.beginPath(); hx.ellipse(px, cyp, rx, ry, (cr() - 0.5) * 0.12, 0, 7); hx.fill();
+          cx.fillStyle = `rgb(${15 * v | 0},${20 * v | 0},${27 * v | 0})`; cx.beginPath(); cx.ellipse(px, cyp, rx, ry, 0, 0, 7); cx.fill();
+        }
+        x += w;
+      }
+    }
+    const hd = hx.getImageData(0, 0, RS, RS).data, rnc = document.createElement('canvas'); rnc.width = rnc.height = RS;
+    const nctx = rnc.getContext('2d'), nd = nctx.createImageData(RS, RS), H = (x, y) => hd[(((y + RS) % RS) * RS + ((x + RS) % RS)) * 4] / 255;
+    for (let y = 0; y < RS; y++) for (let x = 0; x < RS; x++) {
+      const dx = (H(x - 1, y) - H(x + 1, y)) * 2.2, dy = (H(x, y + 1) - H(x, y - 1)) * 2.2, l = Math.hypot(dx, dy, 1), o = (y * RS + x) * 4;
+      nd.data[o] = (dx / l * 0.5 + 0.5) * 255; nd.data[o + 1] = (dy / l * 0.5 + 0.5) * 255; nd.data[o + 2] = (1 / l * 0.5 + 0.5) * 255; nd.data[o + 3] = 255;
+    }
+    nctx.putImageData(nd, 0, 0);
+    const roadTex = new THREE.CanvasTexture(cc), roadN = new THREE.CanvasTexture(rnc);
+    [roadTex, roadN].forEach(t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; });
+    roadTex.encoding = THREE.sRGBEncoding;
+    const TILE = 4;                                            // one texture tile covers 4 x 4 world units, the same everywhere
+    const strip = (x0, x1, z0, z1, y) => {                    // a flat street piece with UVs from world position, so pieces meet seamlessly
+      const g = new THREE.PlaneGeometry(x1 - x0, z0 - z1); g.rotateX(-Math.PI / 2); g.translate((x0 + x1) / 2, y, (z0 + z1) / 2);
+      const p = g.attributes.position, uv = g.attributes.uv; for (let k = 0; k < p.count; k++) uv.setXY(k, p.getX(k) / TILE, -p.getZ(k) / TILE);
+      return { g };
+    };
+    const pieces = [strip(-6, 6, 60, CITY_Z0 + 0.01, -0.245)];                                  // through the gate
+    AVES.forEach(([c, h]) => pieces.push(strip(c - h, c + h, CITY_Z0, CITY_Z1, -0.246)));       // avenues
+    STREETS.forEach(([c, h]) => pieces.push(strip(-CITY_X, CITY_X, c + h, c - h, -0.244)));     // cross streets
+    pieces.push(strip(-6, 6, CITY_Z0 + 0.01, STREETS[0][0], -0.2455));                          // join the road to the first street
+    const roadMat = new THREE.MeshStandardMaterial({ map: roadTex, normalMap: roadN, normalScale: new THREE.Vector2(1.6, 1.6), roughness: 0.82 });
+    const road = new THREE.Mesh(merge(pieces), roadMat); road.receiveShadow = true; scene.add(road);
+
+    // kerbs: along the road through the gate, and around every city block so each street has the same stone edge
+    const kerbs = [], KW = 0.28;
+    [-1, 1].forEach(sd => { kerbs.push({ g: new THREE.BoxGeometry(KW, 0.16, 60 - CITY_Z0), m: T(sd * 6.14, -0.19, (60 + CITY_Z0) / 2) }); });
+    const kx = (x0, x1, z) => kerbs.push({ g: new THREE.BoxGeometry(x1 - x0, 0.16, KW), m: T((x0 + x1) / 2, -0.19, z) });
+    const kz = (z0, z1, x) => kerbs.push({ g: new THREE.BoxGeometry(KW, 0.16, z0 - z1), m: T(x, -0.19, (z0 + z1) / 2) });
+    [[-CITY_X, -6], [6, CITY_X]].forEach(([a, b]) => kx(a, b, zs[1] + KW / 2));          // wall side of the first street, open at the gate
+    for (let i = 0; i + 1 < xs.length; i += 2) for (let j = 2; j + 1 < zs.length; j += 2) {
+      const x0 = xs[i] - KW / 2, x1 = xs[i + 1] + KW / 2, z0 = zs[j] + KW / 2, z1 = zs[j + 1] - KW / 2;
+      kx(x0, x1, z0); if (j + 2 < zs.length) kx(x0, x1, z1);
+      if (i > 0) kz(z0, z1, x0); if (i + 2 < xs.length) kz(z0, z1, x1);
+    }
+    const kerb = new THREE.Mesh(merge(kerbs), capMat); kerb.receiveShadow = true; scene.add(kerb);
+
+    // old iron street lamps behind the wall, along the road and at the city corners, and trees along the first street
+    const lampAt = [];
+    [-4.5].forEach(z => [-1, 1].forEach(sd => lampAt.push([sd * 7.2, z])));
+    AVES.forEach(([c, h]) => STREETS.forEach(([z, zh]) => { if (c !== 0 || z !== STREETS[0][0]) lampAt.push([c + h + 0.6, z + zh + 0.6]); }));
+    for (let x = -54; x <= 54; x += 6) if (Math.abs(x) > 8) trees.push([x, CITY_Z0 + 0.2 + (Math.abs(x) % 12 ? 0 : 0), 0.9 + cr() * 0.35]);
+    const pc = document.createElement('canvas'); pc.width = pc.height = 64; const px = pc.getContext('2d');
+    const pg = px.createRadialGradient(32, 32, 0, 32, 32, 32); pg.addColorStop(0, 'rgba(166,200,255,0.55)'); pg.addColorStop(1, 'rgba(166,200,255,0)');
+    px.fillStyle = pg; px.fillRect(0, 0, 64, 64);
+    const ironMat = new THREE.MeshStandardMaterial({ color: tok('#0e141c'), roughness: 0.5, metalness: 0.6 });
+    const glassMat = new THREE.MeshBasicMaterial({ color: tok('#a6c8ff') });
+    const poolMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(pc), transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false });
+    const lampGroup = list => {
+      const iron = [], glass = [], glow = [], grp = new THREE.Group();
+      list.forEach(([x, z]) => {
+        iron.push({ g: new THREE.BoxGeometry(0.42, 0.34, 0.42), m: T(x, -0.1, z) });                                   // plinth
+        iron.push({ g: new THREE.CylinderGeometry(0.06, 0.09, 3.3, 8), m: T(x, 1.7, z) });                             // post
+        iron.push({ g: new THREE.CylinderGeometry(0.15, 0.1, 0.12, 8), m: T(x, 3.38, z) });                            // collar
+        const cap = new THREE.ConeGeometry(0.34, 0.34, 4); cap.rotateY(Math.PI / 4); iron.push({ g: cap, m: T(x, 4.12, z) });
+        iron.push({ g: new THREE.CylinderGeometry(0.03, 0.03, 0.22, 6), m: T(x, 4.38, z) });                           // finial
+        const lan = new THREE.CylinderGeometry(0.24, 0.16, 0.56, 4); lan.rotateY(Math.PI / 4); glass.push({ g: lan, m: T(x, 3.71, z) });
+        const pool = new THREE.PlaneGeometry(4.2, 4.2); pool.rotateX(-Math.PI / 2); glow.push({ g: pool, m: T(x, -0.23, z) });
+      });
+      const im = new THREE.Mesh(merge(iron), ironMat); im.castShadow = true;
+      grp.add(im, new THREE.Mesh(merge(glass), glassMat));
+      const pm = new THREE.Mesh(merge(glow), poolMat); pm.renderOrder = 1; grp.add(pm);
+      scene.add(grp); return grp;
+    };
+    lampGroup(lampAt);
+    const leaf = [], wood = [];
+    trees.forEach(([x, z, s]) => {
+      wood.push({ g: new THREE.CylinderGeometry(0.08 * s, 0.12 * s, 1.4 * s, 6), m: T(x, 0.7 * s - 0.27, z) });
+      const a = new THREE.IcosahedronGeometry(0.85 * s, 0), b = new THREE.IcosahedronGeometry(0.6 * s, 0);
+      leaf.push({ g: a, m: T(x, 1.9 * s - 0.27, z, cr() * 3) }, { g: b, m: T(x + 0.25 * s, 2.6 * s - 0.27, z - 0.1, cr() * 3) });
+    });
+    const woodMesh = new THREE.Mesh(merge(wood), new THREE.MeshStandardMaterial({ color: tok('#0e141c'), roughness: 0.9 }));
+    const leafMesh = new THREE.Mesh(merge(leaf), new THREE.MeshStandardMaterial({ color: tok('#1c2632'), roughness: 0.85, flatShading: true }));
+    woodMesh.castShadow = leafMesh.castShadow = true; scene.add(woodMesh, leafMesh);
 
     const scan = new THREE.Mesh(new THREE.BoxGeometry(0.06, 14, 0.06), new THREE.MeshBasicMaterial({ color: tok('#4589ff') }));
     scan.position.set(-30, 4.6, 0.6); scan.visible = false; scene.add(scan);
@@ -473,7 +580,7 @@ function pages(PICKS) {
     let active = 0, tStart = performance.now(), winStart = 0, winN = 0, winSum = 0, lastDown = 0, sawFirst = false;
         function setTier(t) {
       tier = Math.min(2, t);
-      if (tier > 0 && renderer.shadowMap.enabled) { renderer.shadowMap.enabled = false; key.castShadow = false; [mat, stoneMat, capMat, ground.material, road.material, city.material].forEach(m => { m.needsUpdate = true; }); }
+      if (tier > 0 && renderer.shadowMap.enabled) { renderer.shadowMap.enabled = false; key.castShadow = false; [mat, stoneMat, capMat, ground.material, road.material, city.material, ironMat, woodMesh.material, leafMesh.material].forEach(m => { m.needsUpdate = true; }); }
       if (tier === 2) { stars.visible = false; edges.visible = false; }
       resize();
     }
