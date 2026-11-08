@@ -21,10 +21,12 @@
   const K = {
     "field.scoreboard": fmt(D.field.scoreboard), "field.one_in": fmt(D.field.one_in), "field.expected_2026": fmt(D.field.expected_2026),
     "why.base": Math.round(allRate), "why.range": `about ${Math.round(d3.median(highs))}×`,
-    "why.wp": fmt(T["WordPress plugin"].attacked), "why.wp_n": fmt(T["WordPress plugin"].holes),
-    "why.xss": fmt(T["Cross-site scripting"].attacked), "why.xss_n": fmt(T["Cross-site scripting"].holes),
-    "why.note": `Holes published ${T["All holes"].period.replace(" to ", "–")}; “attacked” = on CISA's Known Exploited list as of ${D.why.kev_as_of}. ` +
-      `Public attack code: 2024–25 practice years. Traits are word tags on the description. Descriptive only: never a model input. Every trait has ≥ ${fmt(D.why.min_n)} holes.`,
+    "why.wp": fmt(T["WordPress plugin"].added_to_kev), "why.wp_n": fmt(T["WordPress plugin"].cves),
+    "why.xss": fmt(T["Cross-site scripting"].added_to_kev), "why.xss_n": fmt(T["Cross-site scripting"].cves),
+    "why.note": `CVEs published ${T["All holes"].period.replace(" to ", "–")}; “added to CISA KEV” = on CISA's Known Exploited Vulnerabilities list as of ${D.why.kev_as_of}. ` +
+      `Public attack code: 2024–25 practice years. Traits are keyword tags on the description and are associated with, not causes of, a higher or lower rate. ` +
+      `Descriptive only: never a model input. Every trait has ≥ ${fmt(D.why.min_n)} CVEs; fewer than ${D.why.few_cases_below} KEV entries = few cases, treat as a hint. ` +
+      `Limitation: ${D.why.limitation}`,
     "fan.caught": caught, "fan.missed": exploited - caught, "fan.exploited": exploited,
     "fan.caught_pct": Math.round((caught / exploited) * 100) + "%",
     "blind.total": D.blind.visible + D.blind.blind, "blind.visible": D.blind.visible, "blind.blind": D.blind.blind,
@@ -156,7 +158,7 @@
     const fm = f.append("feMerge"); fm.append("feMergeNode").attr("in", "b"); fm.append("feMergeNode").attr("in", "SourceGraphic");
   }
 
-  // ---------- scene: why attackers pick some holes (natural frequencies) ----------
+  // ---------- scene: traits of CVEs that end up on KEV (natural frequencies) ----------
   function why(step) {
     const traits = [D.why.traits[0], ...D.why.traits.slice(1).sort((a, b) => b.per_1000 - a.per_1000)];
     const cols = MOB ? 3 : 3, rowsN = Math.ceil(traits.length / cols);
@@ -170,14 +172,14 @@
         const lit = new Set(d3.shuffler(d3.randomLcg(k + 3))(d3.range(1000)).slice(0, Math.round(t.per_1000)));
         g.append("text").attr("class", "lbl").attr("y", MOB ? 11 : 16).text(t.trait);
         g.append("text").attr("class", "lbl-num").attr("y", MOB ? 25 : 38)
-          .html(`<tspan fill="${C.emberGlow}" font-weight="600">${t.per_1000 < 1 ? t.per_1000.toFixed(1) : Math.round(t.per_1000)}</tspan> in 1,000 attacked`);
+          .html(`<tspan fill="${C.emberGlow}" font-weight="600">${t.per_1000 < 1 ? t.per_1000.toFixed(1) : Math.round(t.per_1000)}</tspan> in 1,000 · ${fmt(t.added_to_kev)} of ${fmt(t.cves)}${t.few_cases ? " · few cases, a hint" : ""}`);
         const dots = g.append("g").attr("transform", `translate(${sp / 2},${(MOB ? 32 : 50) + sp / 2})`);
         dots.selectAll("circle").data(d3.range(1000)).join("circle").attr("cx", (i) => (i % dc) * sp).attr("cy", (i) => Math.floor(i / dc) * sp)
           .attr("r", (i) => (lit.has(i) ? rr * 1.9 : rr)).attr("fill", (i) => (lit.has(i) ? C.ember : C.dot))
           .attr("opacity", (i) => (lit.has(i) ? 1 : 0.55)).attr("filter", (i) => (lit.has(i) ? "url(#glow)" : null));
         g.append("rect").attr("x", -6).attr("y", -6).attr("width", cw + 4).attr("height", ch - 6).attr("fill", "transparent")
           .on("mousemove", (e) => showTip(e, `<span class="t-cve">${t.trait}</span><div class="t-meta">${t.period}</div>` +
-            `${fmt(t.attacked)} attacked out of ${fmt(t.holes)} holes (${t.per_1000} per 1,000)`)).on("mouseleave", hideTip);
+            `${fmt(t.added_to_kev)} added to CISA KEV out of ${fmt(t.cves)} CVEs (${t.per_1000} per 1,000)${t.few_cases ? " · few cases, treat as a hint" : ""}`)).on("mouseleave", hideTip);
       });
       svg.classed("interactive", true);
     }
@@ -205,7 +207,7 @@
         .attr("stroke", C.muted).attr("stroke-width", MOB ? 1 : 1.6).attr("stroke-opacity", 0.55)
         .each(function () { const L = this.getTotalLength(); d3.select(this).attr("stroke-dasharray", `${L} ${L}`).attr("stroke-dashoffset", L).property("L", L); });
       svg.append("circle").attr("class", "origin").attr("cx", x0).attr("cy", y0).attr("r", 9).attr("fill", C.ember).attr("filter", "url(#glow)");
-      svg.append("text").attr("class", "lbl-big").attr("x", x0).attr("y", y0 - 52).text(`${exploited} attacked holes`);
+      svg.append("text").attr("class", "lbl-big").attr("x", x0).attr("y", y0 - 52).text(`${exploited} CVEs added to CISA KEV`);
       svg.append("text").attr("class", "lbl-mute").attr("x", x0).attr("y", y0 - 28).text(`2024 + 2025 practice years`);
     }
     const th = svg.selectAll(".thread");
@@ -387,7 +389,7 @@
       clear();
       const c = overlay.append("div").attr("class", "callout counter show").style("left", "8%").style("top", MOB ? "4%" : "12%")
         .style("color", C.mintGlow).style("font-size", MOB ? "64px" : "clamp(110px, 13vw, 200px)")
-        .html(`<span class="n">${D.leak.honest}</span><small class="cl">attacked holes caught · honest model</small>`);
+        .html(`<span class="n">${D.leak.honest}</span><small class="cl">CVEs added to KEV, caught · honest model</small>`);
       const done = () => { c.style("color", C.emberGlow); c.select(".cl").html(`with after-the-fact columns, up from ${D.leak.honest} · too good to be true`); };
       if (!REDUCED) {
         const n = c.select(".n");
@@ -398,7 +400,7 @@
     svg.selectAll(".abar").remove();
     if (step >= 1) {
       const x0 = W * 0.08, wmax = W * 0.78, y0 = H * (MOB ? 0.5 : 0.56), bh = Math.max(28, H * 0.065);
-      const rows = [{ k: "Attacked holes", v: D.leak.analyzed_exploited, c: C.ember }, { k: "All the others", v: D.leak.analyzed_others, c: C.dot }];
+      const rows = [{ k: "Added to CISA KEV", v: D.leak.analyzed_exploited, c: C.ember }, { k: "All the others", v: D.leak.analyzed_others, c: C.dot }];
       const g = svg.append("g").attr("class", "abar");
       g.append("text").attr("class", "lbl-big").attr("x", x0).attr("y", y0 - 22).text("Marked “Analyzed” in today's database");
       rows.forEach((r, i) => {
@@ -459,8 +461,8 @@
       if (REDUCED) n.text(val);
       else d3.select({}).transition().duration(1200).ease(d3.easeCubicOut).tween("n", () => (t) => n.text(Math.round(val * t)));
     };
-    big(cx1, vb, C.ink2, "Best simple rule", "attacked holes caught");
-    big(cx2, vo, C.mintGlow, "Our model", "attacked holes caught");
+    big(cx1, vb, C.ink2, "Best simple rule", "CVEs added to KEV, caught");
+    big(cx2, vo, C.mintGlow, "Our model", "CVEs added to KEV, caught");
     // the difference, with its range
     const yd = H * (MOB ? 0.72 : 0.7), xd = d3.scaleLinear([-6, 10], [W * 0.1, W * 0.9]);
     svg.append("text").attr("class", "lbl-big").attr("x", W * 0.1).attr("y", yd - 58).text("How sure are we? Our edge, with its 90% uncertainty range");

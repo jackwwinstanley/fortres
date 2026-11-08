@@ -1,6 +1,6 @@
 # Write-up sections: Person B (draft v1)
 
-For Jack to merge into the main README write-up (#23). Numbers: v4 headline model, `outputs/headline.json`,
+For Jack to merge into the main README write-up (#23). Numbers: v5 headline model, `outputs/headline.json`,
 `outputs/b_*_report.md`. Each section is short on purpose: lead with the finding, then how we know.
 
 ## 1. Blind spots: what the standard signals can't see

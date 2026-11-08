@@ -42,13 +42,16 @@ KINDS = [("Takes over the machine", ["txt_rce", "txt_cmd_injection", "txt_deseri
 HIGHLIGHTS = [("Authentication Bypass", "Login bypass"), ("remote unauthenticated attacker", "No login needed"),
               ("super-admin privileges", "Takes full control"), ("FortiOS", "Widely deployed edge product")]
 
-# ---- "why do attackers pick some holes?": descriptive natural frequencies (never used by the model) ----
+# ---- traits of CVEs that end up on KEV: descriptive natural frequencies (never used by the model) ----
 TRAITS = [("All holes", None), ("Network edge device (firewall, VPN)", ["txt_edge_device"]),
           ("No login needed", ["txt_unauth", "txt_auth_bypass"]),
           ("Takes over the machine", ["txt_rce", "txt_cmd_injection"]),
           ("Enterprise software", ["txt_enterprise"]), ("Web browser", ["txt_browser"]),
           ("WordPress plugin", ["txt_wordpress"]), ("Cross-site scripting", ["txt_xss"])]
-MIN_N = 1000  # a trait needs at least this many holes to be shown
+MIN_N = 1000  # a trait needs at least this many CVEs to be shown
+FEW_CASES = 30  # fewer KEV entries than this -> "few cases, treat as a hint"
+LIMITATION = ("KEV skews toward enterprise and government-relevant software, so WordPress plugins (3 of 13,777) and cross-site "
+              "scripting (22 of 31,018) look safe here although they are widely attacked in practice.")
 
 
 def why_traits(P):
@@ -57,26 +60,30 @@ def why_traits(P):
     v["published"] = pd.to_datetime(v["published"], errors="coerce")
     v = v[(v["published"] >= "2018-01-01") & (v["published"] <= "2025-09-30")].copy()
     kev = pd.read_csv(DATA_DIR / "known_exploited.csv", usecols=["cve_id", "date_added"])
-    v["attacked"] = v["cve_id"].isin(kev["cve_id"])
+    v["added_to_kev"] = v["cve_id"].isin(kev["cve_id"])
     d = v["description"].fillna("").map(strip_post_attack).str.lower()
     flags = {f: d.str.contains(pat, regex=True) for f, pat in FLAGS.items()}
     rows = []
     for name, fl in TRAITS:
         m = pd.Series(True, index=v.index) if fl is None else np.logical_or.reduce([flags[f] for f in fl])
         g = v[m]
-        rows.append({"trait": name, "holes": int(len(g)), "attacked": int(g["attacked"].sum()),
-                     "per_1000": round(float(g["attacked"].mean() * 1000), 2), "period": "2018-01 to 2025-09"})
+        rows.append({"trait": name, "cves": int(len(g)), "added_to_kev": int(g["added_to_kev"].sum()),
+                     "per_1000": round(float(g["added_to_kev"].mean() * 1000), 2), "period": "2018-01 to 2025-09"})
     rep = pd.concat([P[2024], P[2025]], ignore_index=True)
     flagged = pd.concat([pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["exploitdb", "metasploit", "nuclei", "poc_github"])
                          for y in (2024, 2025)], ignore_index=True).max(axis=1) == 1
     g = rep[flagged.to_numpy()]
-    rows.insert(1, {"trait": "Public attack code exists", "holes": int(len(g)), "attacked": int(g["label"].sum()),
+    rows.insert(1, {"trait": "Public attack code exists", "cves": int(len(g)), "added_to_kev": int(g["label"].sum()),
                     "per_1000": round(float(g["label"].mean() * 1000), 2), "period": "2024-25 practice years"})
-    rows = [r for r in rows if r["holes"] >= MIN_N]
+    rows = [r for r in rows if r["cves"] >= MIN_N]
+    for r in rows:
+        r["few_cases"] = r["added_to_kev"] < FEW_CASES  # fewer than ~30 KEV entries: treat as a hint
     return {"traits": rows, "kev_as_of": str(kev["date_added"].max()), "min_n": MIN_N,
-            "note": ("Descriptive only, never a model input. Traits are regex tags on the description (post-attack "
-                     "phrases removed). 'Attacked' = on CISA's KEV list as of the date shown; older holes had more time "
-                     "to be attacked. Public attack code uses the 2024-25 practice years, attacked by 4 Nov of that year.")}
+            "note": ("Descriptive only, never a model input. Traits are keyword tags on the description (post-attack "
+                     "phrases removed). 'Added to CISA KEV' = on CISA's Known Exploited Vulnerabilities list as of the date shown; "
+                     "older CVEs had more time to be added. Public attack code uses the 2024-25 practice years (added by 4 Nov "
+                     "of that year). A trait is associated with a higher or lower rate; it does not cause it."),
+            "limitation": LIMITATION, "few_cases_below": FEW_CASES}
 
 
 def blind_cves():

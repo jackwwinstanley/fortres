@@ -29,10 +29,10 @@ and any 2026 KEV information.
 
 ## Why the banned list matters (measured)
 
-In today's NVD data, **100% of the exploited CVEs** in both replicas have `nvd_status = Analyzed`,
+In today's NVD data, **100% of the CVEs added to CISA KEV** in both replicas have `nvd_status = Analyzed`,
 against 42% (2024) and 50% (2025) of the rest. NVD analyses KEV-listed CVEs first, so this field is close to
 the answer itself. The leakage experiment (`python -m src.b.leakage`, `docs/figures/leakage.png`) shows the
-same model jumps from 23 to 30 pooled hits when such columns are added.
+v5 headline model jumps from 21 to 28 pooled hits when such columns are added.
 
 ## Known limits (not leaks, but worth stating in the write-up)
 

@@ -86,6 +86,8 @@ explanations, drift, leak = read("explanations.csv"), read("b_drift.json"), read
 expl_summary = read("explanations_summary.json")
 WHY = ROOT / "site" / "data" / "why_traits.csv"
 why = pd.read_csv(WHY) if WHY.exists() else None
+LIMIT = ("KEV skews toward enterprise and government-relevant software, so WordPress plugins (3 of 13,777) and cross-site "
+         "scripting (22 of 31,018) look safe here although they are widely attacked in practice.")
 blind = blind_spot_counts()
 
 st.title("Before the Breach")
@@ -129,16 +131,20 @@ with tabs[0]:
         fig = go.Figure(go.Bar(x=w["per_1000"], y=w["trait"], orientation="h",
                                marker_color=[GREYS[0] if t == "All holes" else (WARN if r > base_rate * 2 else GREYS[1])
                                              for t, r in zip(w["trait"], w["per_1000"])],
-                               text=[f"{r:.1f}" for r in w["per_1000"]], textposition="outside", cliponaxis=False,
-                               customdata=w[["attacked", "holes", "period"]].to_numpy(),
+                               text=[f"{r:.1f}  ({k:,} of {n:,}{', few cases' if fc else ''})" for r, k, n, fc in
+                                     zip(w["per_1000"], w["added_to_kev"], w["cves"], w["few_cases"])], textposition="outside", cliponaxis=False,
+                               customdata=w[["added_to_kev", "cves", "period"]].to_numpy(),
                                hovertemplate="%{y}: %{customdata[0]:,} of %{customdata[1]:,} added to KEV (%{customdata[2]})<extra></extra>"))
         fig.update_xaxes(range=[0, w["per_1000"].max() * 1.2])
         st.plotly_chart(style(fig, "CVEs added to CISA KEV, per 1,000, by kind of CVE", "Added to CISA KEV per 1,000 CVEs"),
                         width="stretch", theme="streamlit")
-        st.dataframe(why.rename(columns={"attacked": "added to KEV", "holes": "CVEs"}), hide_index=True, width="stretch")
-        st.caption("Descriptive only: these rates are associations, not causes, and are never model inputs. Kinds are word tags "
-                   "on the description (post-attack phrases removed); 'added to KEV' uses the KEV list as of its latest date, so "
-                   "older CVEs had more time. Public exploit code uses the 2024–25 practice years. Source: site/data/why_traits.csv.")
+        st.dataframe(why.rename(columns={"added_to_kev": "added to CISA KEV", "cves": "CVEs",
+                                         "few_cases": "few cases (< 30, treat as a hint)"}), hide_index=True, width="stretch")
+        st.caption("Descriptive only: each trait is associated with a higher or lower rate, it does not cause it, and these numbers "
+                   "are never model inputs. Kinds are keyword tags on the description (post-attack phrases removed); 'added to CISA "
+                   "KEV' uses the KEV list as of its latest date, so older CVEs had more time. Public exploit code uses the 2024–25 "
+                   "practice years. Source: site/data/why_traits.csv.")
+        st.caption("Limitation: " + LIMIT)
 
 # ---- blind spots --------------------------------------------------------------------------------
 with tabs[1]:
@@ -246,8 +252,8 @@ with tabs[4]:
                        "CVEs. 0.5 = indistinguishable, 1.0 = perfectly separable.")
         c1.markdown(
             "The 2026 scoreboard is **clearly different** from the practice years. The biggest change is "
-            "EPSS, and it's a mid-year step: January–May 2026 looks like past years, but from the July 2026 "
-            "snapshot the typical score is about 6× higher (62% of the list). A fixed EPSS threshold tuned on "
+            "EPSS, and it's a mid-year step: January–May 2026 looks like past years, but EPSS jumped ~6× from the "
+            "July 2026 snapshot (cause unknown); those months are 62% of the list. A fixed EPSS threshold tuned on "
             "past years won't transfer, so we rank *within* each month." if auc >= 0.75 else
             "The 2026 scoreboard looks broadly similar to the practice years.")
         colors = [WARN if v > 0.25 else ACCENT if v > 0.1 else GREYS[0] for v in shift["psi_2025_vs_2026"]]

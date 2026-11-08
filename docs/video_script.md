@@ -10,11 +10,11 @@ final list changes. **[Bracketed text] = what's on screen.**
 **0:00–0:15 · Hook** *(Aba)*
 [Dashboard title, then the "Blind spots" tab]
 "Every year, tens of thousands of vulnerabilities are published, and only about one in a thousand ends up being
-used by real attackers. We set out to find those few before it happens, using only what was known at the time."
+added to CISA's list of known-exploited vulnerabilities. We set out to find those few before it happens, using only what was known at the time."
 
 **0:15–0:35 · The surprise: blind spots** *(Aba)*
 [blindspots.png]
-"First surprise: in our 2024 and 2025 practice runs, 44 of the 75 vulnerabilities that were later exploited had
+"First surprise: in our 2024 and 2025 practice runs, 44 of the 75 vulnerabilities later added to CISA KEV had
 no public exploit code and a low EPSS score. The standard rules catch exactly zero of them. That's the gap we
 went after."
 
@@ -31,14 +31,14 @@ rejects any sentence that mentions a fact we didn't give it."
 
 **1:15–1:35 · Results, stated honestly** *(Jack)*
 [baselines.png]
-"Our model catches 21 exploited vulnerabilities across the two test years, against 19 for the best simple rule.
+"Our model catches 21 vulnerabilities that were added to KEV across the two test years, against 19 for the best simple rule. In the strictest test, training on 2024 and testing on 2025, we were one behind, 12 to 13.
 That's a small edge, and we show the uncertainty range rather than overclaim."
 
 **1:35–1:50 · Two discoveries that protect the result** *(Aba)*
 [drift_epss.png, then leakage.png]
-"Two things we caught. One: from July 2026, risk scores suddenly jumped about six times, so we compare each
-hole only with others from the same month instead of trusting raw scores. Two: columns filled in after an attack would inflate our score from 21 to
-28. Every exploited vulnerability is marked 'Analyzed' in today's NVD, so we banned those columns."
+"Two things we caught. One: EPSS jumped about six times from the July 2026 snapshot, cause unknown, so we compare each
+hole only with others from the same month instead of trusting raw scores. Two: columns filled in after a CVE is added to KEV would inflate our score from 21 to
+28. Every vulnerability added to KEV is marked 'Analyzed' in today's NVD, so we banned those columns."
 
 **1:50–2:00 · Close** *(Jack)*
 [Top 500 list, scrolling]

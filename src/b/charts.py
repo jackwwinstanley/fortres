@@ -165,7 +165,7 @@ def drift(plt):
     ax.set_xticks(range(1, 10), ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"])
     ax.set_xlim(0.6, 9.9)
     ax.set_ylabel("Median EPSS of new CVEs (%)")
-    titles(ax, f"2026 tracked past years until July, then EPSS jumped ~{late_med / past:.0f}×",
+    titles(ax, f"EPSS jumped ~{late_med / past:.0f}× from the July 2026 snapshot (cause unknown)",
            f"Jul–Sep snapshots are {share:.0%} of the 2026 list (no June data). Rank EPSS within the month.")
     ax.grid(axis="x", visible=False)
     _save(fig, "drift_epss.png")
