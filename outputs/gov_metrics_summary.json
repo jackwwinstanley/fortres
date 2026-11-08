@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T06:33:42+00:00",
+ "generated_at": "2026-11-08T14:05:00+00:00",
  "sdk": "ibm-watsonx-gov",
  "sdk_version": "1.5.2",
  "sdk_requires_python": ">=3.11,<3.14",
@@ -14,8 +14,8 @@
   "n": 500,
   "which": "all rows",
   "by_source": {
-   "granite": 318,
-   "template": 182
+   "granite": 302,
+   "template": 198
   }
  },
  "inputs": {
@@ -33,13 +33,13 @@
    "note": "share of the sentence's tokens found in the facts",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.7317,
+   "mean": 0.7328,
    "median": 0.7586,
-   "min": 0.4444,
+   "min": 0.4737,
    "max": 0.8571,
    "mean_by_source": {
-    "granite": 0.7501,
-    "template": 0.6995
+    "granite": 0.7604,
+    "template": 0.6906
    },
    "secs": 0.2
   },
@@ -51,15 +51,15 @@
    "note": "MiniLM embedding similarity, sentence vs facts",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.6514,
-   "median": 0.6573,
+   "mean": 0.642,
+   "median": 0.6507,
    "min": 0.4652,
-   "max": 0.8674,
+   "max": 0.8034,
    "mean_by_source": {
-    "granite": 0.6633,
-    "template": 0.6305
+    "granite": 0.6552,
+    "template": 0.622
    },
-   "secs": 0.8
+   "secs": 1.0
   },
   {
    "column": "answer_similarity__token_recall",
@@ -69,15 +69,15 @@
    "note": "share of the template sentence's tokens in our sentence",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.9227,
-   "median": 0.9365,
+   "mean": 0.9294,
+   "median": 0.9565,
    "min": 0.5789,
    "max": 1.0,
    "mean_by_source": {
-    "granite": 0.8784,
+    "granite": 0.8831,
     "template": 1.0
    },
-   "secs": 0.4
+   "secs": 0.2
   },
   {
    "column": "answer_similarity__bert_score_recall",
@@ -87,15 +87,15 @@
    "note": "BERTScore recall vs the template sentence",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.9415,
-   "median": 0.9344,
-   "min": 0.7832,
+   "mean": 0.9458,
+   "median": 0.9354,
+   "min": 0.7851,
    "max": 1.0,
    "mean_by_source": {
-    "granite": 0.908,
+    "granite": 0.9102,
     "template": 1.0
    },
-   "secs": 2.8
+   "secs": 3.1
   },
   {
    "column": "answer_similarity__sentence_bert_mini_lm",
@@ -105,12 +105,12 @@
    "note": "MiniLM embedding similarity vs template",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.9501,
-   "median": 0.948,
-   "min": 0.5158,
+   "mean": 0.9602,
+   "median": 0.958,
+   "min": 0.8356,
    "max": 1.0,
    "mean_by_source": {
-    "granite": 0.9215,
+    "granite": 0.9341,
     "template": 1.0
    },
    "secs": 0.7
@@ -123,13 +123,13 @@
    "note": "question is one we wrote; low information",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 0.4665,
+   "mean": 0.4625,
    "median": 0.5,
    "min": 0.25,
-   "max": 0.75,
+   "max": 0.5,
    "mean_by_source": {
-    "granite": 0.4984,
-    "template": 0.4107
+    "granite": 0.4917,
+    "template": 0.4179
    },
    "secs": 0.2
   },
@@ -141,13 +141,13 @@
    "note": "readability (textstat)",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 13.8898,
+   "mean": 13.8116,
    "median": 14.3546,
    "min": 8.4744,
    "max": 20.07,
    "mean_by_source": {
-    "granite": 14.5033,
-    "template": 12.8179
+    "granite": 14.5926,
+    "template": 12.6204
    },
    "secs": 0.0
   },
@@ -159,13 +159,13 @@
    "note": "readability (textstat)",
    "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
    "n": 500,
-   "mean": 45.618,
-   "median": 46.0686,
+   "mean": 46.0502,
+   "median": 47.455,
    "min": 16.9517,
    "max": 67.3289,
    "mean_by_source": {
-    "granite": 44.1561,
-    "template": 48.1722
+    "granite": 44.2694,
+    "template": 48.7663
    },
    "secs": 0.0
   }
@@ -719,9 +719,9 @@
   }
  ],
  "runtime_secs": {
-  "total": 12.1,
-  "inventory": 7.1,
-  "local_scoring_all_rows": 5.1
+  "total": 14.5,
+  "inventory": 9.0,
+  "local_scoring_all_rows": 5.5
  },
  "pip_freeze": [
   "Jinja2==3.1.6",

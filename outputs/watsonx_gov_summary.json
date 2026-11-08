@@ -1,17 +1,17 @@
 {
- "generated_at": "2026-11-08T13:43:12+00:00",
+ "generated_at": "2026-11-08T14:04:40+00:00",
  "sdk": "ibm-watsonx-gov",
  "sdk_version": "1.5.2",
  "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor, Lite plan) on IBM Cloud",
- "claim": "500 explanation sentences (318 granite, 182 template) scored with metrics hosted on IBM watsonx.governance (watsonx.governance-pv, ca-tor, Lite plan) on IBM Cloud.",
+ "claim": "500 explanation sentences (302 granite, 198 template) scored with metrics hosted on IBM watsonx.governance (watsonx.governance-pv, ca-tor, Lite plan) on IBM Cloud.",
  "rows": {
   "file": "outputs/explanations.csv",
   "which": "all rows",
   "requested": 500,
   "n": 500,
   "by_source": {
-   "granite": 318,
-   "template": 182
+   "granite": 302,
+   "template": 198
   }
  },
  "sent": "public CVE facts (src.b.explain.facts_prose) and our own explanation sentences only; nothing from data/",
@@ -23,14 +23,14 @@
    "method": "granite_guardian",
    "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor, Lite plan) on IBM Cloud",
    "n": 500,
-   "mean": 0.8011,
+   "mean": 0.8013,
    "median": 0.8269,
-   "min": 0.2814,
+   "min": 0.4378,
    "max": 0.9242,
    "n_ge_0_5": 495,
    "mean_by_source": {
-    "granite": 0.7968,
-    "template": 0.8088
+    "granite": 0.8042,
+    "template": 0.7968
    }
   },
   {
@@ -39,14 +39,14 @@
    "method": "granite_guardian",
    "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor, Lite plan) on IBM Cloud",
    "n": 500,
-   "mean": 0.6459,
+   "mean": 0.6495,
    "median": 0.6656,
-   "min": 0.2449,
+   "min": 0.2566,
    "max": 0.8598,
-   "n_ge_0_5": 443,
+   "n_ge_0_5": 448,
    "mean_by_source": {
-    "granite": 0.6708,
-    "template": 0.6023
+    "granite": 0.6864,
+    "template": 0.5932
    }
   },
   {
@@ -99,6 +99,6 @@
   }
  ],
  "stopped": null,
- "calls_this_run": 2085,
- "runtime_secs": 115.6
+ "calls_this_run": 80,
+ "runtime_secs": 15.1
 }

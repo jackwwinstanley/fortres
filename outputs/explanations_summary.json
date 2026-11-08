@@ -1,20 +1,20 @@
 {
  "total": 500,
- "passed_guardian": 318,
- "rewritten": 408,
- "template_fallback": 182,
+ "passed_guardian": 302,
+ "rewritten": 392,
+ "template_fallback": 198,
  "pending": 0,
  "guardian_ran": true,
  "guardian_model": "granite3-guardian:2b",
  "granite_model": "ibm-granite/granite-3.3-2b-instruct",
  "guardian_verdicts": {
-  "No": 318,
-  "not_run": 92,
+  "No": 302,
+  "not_run": 108,
   "Yes": 90
  },
- "guardian_calls_answered": 408,
+ "guardian_calls_answered": 392,
  "notes": "passed_guardian = Granite sentences kept because Guardian answered No; rewritten = Granite drafts that passed the local checks and were sent to Guardian; template_fallback = template sentences used (draft failed a local check, Guardian did not clearly say No, or Granite was not run). guardian_ran is true only if the Guardian model returned a Yes or No at least once; template rows whose guardian_verdict is not_run were never shown to Guardian.",
- "generated_at": "2026-11-08T06:00:24+00:00",
+ "generated_at": "2026-11-08T14:04:09+00:00",
  "prompt_version": "2026-11-08-restate-v6",
  "rows_regenerated_for_new_prompt": 429,
  "local_check_failures": {
@@ -49,5 +49,29 @@
  },
  "regenerated_passed_guardian": 82,
  "regenerated_template_fallback": 62,
- "top_list": "top500_v6.csv"
+ "top_list": "top500_v6.csv",
+ "manual_template_swaps": {
+  "n": 16,
+  "cve_ids": [
+   "CVE-2019-25485",
+   "CVE-2026-4092",
+   "CVE-2026-46455",
+   "CVE-2026-46457",
+   "CVE-2026-46585",
+   "CVE-2026-47101",
+   "CVE-2026-48204",
+   "CVE-2026-48206",
+   "CVE-2026-49099",
+   "CVE-2026-58635",
+   "CVE-2026-66908",
+   "CVE-2026-67620",
+   "CVE-2026-73320",
+   "CVE-2026-86283",
+   "CVE-2026-8794",
+   "CVE-2026-90781"
+  ],
+  "applied_at": "2026-11-08T14:04:09+00:00",
+  "why": "Granite sentences replaced with explain.template after review of the hosted watsonx.governance scores: 15 used the CVE id as filler; CVE-2026-4092 tied its proof of concept to one weakness hint.",
+  "guardian_note": "These 16 Granite drafts had been answered No by Guardian. The template sentences now shown were never shown to Guardian, so they are not_run and no longer count in passed_guardian, rewritten or guardian_calls_answered."
+ }
 }
