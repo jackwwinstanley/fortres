@@ -28,15 +28,27 @@ python scripts/check_top500.py outputs/top500_v1.csv
 Not used by the model: `nvd_status`, `n_affected_cpes`, `n_references`, CVSS (baseline only), `cwe_ids`, references, affected products, any 2026 KEV information.
 Results and caveats (low power: 75 positives): `outputs/v1_report.md`. Run: `python -m src.replicas && python -m src.features.build && python -m src.models.train_v1`.
 
+## Results (v5, `outputs/headline.json`; low power: 75 CVEs added to KEV in the two practice years)
+| test | v5 (20-seed bag) | best simple rule (public exploit, then EPSS) |
+|---|---|---|
+| forward: train 2024 → test 2025 | 12 | 13 |
+| stability: train 2025 → test 2024 | 9 | 6 |
+| pooled | 21 | 19 (+2, 90% range −4 to +8) |
+
+Leakage test (after-the-fact NVD columns added, never submitted): 21 → 28 (`outputs/leakage_results.csv`). Blind spots: 44 of 75 KEV additions had no
+public exploit code and a low EPSS; the simple rule catches 0 of them, the v5 bag 2 (`outputs/v5_blindspots.csv`). Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
+IBM Granite and IBM Granite Guardian are open models run locally; nothing here runs on watsonx. Ideas tested and not adopted: `docs/considered_not_adopted.md`.
+Regenerate Person B outputs with `python -m src.b.refresh_all`; `python scripts/number_sweep.py` checks every number in docs/site/app/README against the outputs.
+
 ## Final feature set (v5, drift-robust; the last feature-set change)
-Raw EPSS (`epss`) was **removed** because its scale shifted about 4x in 2026 (PSI 2.87 pooled replicas vs the scoreboard; 1.70 against the 2025 replica alone), so a model that
-uses raw EPSS would see a different distribution in 2026. `epss_rank_in_month` and `epss_missing` remain. For each scale-sensitive history feature the transformation with the
+Raw EPSS (`epss`) was **removed** because its scale shifted in 2026 (PSI 2.87 pooled replicas vs the scoreboard; 1.70 against the 2025 replica alone): EPSS jumped ~6× from
+the July 2026 snapshot (cause unknown), while January–May 2026 looks like past years. A model that uses raw EPSS would see a different distribution in 2026. `epss_rank_in_month` and `epss_missing` remain. For each scale-sensitive history feature the transformation with the
 lowest PSI against the 2026 scoreboard was used (raw, within-pool percentile rank, or a scale-free share of everything known by the history cutoff), chosen by drift alone, never by hits.
 The 33 model features are: `epss_missing`, `epss_rank_in_month`, the four exploit flags, `n_flags`, `any_exploit`, `days_to_snapshot`, `days_to_cutoff` (raw),
 `assigner_prior_cves_pctrank`, `assigner_kev_share`, `assigner_kev_12m_share`, `assigner_kev_rate_smooth_pctrank`, `n_vendors_mentioned`, `vendor_kev_count_max`, `vendor_kev_12m_max`,
 `kev_text_score`, `nearest_kev_sim` and the 14 `txt_*` flags. The final model is a 20-seed LightGBM bag. `kev_text_score` and `nearest_kev_sim` (the Granite-derived scores) are kept: the
 ablation shows them neutral within noise, so they are not claimed to add hits. Some assigner-history features still have a PSI above 0.25 after this treatment; `outputs/v5_report.md`
-explains why and gives the intervals and caveats (low power: 75 positives). Final list: `outputs/top500_v5.csv`. A descriptive analysis of why CVEs get attacked
+explains why and gives the intervals and caveats (low power: 75 positives). Final list: `outputs/top500_v5.csv`. A descriptive analysis of the traits of CVEs added to CISA KEV
 (`outputs/why_attacked_report.md`) uses today's NVD fields and is not used by any model or list.
 
 ## Columns used (v2 adds Person B's text features)

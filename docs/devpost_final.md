@@ -53,10 +53,11 @@ description, the way an analyst would, can help.
   similarity to past KEV entries) caught 2 (both Fortinet FortiOS). Either part alone (keyword flags or Granite
   similarity scores) still catches two or three of the 44; with neither, none. The exact CVEs change between runs, so
   treat it as noise.
-- **An honest result:** 21 vs 19 for the best simple rule across both years (+2, 90% range −4 to +8). On the
-  strictest forward test we're one behind (12 vs 13), and we say so.
-- **Reasons people can check:** [passed_guardian] of 500 Granite-written reasons passed a groundedness check (fill from
-  `outputs/explanations_summary.json`); the rest use a plain
+- **An honest result:** on the strictest forward test (train 2024, test 2025) we're one behind the best simple rule,
+  12 vs 13, and we say so. The stability check is 9 vs 6, so pooled over both years it's 21 vs 19 (+2, 90% range −4 to
+  +8): a small edge that could be luck.
+- **Reasons people can check:** [TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges] Granite-written reasons passed a groundedness check;
+  the rest use a plain
   template.
 
 ## What we learned

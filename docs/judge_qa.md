@@ -21,9 +21,9 @@ check" (not "verified").
 
 **Jack (the "how and how honest", for technical and IBM judges)**
 > We rebuilt 2024 and 2025 exactly the way 2026 is scored, used only information available at the time, and trained on
-> one year to test on the other. Our final model is a 20-seed LightGBM bag using IBM Granite text features. Across both
-> years it catches 21 flaws that were added to KEV, against 19 for the best simple rule. That's +2, with a 90% range from
-> −4 to +8, so it could be luck. On the strictest forward test it's one behind, 12 vs 13. Two things make us trust the
+> one year to test on the other. Our final model is a 20-seed LightGBM bag with text features, including IBM Granite
+> similarity scores. On the strictest forward test it's one behind the best simple rule, 12 vs 13; the other direction
+> is 9 vs 6, so across both years 21 vs 19. That's +2, with a 90% range from −4 to +8, so it could be luck. Two things make us trust the
 > setup. First, EPSS jumped about 6× from the July 2026 snapshot, so we rank within each month. Second, a leakage test:
 > adding database fields that are filled in after the fact lifts us to 28. Every CVE added to KEV is marked "Analyzed"
 > today, so we never use those fields. Each of our 500 picks has a plain-English reason from Granite, checked by Granite
@@ -49,8 +49,8 @@ Three ways:
    where the trap is, and that we stayed out of it.
 
 **Is 21 vs 19 just luck?**
-It could be. With only 75 CVEs added to KEV across the two practice years, +2 has a 90% range of −4 to +8. In the
-strictest test (train on 2024, test on 2025) we're one behind, 12 vs 13. What *is* solid: the blind spots (44 of 75),
+It could be. In the strictest test (train on 2024, test on 2025) we're one behind, 12 vs 13; the other direction is
+9 vs 6. With only 75 CVEs added to KEV across the two practice years, the pooled +2 has a 90% range of −4 to +8. What *is* solid: the blind spots (44 of 75),
 the July 2026 EPSS jump, and the leakage result.
 
 **Why 500?**
@@ -70,7 +70,7 @@ make the model compare each flaw only with others from the same month, so the ju
 Groundedness: whether each sentence is supported by the facts we gave Granite. It does **not** check that the
 sentence is true about the world, and it doesn't judge style. On top of it we run our own checks (no invented numbers,
 products or CVE ids; no words like "critical" or "actively exploited"). Anything that fails gets a plain template
-sentence instead. The current count is in `outputs/explanations_summary.json` (`passed_guardian` of `total`); read it from there on the day.
+sentence instead. Count: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges (`passed_guardian` of `total`).
 
 **What's the most interesting thing you found?**
 That the standard signals can't see most of the flaws that end up on KEV. 44 of 75 had no public attack code and a low

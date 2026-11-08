@@ -1,7 +1,18 @@
-# Write-up sections: Person B (draft v2)
+# Write-up sections: Person B (final draft)
 
 For Jack to merge into the main README write-up (#23). Numbers: v5 headline model, `outputs/headline.json`,
 `outputs/b_*_report.md`. Each section is short on purpose: lead with the finding, then how we know.
+
+## 0. Results (v5 headline model, `outputs/headline.json`)
+- **Forward test (train 2024 → test 2025): 12 vs 13**, one behind the best simple rule (90% range −6 to +3).
+- Stability check (train 2025 → test 2024): 9 vs 6.
+- Pooled over both: **21 vs 19** (+2, 90% range −4 to +8). The gain is small and could be luck.
+- Leakage test: adding after-the-fact columns lifts the same model from 21 to **28** (17 + 11).
+- Blind spots: 44 of 75 CVEs added to KEV had no public exploit code and a low EPSS; the simple rule catches 0 of them,
+  the v5 bag 2.
+- Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
+
+What holds up: the blind spots, the July 2026 EPSS step, and the leakage test.
 
 ## 1. Blind spots: what the standard signals can't see
 Of the 75 CVEs added to CISA KEV in our two practice years, **44 (59%) were blind spots**: no public exploit
@@ -55,8 +66,8 @@ month, public exploit sources, IBM Granite KEV-likeness and the model's stronges
 (`granite-3.3-2b-instruct`, open model run locally) rewords them. A local checker rejects any sentence that adds a
 number, product, CVE id or blocked claim ("critical", "actively exploited", …), and IBM Granite Guardian
 (`granite3-guardian:2b`, run locally via Ollama) checks that the rest is supported by the facts. Sentences that fail
-keep the plain template. The current counts are in `outputs/explanations_summary.json` (`passed_guardian`,
-`template_fallback`); Guardian checks support by the facts, not truth, fluency or causality ("passed a groundedness check",
+keep the plain template. Counts: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges (`passed_guardian`,
+`template_fallback`). Guardian checks support by the facts, not truth, fluency or causality ("passed a groundedness check",
 never "verified").
 
 ## 6. Understanding the errors
@@ -65,12 +76,6 @@ alone catches five high-EPSS CVEs with public exploit code from vendors rarely o
 ×2). The model alone catches four enterprise/edge CVEs whose descriptions read like past KEV entries (Fortinet, Cisco ISE,
 Citrix NetScaler, VMware). Ideas we tested from this (track-record priors, a 50/50 blend) were **considered, not
 adopted**; see `docs/considered_not_adopted.md`.
-
-## Honest results (v5 headline model, `outputs/headline.json`)
-Pooled over both practice years, the v5 model catches **21** CVEs added to KEV against **19** for the best simple rule
-(+2, 90% range −4 to +8). In the strict forward-in-time test (train 2024 → test 2025) it is **one behind**: 12 vs 13
-(range −6 to +3). The stability check (train 2025 → test 2024) is 9 vs 6. The gain is small and could be luck. What holds
-up: the blind spots, the July 2026 shift, and the leakage test.
 
 ## Limits
 Low power (75 positives, so a few hits are within noise). Descriptions are today's NVD text and can be edited

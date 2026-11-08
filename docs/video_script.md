@@ -1,4 +1,4 @@
-# 2-minute demo video: script (draft v2)
+# 2-minute demo video: script (final draft)
 
 Target: about 290 spoken words, roughly 2:00 at a calm pace. Judges score Discovery 35%, Data use 25%,
 Communication 25% and Impact 15%, so we lead with findings, not code.
@@ -30,9 +30,9 @@ sentence that isn't supported by the facts we gave it."
 
 **1:15–1:35 · Results, stated honestly** *(Jack)*
 [baselines.png]
-"Across the two test years our model catches 21 vulnerabilities that were added to KEV, against 19 for the best simple
-rule. That's a small edge and it could be luck. In the strictest test, training on 2024 and testing on 2025, we were one
-behind, 12 to 13. We show the uncertainty rather than overclaim."
+"In the strictest test, training on 2024 and testing on 2025, we were one behind the best simple rule, 12 to 13. The
+other way round it was 9 to 6, so across both years 21 against 19: a small edge that could be luck. We show the
+uncertainty rather than overclaim."
 
 **1:35–1:50 · Two discoveries that protect the result** *(Aba)*
 [drift_epss.png, then leakage.png]
