@@ -1,0 +1,19 @@
+{
+ "total": 500,
+ "passed_guardian": 420,
+ "rewritten": 476,
+ "template_fallback": 80,
+ "pending": 0,
+ "guardian_ran": true,
+ "guardian_model": "granite3-guardian:2b",
+ "granite_model": "ibm-granite/granite-3.3-2b-instruct",
+ "guardian_verdicts": {
+  "No": 420,
+  "Yes": 56,
+  "not_run": 24
+ },
+ "guardian_calls_answered": 476,
+ "notes": "passed_guardian = Granite sentences kept because Guardian answered No; rewritten = Granite drafts that passed the local checks and were sent to Guardian; template_fallback = template sentences used (draft failed a local check, Guardian did not clearly say No, or Granite was not run). guardian_ran is true only if the Guardian model returned a Yes or No at least once.",
+ "generated_at": "2026-11-08T00:21:23+00:00",
+ "top_list": "top500_v5.csv"
+}

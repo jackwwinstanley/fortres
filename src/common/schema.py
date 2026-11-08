@@ -58,7 +58,7 @@ SCHEMAS.update({
 
 CSV_SCHEMAS = {
     "emb_ids.csv": dict(cols=["cve_id"], unique_cve=True),
-    "explanations.csv": dict(cols=["cve_id", "reason"], unique_cve=True),
+    "explanations.csv": dict(cols=["cve_id", "explanation", "source", "guardian_verdict", "reason"], unique_cve=True),
     "runlog.csv": dict(cols=["timestamp", "version", "replica", "k", "hits",
                              "baseline_exploit_epss_hits", "notes"], unique_cve=False),
 }

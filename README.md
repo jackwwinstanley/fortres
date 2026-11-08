@@ -59,3 +59,9 @@ writes `outputs/b_text_report.md`.
 - `nearest_kev_sim`: max cosine similarity to KEV entries with `date_added` <= (Y-1)-12-31
   (2023-12-31 for replica 2024, 2024-12-31 for replica 2025, 2025-12-31 for the 2026 scoreboard).
 - `txt_*`: int8 regex flags on the description (RCE, unauthenticated, edge device, ...).
+
+## Explanations (Person B's file, Guardian gate)
+`python -m src.b.explain --granite` writes `outputs/explanations.csv` (columns `cve_id`, `explanation`, `source`, `guardian_verdict`, plus `reason`, a copy of `explanation` for the dashboard) and
+`outputs/explanations_summary.json`. Granite (granite-3.3-2b-instruct) rewrites facts built only from tracked columns and the v5 contribution file; local checks and then
+Granite Guardian (`ollama pull granite3-guardian:2b`, risk = groundedness) must clearly answer "No", otherwise the template sentence is used. Results are cached in `outputs/.cache/`
+and the run resumes after a crash. The committed files were produced by that run; no sentence is labelled Guardian-checked unless the Guardian model returned "No" for it.
