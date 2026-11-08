@@ -132,8 +132,8 @@
     if (built) return; built = true;
     const secs = [...root.querySelectorAll('.fd')];
     const idx = root.querySelector('.fidx');
-    idx.innerHTML = secs.map((s, i) => `<button type="button" data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b>${s.dataset.t}</button>`).join('');
-    idx.addEventListener('click', e => { const b = e.target.closest('button'); if (b) secs[+b.dataset.i].scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); });
+    if (idx) idx.innerHTML = secs.map((s, i) => `<button type="button" data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b>${s.dataset.t}</button>`).join('');
+    if (idx) idx.addEventListener('click', e => { const b = e.target.closest('button'); if (b) secs[+b.dataset.i].scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); });
     secs.forEach(sec => { sec.__reveals = []; const v = sec.querySelector('.viz'); try { draw[sec.dataset.viz](sec, v, D); } catch (e) { console.warn('finding chart', sec.id, e); } });
     const io = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting) return;

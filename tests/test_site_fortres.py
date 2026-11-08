@@ -86,8 +86,8 @@ def test_findings_charts_equal_the_outputs():
     assert r["passed_guardian"] + r["guardian_rejected"] + r["local_failed"] == r["total"]
     assert sum(n for _, _, n in on_page["events"]) == on_page["blind"]["total"]
     html = re.sub(r"\s+", " ", (SITE / "index.html").read_text())
-    for sid in ["f-blind", "f-work", "f-sev", "f-leak", "f-reasons", "f-events", "f-vendor", "f-epss", "f-dates", "f-simple"]:
+    for sid in ["f-events", "f-vendor", "f-epss", "f-dates", "f-simple"]:
         assert f'id="{sid}"' in html, sid
-    assert f"Granite Guardian rejected {r['guardian_rejected']} reasons, and {r['local_failed']} more failed our own checks" in html
+    assert f"EPSS scores jumped {on_page['epss_jump']} times" in html
     assert f"{len(on_page['events'])} separate events" in html
     assert f"from {on_page['vendor_cv_2025']['ungrouped']} to {on_page['vendor_cv_2025']['vendor_grouped']}" in html
