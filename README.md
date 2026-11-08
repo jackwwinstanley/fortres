@@ -147,7 +147,7 @@ and the run resumes after a crash. The sentence must restate at most three facts
 
 ## Built with Entire
 We used [Entire](https://docs.entire.com/overview) to keep an audit trail of the AI-assisted work in this repository: checkpoints of Claude Code sessions, linked to commits.
-`outputs/entire_summary.json` is a counts-and-timestamps snapshot: 30 checkpoints from 2 sessions, first and last dated in it (made by `python scripts/entire_summary.py`).
-The checkpoints, prompts and transcripts stay on one laptop (`push_sessions` is false and the remote has no `refs/entire/*` ref) because transcripts contain personal data.
+`outputs/entire_summary.json` is a counts-and-timestamps snapshot: 30 checkpoints from 2 sessions (27 imported from earlier Claude Code history, 3 captured live), first and last dated in it (made by `python scripts/entire_summary.py`). It covers only Jack's laptop.
+The checkpoints, prompts and transcripts stay on that laptop (`push_sessions` is false and the remote has no `refs/entire/*` ref) because the repository is public and transcripts contain personal data (home-folder paths and e-mail-shaped strings).
 What Entire shows, what it does not, and the read-only commands to check it: [docs/entire.md](docs/entire.md).
 A 25-second screen-recording plan that uses only those commands: [docs/entire_demo.md](docs/entire_demo.md).
