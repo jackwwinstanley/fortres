@@ -1,7 +1,7 @@
 # Devpost submission text (DRAFT, for Aba or Jack to paste)
 
 Claude can't log in to Devpost; paste each section into the matching Devpost field. Numbers match `outputs/headline.json`
-(v6) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
+(v6) and the Person B reports. Guardian counts are from `outputs/explanations_summary.json`.
 
 ---
 
@@ -58,8 +58,8 @@ description, the way an analyst would, can help.
 - **An honest result:** on the strictest forward test (train 2024, test 2025) we're five ahead of the best simple rule,
   18 vs 13. The stability check is 9 vs 6, so pooled over both years it's 27 vs 19 (+8, 90% range +2 to +14). With
   only 75 positives that is still a small sample, and we say so.
-- **Reasons people can check:** [TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges] Granite-written reasons passed a groundedness check;
-  the rest use a plain
+- **Reasons people can check:** 318 of 500 Granite-written reasons passed a groundedness check;
+  the other 182 use a plain
   template.
 
 ## What we learned

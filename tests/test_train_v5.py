@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from scripts.check_top500 import check
-from src.common.paths import OUT_DIR
+from src.common.paths import OUT_DIR, SCOREBOARD_CSV
 from src.common.schema import SHARE_FEATURES
 from src.models.train_v5 import FEATURES_V5, bootstrap_p
 
@@ -31,6 +31,7 @@ def test_share_columns_exist_in_feature_files_and_are_proper_shares():
 
 
 @pytest.mark.skipif(not (OUT_DIR / "top500_v5.csv").exists(), reason="top500_v5.csv not produced yet")
+@pytest.mark.skipif(not SCOREBOARD_CSV.exists(), reason="needs the untracked datathon data (data/scoreboard_2026.csv) to validate the IDs")
 def test_top500_v5_format_and_contributions():
     assert check(OUT_DIR / "top500_v5.csv") == []
     ids = pd.read_csv(OUT_DIR / "top500_v5.csv")["cve_id"].tolist()

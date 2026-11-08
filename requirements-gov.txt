@@ -1,0 +1,11 @@
+# Separate environment for scripts/gov_metrics.py ONLY (never add these to requirements.txt).
+# ibm-watsonx-gov requires Python >=3.11,<3.14, and the project runs on 3.14:
+#   uv venv --python 3.11 .venv-gov
+#   uv pip install --python .venv-gov/bin/python -r requirements-gov.txt
+# Versions are the ones the recorded runs used (outputs/gov_metrics_summary.json has the full pip freeze).
+ibm-watsonx-gov[metrics]==1.5.2
+sentence-transformers==6.2.0   # local embedding methods (MiniLM, BGE)
+bert-score==0.3.13             # local BERTScore method
+requests==2.34.2               # hosted run: IBM Cloud login and instance lookup
+pandas==2.2.3
+pyarrow==26.0.1

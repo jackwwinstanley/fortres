@@ -160,3 +160,22 @@ def test_entire_counts_on_any_line_that_mentions_entire(line, ok):
 
 def test_entire_count_rule_needs_no_summary_when_there_is_none():
     assert ns.check_text("README.md", "Entire has 99 checkpoints.", E) == []
+
+
+def test_leftover_todo_markers_fail():
+    probs = ns.check_text("docs/judge_qa.md", "Count: TODO(#35): fill from the summary.", E)
+    assert any("leftover TODO( marker" in p for p in probs), probs
+
+
+@pytest.mark.parametrize("line,needle", [
+    ("The other 150 reasons use the plain template.", "template count 150"),
+    ("Explanations: 3 rows pending.", "pending count 3"),
+])
+def test_explanation_counts_in_prose(line, needle):
+    probs = ns.check_text(FINAL, line, E)
+    assert any(needle in p for p in probs), probs
+
+
+def test_correct_explanation_counts_pass():
+    line = "347 of 500 reasons passed a groundedness check; the other 153 use the plain template; 0 pending."
+    assert ns.check_text(FINAL, line, E) == []
