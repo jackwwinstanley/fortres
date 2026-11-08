@@ -97,12 +97,12 @@ commits, inside our own repository. The evidence we publish is a counts-and-time
 address ever reaches it. The checkpoints themselves stay on Jack's laptop with `push_sessions` off, because the repository is public and
 transcripts contain personal data (home-folder paths and e-mail-shaped strings); the remote has no Entire refs, and the page `docs/entire.md` has the read-only commands to check that. Of the
 snapshot, 27 are imports of earlier history and 3 were captured live, since we enabled Entire part-way through, and it
-covers only that one laptop.
+covers only that one laptop. Screen recording: https://youtu.be/_rM3jJBfXMg. We tried Entire's Graph and Brain add-ons only at the end, on a fresh clone of the repository; they were not used throughout the project.
 
 ## Best Use of Vultr
-The public site, https://fortres.us, runs on a Vultr server (Ubuntu 24.04) with Caddy handling HTTPS. The server was set up from the
-script in `deploy/vultr/cloud-init.yaml`, and every response carries the header `X-Served-By: Vultr`, so anyone can check where the page
-comes from. The steps are in `deploy/README.md`.
+The public site, https://fortres.us, runs on a Vultr server (Ubuntu 24.04) with Caddy handling HTTPS. Every response carries the header
+`X-Served-By: Vultr`, so anyone can check where the page comes from. The setup script and steps are in `deploy/vultr/cloud-init.yaml` and
+`deploy/README.md`.
 
 ## Built with
 python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly, entire, vultr, caddy

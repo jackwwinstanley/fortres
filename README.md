@@ -169,3 +169,5 @@ We used [Entire](https://docs.entire.com/overview) to keep an audit trail of the
 The checkpoints, prompts and transcripts stay on that laptop (`push_sessions` is false and the remote has no `refs/entire/*` ref) because the repository is public and transcripts contain personal data (home-folder paths and e-mail-shaped strings).
 What Entire shows, what it does not, and the read-only commands to check it: [docs/entire.md](docs/entire.md).
 A 25-second screen-recording plan that uses only those commands: [docs/entire_demo.md](docs/entire_demo.md).
+Screen recording: https://youtu.be/_rM3jJBfXMg
+We tried Entire's Graph and Brain add-ons only at the end, on a fresh clone of the repository; they were not used throughout the project.
