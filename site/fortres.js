@@ -122,9 +122,11 @@ function pages(PICKS) {
   lq.addEventListener('paste', () => setTimeout(() => lookup(lq.value), 0));
   document.querySelector('.tries').addEventListener('click', e => { const b = e.target.closest('button'); if (b) lookup(b.dataset.c); });
   function route() {
-    ROUTE = location.hash === '#picks' ? 'picks' : location.hash === '#lookup' ? 'lookup' : 'story';
+    ROUTE = location.hash === '#picks' ? 'picks' : location.hash === '#lookup' ? 'lookup' : location.hash === '#found' ? 'found' : 'story';
     document.documentElement.classList.toggle('route-picks', ROUTE !== 'story');
     document.documentElement.classList.toggle('route-lookup', ROUTE === 'lookup');
+    document.documentElement.classList.toggle('route-found', ROUTE === 'found');
+    document.getElementById('t-found').setAttribute('aria-current', ROUTE === 'found' ? 'page' : 'false');
     document.getElementById('t-lookup').setAttribute('aria-current', ROUTE === 'lookup' ? 'page' : 'false');
     if (ROUTE === 'lookup') { needRanks().catch(() => {}); countUp(document.getElementById('lnum')); setTimeout(() => lq.focus({ preventScroll: true }), 50); }
     document.getElementById('t-story').setAttribute('aria-current', ROUTE === 'story' ? 'page' : 'false');

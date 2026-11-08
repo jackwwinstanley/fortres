@@ -14,7 +14,7 @@
 <body>
 <header class="top">
   <a class="brand" href="#story" aria-label="fortres home"><svg width="21" height="27" viewBox="400 180 610 790" aria-hidden="true"><path d="M450 293L528 266L532 330L608 310L610 238L703 201L797 238L798 310L876 330L880 266L958 293L958 412L703 362L452 412Z" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M487 450L703 398L919 450L884 492L884 742L703 840L522 742L522 492Z" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M507 606L425 655L425 798L703 948L982 798L982 655L900 606" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="miter" stroke-miterlimit="8"/></svg>fortres</a>
-  <nav class="tabs" aria-label="Pages"><a href="#story" id="t-story" aria-current="page">story</a><a href="#picks" id="t-picks">the 500</a><a href="#lookup" id="t-lookup">look up</a></nav>
+  <nav class="tabs" aria-label="Pages"><a href="#story" id="t-story" aria-current="page">story</a><a href="#found" id="t-found">findings</a><a href="#picks" id="t-picks">the 500</a><a href="#lookup" id="t-lookup">look up</a></nav>
 </header>
 <div class="prog" id="prog" aria-hidden="true"></div>
 <div class="poster" aria-hidden="true"></div>
@@ -56,7 +56,7 @@
   <section class="step" data-s="picks"><div class="card">
     <span class="num blue">500</span>
     <h2>Fortres picks <mark>the 500 to fix first</mark>.</h2>
-    <p>IBM Granite reads every description, a model ranks them, and each pick gets a plain reason.</p>
+    <p>Fortres is a triage system for security holes. A statistical model ranks all 72,670 and picks the 500 most likely to be attacked. IBM Granite helps read the descriptions and explains every pick in plain words.</p>
     <span class="note">6 of 855 bricks: the same share as 500 of 72,670</span>
   </div></section>
 
@@ -70,10 +70,10 @@
 
   <section class="step" data-s="work"><div class="card">
     <span class="num mint">23&times;<small>less work</small></span>
-    <h2>To catch those 27, fortres needed only <mark>441 fixes</mark>.</h2>
-    <p>The usual rule would need 1,116 fixes to catch the same 27. EPSS alone, 6,858. Sorting by severity, 10,026. Every fix costs a team time and money, so fewer, better-chosen fixes is the whole point.</p>
-    <div class="vs sm"><div><span class="num mint">441</span><span class="l">fortres</span></div><div><span class="num" style="color:var(--mute)">1,116</span><span class="l">usual rule</span></div><div><span class="num blue">6,858</span><span class="l">EPSS alone</span></div><div><span class="num amber">10,026</span><span class="l">by severity</span></div></div>
-    <span class="note">each brick is about 100 fixes · same 2024 and 2025 test as the 27</span>
+    <h2>Fortres caught those 27 with a list of only <mark>441 fixes</mark>.</h2>
+    <p>To reach the same 27, the usual rule would have to go 1,116 deep. Sorting by severity, 6,858. EPSS alone, 10,026. Every fix costs a team time and money, so fewer, better-chosen fixes is the whole point.</p>
+    <div class="vs sm"><div><span class="num mint">441</span><span class="l">fortres</span></div><div><span class="num" style="color:var(--mute)">1,116</span><span class="l">usual rule</span></div><div><span class="num amber">6,858</span><span class="l">by severity</span></div><div><span class="num blue">10,026</span><span class="l">EPSS alone</span></div></div>
+    <span class="note">each brick is about 100 fixes · same 2024 and 2025 test as the 27 · fortres's 27th catch is at position 353</span>
   </div></section>
 
   <section class="step" data-s="blindRule"><div class="card">
@@ -107,7 +107,7 @@
     <p>IBM Granite writes one plain sentence per pick. Granite Guardian checks it only says what the facts say. The 182 that fail get a simple fill-in sentence, so nothing made up reaches you.</p>
     <p class="eg">Pick 472: “Prioritised because it has public exploit code in Exploit-DB and GitHub, and it's an SQL injection vulnerability.”</p>
     <p class="tool"><b>IBM Granite Guardian</b>Granite Guardian 3 (2B) · run locally · 318 of 500 passed</p>
-    <p class="tool"><b>IBM watsonx.governance</b>IBM Cloud · scored a trial of 100 sentences · 0 flagged for harm or personal data</p>
+    <p class="tool"><b>IBM watsonx.governance</b>IBM Cloud · scored all 500 reasons · 0 of 500 flagged for harm or personal data</p>
   </div></section>
 
   <section class="step" data-s="trust"><div class="card">
@@ -119,10 +119,43 @@
   <section class="step" data-s="close"><div class="card">
     <svg class="biglogo" viewBox="400 180 610 790" aria-hidden="true"><path d="M450 293L528 266L532 330L608 310L610 238L703 201L797 238L798 310L876 330L880 266L958 293L958 412L703 362L452 412Z" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M450 293L528 266L532 330L608 310L610 238L703 201L797 238L798 310L876 330L880 266L958 293L958 412L703 362L452 412Z" fill="none" stroke="var(--bg)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M487 450L703 398L919 450L884 492L884 742L703 840L522 742L522 492Z" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M487 450L703 398L919 450L884 492L884 742L703 840L522 742L522 492Z" fill="none" stroke="var(--bg)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M507 606L425 655L425 798L703 948L982 798L982 655L900 606" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M507 606L425 655L425 798L703 948L982 798L982 655L900 606" fill="none" stroke="var(--bg)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="8"/></svg>
     <h2>A fortress can't guard every brick. It can guard <mark>the ones attackers aim for</mark>.</h2>
-    <div class="cta"><a class="btn" href="#picks">See the 500 picks <span aria-hidden="true">→</span></a><a class="btn ghost" href="https://github.com/jackwwinstanley/ibm-breach">Code on GitHub</a></div>
-    <p class="credits">fortres.us · IBM "Before the Breach" · Sheridan Datathon 2026 · Yahya and Jack<br>Data: NVD, FIRST EPSS, CISA KEV · IBM Granite and Granite Guardian, run locally<br>Design inspired by taste-skill, impeccable and Emil Kowalski, with IBM Carbon touches</p>
+    <div class="cta"><a class="btn" href="#picks">See the 500 picks <span aria-hidden="true">→</span></a><a class="btn ghost" href="#found">What we found</a><a class="btn ghost" href="https://github.com/jackwwinstanley/ibm-breach">Code on GitHub</a></div>
+    <p class="credits">fortres.us · IBM "Before the Breach" · Sheridan Datathon 2026 · Yahya and Jack<br>Data: NVD, FIRST EPSS, CISA KEV · IBM Granite and Granite Guardian, run locally · IBM watsonx.governance on IBM Cloud<br>Design inspired by taste-skill, impeccable and Emil Kowalski, with IBM Carbon touches</p>
   </div></section>
 </main>
+
+<div id="found" class="gut">
+  <div class="fwrap">
+    <h1>What is fortres?</h1>
+    <p class="def">Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.</p>
+    <ol class="pts">
+      <li><b>The ranking is 20 models that vote, each built from 150 small decision trees.</b> It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.</li>
+      <li><b>IBM Granite does the reading and the explaining.</b> Granite Embedding reads each description and gives the ranking one clue. Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts. If it fails, a plain template sentence is used instead. Then IBM watsonx.governance on IBM Cloud scored all 500 reasons: 0 were flagged for harm or personal data.</li>
+      <li><b>What it is not.</b> It doesn't predict who gets attacked. The language model never decides the ranking. And it still misses most holes that give no warning.</li>
+    </ol>
+
+    <h2>What we found</h2>
+    <p class="sub">Results come from our 2024 and 2025 test: we trained on one year and ranked the other, then checked which holes CISA later added to its list.</p>
+    <ol class="finds">
+      <li><span class="fn">44<small>of 75</small></span><div><h3>Most holes on CISA's list gave no warning.</h3><p>No public attack code and a low EPSS score. The usual rule catches 0 of them. Fortres caught 5, and three of those come from one Ivanti event. The gap is real, and most of it is still open.</p><code>outputs/v6_blindspots.csv</code></div></li>
+      <li><span class="fn">1 in 9<small>162 of 1,484</small></span><div><h3>Severity labels hide danger.</h3><p>Of the holes on CISA's list from 2021 to 2025, 1 in 9 was labelled only "Medium". A team that fixes Critical and High first reaches these last.</p><code>NVD severity labels on CISA KEV, 2021 to 2025</code></div></li>
+      <li><span class="fn">27<small>not 33</small></span><div><h3>Data that arrives after an attack makes results look better than they are.</h3><p>NVD reviews holes on CISA's list first: every one of them is marked "Analyzed", against 42 to 50% of the rest. Using that review status would raise 27 catches to 33, so we left it out.</p><code>outputs/v6_leakage_results.csv · docs/column_review.md</code></div></li>
+      <li><span class="fn">249<small>of 490</small></span><div><h3>Outside data can carry hindsight dates.</h3><p>In Metasploit, 249 of 490 links to a hole were added more than 30 days after the attack module itself. Some 2025 holes are new numbers for exploits from 2010. VulnCheck's list dates match the first attack report in 5,803 of 5,809 entries, which looks like backfilling. We rejected VulnCheck for this, dated Metasploit by when the link was added, and adopted neither.</p><code>outputs/newdata_provenance.md · outputs/outside_report.md</code></div></li>
+      <li><span class="fn">7 + 11<small>tried, one kept</small></span><div><h3>Simpler beat clever.</h3><p>We declared 7 model variants and 11 extra methods before seeing results. The winner was the more constrained model, and no extra method passed our pre-set rule. That restraint is also why rare signals, like Nuclei and Metasploit flags, add nothing.</p><code>outputs/rank_summary.csv · outputs/zoo_summary.md · outputs/newdata_report.md</code></div></li>
+      <li><span class="fn">19 → 10</span><div><h3>Attackers return to the same vendors.</h3><p>Hiding whole vendors from training halves the 2025 test's catches, from 19 to 10. A vendor's track record is a strong clue, and that's also a limit: a brand-new vendor gets less help.</p><code>outputs/rank_vendor_cv.csv</code></div></li>
+      <li><span class="fn">67<small>events behind 75</small></span><div><h3>Attacks come in bursts.</h3><p>The 75 holes come from 67 separate events, where one vendor's holes are added to CISA's list on the same day. Because they're linked, our ranges resample whole events, which makes them wider and more honest.</p><code>outputs/v4_report.md · outputs/headline.json</code></div></li>
+      <li><span class="fn">182<small>of 500</small></span><div><h3>The AI's reasons needed a referee.</h3><p>Granite Guardian rejected 90 reasons, and 92 more failed our own checks. The most common failure was a word that isn't in the facts. All 182 got a plain template sentence instead.</p><code>outputs/explanations_summary.json</code></div></li>
+      <li><span class="fn">441<small>fixes, not 10,026</small></span><div><h3>Less work for the same catch.</h3><p>Fortres's list of 441 holds all 27 catches (its 27th comes at position 353). To reach 27, you'd have to go 1,116 deep with the usual rule, 6,858 deep sorting by severity, and 10,026 deep with EPSS alone.</p><code>same 2024 and 2025 test as the 27 · docs/findings.md</code></div></li>
+      <li><span class="fn">6.37&times;<small>EPSS jump</small></span><div><h3>A warning score changed scale mid-year.</h3><p>From the July 2026 snapshots on, EPSS scores were 6.37 times the 2024 to 2025 median. So fortres compares each hole only with others scored in the same month, instead of trusting the raw score.</p><code>outputs/discovery_epss_jump.csv</code></div></li>
+    </ol>
+
+    <h2>Questions judges ask</h2>
+    <dl class="qa">
+      <div><dt>Is fortres an LLM?</dt><dd>No. The ranking is 20 models that vote, each built from 150 small decision trees. IBM Granite reads the descriptions to give the ranking one clue, and writes the plain reason for each pick, which Granite Guardian checks against the facts.</dd></div>
+      <div><dt>Why not use an LLM to rank?</dt><dd>A ranking model can be tested against known outcomes, and it gives the same answer every time. A language model can make things up, so we only let it explain.</dd></div>
+    </dl>
+  </div>
+</div>
 
 <div id="look" class="gut">
   <div class="lwrap">
