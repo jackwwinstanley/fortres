@@ -13,7 +13,7 @@ README.md. Checks:
   4. "N vs M" against the simple rule/baseline in the final documents must be a headline pair (pooled, forward or stability);
   5. 90% ranges in the final documents must be a headline range (any stored interval in headline.json, CVE-level or
      event-clustered, outside the `previous` block);
-  6. "N of M" blind-spot claims must equal the v5 blind-spot totals;
+  6. "N of M" blind-spot claims must equal the primary model's blind-spot totals;
   7. Guardian counts in prose ("N of 500 ... passed") must equal `passed_guardian` in outputs/explanations_summary.json
      (without that file, any such count is an error);
   8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it

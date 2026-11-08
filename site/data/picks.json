@@ -148,8 +148,8 @@
  ],
  "guardian": {
   "total": 500,
-  "passed_guardian": 347,
-  "template_fallback": 153,
+  "passed_guardian": 318,
+  "template_fallback": 182,
   "guardian_model": "granite3-guardian:2b",
   "granite_model": "ibm-granite/granite-3.3-2b-instruct"
  }
