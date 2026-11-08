@@ -11,3 +11,6 @@ timestamp,method,seed_set,variants,exit,runtime_s,failed_filled
 2026-11-08T05:02:44+00:00,m07_extratrees,0-19,"standalone,blend_I",0,85,
 2026-11-08T05:03:25+00:00,m09_prototypes,0-19,"standalone,blend_I,I_plus_feature",0,35,
 2026-11-08T05:06:30+00:00,m01_elasticnet,0-19,"standalone,blend_I",0,310,
+2026-11-08T05:11:49+00:00,m11_regex,1000-1019,I_plus_feature,0,25,
+2026-11-08T05:11:49+00:00,m11_regex,2000-2019,I_plus_feature,0,25,
+2026-11-08T05:11:49+00:00,m11_regex,3000-3019,I_plus_feature,0,25,
