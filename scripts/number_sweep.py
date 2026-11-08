@@ -15,7 +15,13 @@ README.md. Checks:
   7. Guardian counts in prose ("N of 500 ... passed") must equal `passed_guardian` in outputs/explanations_summary.json
      (without that file, any such count is an error);
   8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it
-     names in outputs/explanations_summary.json (dotted names such as `guardian_verdicts.No` are looked up inside objects).
+     names in outputs/explanations_summary.json (dotted names such as `guardian_verdicts.No` are looked up inside objects);
+  9. watsonx.governance numbers, in every checked file: a sentence or clause that names watsonx.governance is HOSTED unless it
+     says the scores were computed locally (or names a local-only metric: token overlap, BERTScore, readability), then it is
+     LOCAL. Every decimal and every "N of M" in a HOSTED clause must come from outputs/watsonx_gov_summary.json, and in a
+     LOCAL clause from outputs/gov_metrics_summary.json, so one file can never feed the other's claim. A number claimed
+     without its summary file is an error. The summaries' own `claim` must say "hosted on IBM watsonx.governance" (hosted)
+     and must not say "hosted" (local).
 """
 import json
 import re
@@ -29,6 +35,12 @@ FINAL_DOCS = {"docs/writeup_person_b.md", "docs/devpost_final.md", "docs/judge_q
               "docs/page_content.md", "README.md", "site/index.html"}
 MINUS = "[−-]"
 MODEL_CARD = "docs/model_card.md"
+GOV_SUMMARIES = {"watsonx_gov": "watsonx_gov_summary.json", "gov_local": "gov_metrics_summary.json"}
+GOV_NAME = re.compile(r"watsonx[ .]?governance", re.I)
+GOV_LOCAL = re.compile(r"\blocal(?:ly)?\b|no ibm service|token[- ]overlap|word[- ]overlap|bert ?score|readab|flesch|"
+                       r"reading ease|grade level", re.I)
+GOV_DECIMAL = re.compile(r"(?<![\d.v])(\d+\.\d+)(?![\d.])")
+GOV_OF = re.compile(r"\b(\d+) of (?:the |our )?(\d+)\b")
 
 
 def expected(out=OUT) -> dict:
@@ -51,6 +63,9 @@ def expected(out=OUT) -> dict:
     gs = out / "explanations_summary.json"
     if gs.exists():
         e["guardian"] = json.loads(gs.read_text())
+    for kind, name in GOV_SUMMARIES.items():
+        if (out / name).exists():
+            e[kind] = json.loads((out / name).read_text())
     bs = out / "v5_blindspots.csv"
     if bs.exists():
         b = pd.read_csv(bs)
@@ -122,6 +137,70 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
                 probs.append(f"{where}: Guardian count {m.group(1)} of 500, expected passed_guardian = {g.get('passed_guardian')}")
     if rel == MODEL_CARD:
         probs += check_guardian_table(rel, text, e)
+    probs += check_gov_numbers(rel, text, e)
+    return probs
+
+
+def _gov_values(summary: dict) -> tuple[set, set, set]:
+    """(decimals, counts, totals) a summary supports: per-metric mean/median/min/max/mean_by_source; n, n_ge_0_5 and the
+    rest; the row totals."""
+    dec, cnt = set(), set()
+    rows = summary.get("rows", {})
+    tot = {v for v in (rows.get("n"), rows.get("requested")) if isinstance(v, int)}
+    cnt |= tot | {v for v in rows.get("by_source", {}).values() if isinstance(v, int)}
+    for m in summary.get("metrics", []):
+        dec |= {float(m[k]) for k in ("mean", "median", "min", "max") if isinstance(m.get(k), (int, float))}
+        dec |= {float(v) for v in m.get("mean_by_source", {}).values() if isinstance(v, (int, float))}
+        n = m.get("n")
+        if isinstance(n, int):
+            cnt.add(n)
+            if isinstance(m.get("n_ge_0_5"), int):
+                cnt |= {m["n_ge_0_5"], n - m["n_ge_0_5"]}
+    return dec, cnt, tot
+
+
+def _gov_clauses(line: str):
+    """Sentences / clauses: split on ';' and on a '.' followed by a space or the end (not inside 0.81 or watsonx.governance)."""
+    return [c for c in re.split(r";|\.(?=\s|$)", line) if c.strip()]
+
+
+def check_gov_numbers(rel: str, text: str, e: dict) -> list[str]:
+    probs = []
+    for n, line in enumerate(text.splitlines(), 1):
+        if not GOV_NAME.search(line):
+            continue
+        for clause in _gov_clauses(line):
+            if not GOV_NAME.search(clause):
+                continue
+            kind = "gov_local" if GOV_LOCAL.search(clause) else "watsonx_gov"
+            nums = [m.group(1) for m in GOV_DECIMAL.finditer(clause)]
+            pairs = [(int(a), int(b)) for a, b in GOV_OF.findall(clause)]
+            if not nums and not pairs:
+                continue
+            fname = "outputs/" + GOV_SUMMARIES[kind]
+            label = "hosted watsonx.governance" if kind == "watsonx_gov" else "local SDK"
+            if kind not in e:
+                probs.append(f"{rel}:{n}: {label} number(s) {nums + [f'{a} of {b}' for a, b in pairs]} without {fname}")
+                continue
+            dec, cnt, tot = _gov_values(e[kind])
+            for x in nums:
+                k = len(x.split(".")[1])
+                if not any(round(v, k) == float(x) for v in dec):
+                    probs.append(f"{rel}:{n}: {label} number {x} is not in {fname}")
+            for a, b in pairs:
+                if b not in tot or a not in cnt:
+                    probs.append(f"{rel}:{n}: {label} claim '{a} of {b}' is not in {fname} (rows {sorted(tot)})")
+    return probs
+
+
+def gov_summary_problems(e: dict) -> list[str]:
+    probs = []
+    w = e.get("watsonx_gov")
+    if w is not None and "hosted on IBM watsonx.governance" not in w.get("claim", ""):
+        probs.append("outputs/watsonx_gov_summary.json: claim must say 'hosted on IBM watsonx.governance'")
+    loc = e.get("gov_local")
+    if loc is not None and "hosted" in loc.get("claim", "").lower():
+        probs.append("outputs/gov_metrics_summary.json: the local claim must not say 'hosted'")
     return probs
 
 
@@ -160,10 +239,11 @@ def check_guardian_table(rel: str, text: str, e: dict) -> list[str]:
 
 def main(root=ROOT) -> int:
     e = expected(root / "outputs")
-    probs = []
+    probs = gov_summary_problems(e)
     for f in files(root):
         probs += check_text(str(f.relative_to(root)), f.read_text(errors="ignore"), e)
-    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k != "guardian"}
+    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", *GOV_SUMMARIES)}
+    shown["gov_summaries"] = sorted(k for k in GOV_SUMMARIES if k in e)
     if "guardian" in e:
         shown["passed_guardian"] = e["guardian"].get("passed_guardian")
     print(f"number sweep: expected {json.dumps(shown)}")
