@@ -4,15 +4,31 @@ Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and s
 `top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
 CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
 
-## Run
+## Reproduce the final list
+This rebuild **rewrites `outputs/` in place**, so run it in a fresh clone, not in a working copy with changes.
 ```
+git clone https://github.com/jackwwinstanley/ibm-breach.git && cd ibm-breach
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt                         # pinned versions
 # put the datathon CSVs in ./data (not committed)
-pytest -q
-python scripts/check_contract.py
-python scripts/check_top500.py outputs/top500_v1.csv
+cp outputs/top500_v5.csv /tmp/top500_v5_committed.csv   # keep the committed list for the comparison
+python -m src.replicas                                  # practice pools (2024, 2025)
+python -m src.features.build                            # features
+python -m src.models.train_v5                           # final model -> outputs/top500_v5.csv
+python scripts/check_top500.py outputs/top500_v5.csv    # format check: PASS
+cmp outputs/top500_v5.csv /tmp/top500_v5_committed.csv && echo "identical"   # byte-for-byte
 ```
+- **Time:** a full rebuild takes about 10 minutes on a laptop CPU. In a fresh clone it took 8 min 38 s: replicas 1 s,
+  features 6 s, train_v5 8 min 30 s (most of it hyper-parameter grids and the placebo). Allow up to ~30 minutes on a
+  slower machine.
+- **Text features:** the description/embedding step (`python -m src.b.texts && python -m src.b.embed && python -m src.b.text_features`)
+  needs the IBM Granite embedding model locally and is **optional**: `outputs/text_features.parquet` is tracked, so the
+  rebuild above uses the committed text features.
+- **Tested on:** the result was byte-for-byte identical on Python 3.14.7, macOS 27.2 arm64, with the pinned
+  `requirements.txt`. The pins were first checked on Python 3.14.5, macOS arm64.
+- **Other files it rewrites:** besides the identical list, the rebuild adds rows to `outputs/runlog.csv` and regenerates
+  `outputs/v5_report.md` without its hand-written "Considered, not adopted" section; `git checkout outputs/` restores them.
+- **Tests:** `pytest -q` and `python scripts/check_contract.py` run the test suite and the column contract.
 
 ## Layout
 `src/common/` shared paths, schema, scoring · `src/legacy/` first practice-pool script ·
