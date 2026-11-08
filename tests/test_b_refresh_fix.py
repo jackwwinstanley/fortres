@@ -24,7 +24,8 @@ def test_headline_leakage_runs_right_after_the_leakage_step(monkeypatch):
     monkeypatch.setattr(refresh_all, "step", lambda name, args: seen.append((name, args)))
     refresh_all.main()
     names = [n for n, _ in seen]
-    i = names.index("leakage + v5 blind spots")
+    from src.common import primary
+    i = names.index(f"leakage + {primary.PRIMARY} blind spots")
     assert seen[i + 1] == ("leakage numbers into headline.json", ["-m", "src.b.headline_leakage"])
     assert seen[i][1] == ["-m", "src.b.leakage"]
 

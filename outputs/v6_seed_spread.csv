@@ -1,0 +1,5 @@
+seed_set,v6_forward,v6_stability,v6_pooled,v5_forward,v5_stability,v5_pooled,v6_minus_v5_pooled
+seeds 0-19,18,9,27,12,9,21,6
+seeds 1000-1019,18,10,28,15,9,24,4
+seeds 2000-2019,18,8,26,12,9,21,5
+seeds 3000-3019,18,9,27,15,10,25,2

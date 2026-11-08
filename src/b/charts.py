@@ -8,7 +8,7 @@ Each chart is drawn only if its inputs exist, so this can be rerun as files land
   timing.png         positive rate by snapshot month vs days left to the cutoff (positive_rate_by_month.csv)
   drift_psi.png      biggest feature shifts 2025 -> 2026 (outputs/b_drift.json)
   drift_epss.png     EPSS distribution by pool (replica / scoreboard parquet files)
-  leakage.png        honest vs leaky model hits (outputs/leakage_results.csv, issue #8)
+  leakage.png        honest vs leaky model hits (the primary model's leakage file, src/common/primary.py; issue #8)
 """
 import json
 import re
@@ -18,6 +18,7 @@ import pandas as pd
 
 from src.b import runlog
 from src.b.style import ACCENT, ACCENT_LIGHT, GREYS, INK, MUTED, WARN, mpl, titles
+from src.common import primary
 from src.common.paths import OUT_DIR, REPO_ROOT
 
 FIG_DIR = REPO_ROOT / "docs" / "figures"
@@ -173,9 +174,9 @@ def drift(plt):
 
 
 def leakage(plt):
-    p = OUT_DIR / "leakage_results.csv"
+    p = primary.file("leakage")
     if not p.exists():
-        print("skip leakage.png: outputs/leakage_results.csv not produced yet (#8)")
+        print(f"skip leakage.png: outputs/{p.name} not produced yet (#8)")
         return
     d = pd.read_csv(p)
     d["replica"] = d["replica"].astype(str)
@@ -216,7 +217,7 @@ def blind_spot_counts():
     model in each group. Uses Person A's outputs/blindspot_positives.csv and the newest mechanism file
     (v4_mechanism.csv: gained/lost vs the baseline for the headline model; else v2_mechanism.csv for v1/v2 LightGBM)."""
     res = runlog.results()
-    v5b = OUT_DIR / "v5_blindspots.csv"  # written by src.b.leakage from the honest v5 bag (= the headline model)
+    v5b = primary.file("blindspots")  # written by src.b.leakage from the honest bag of the primary (headline) model
     if v5b.exists() and not res.empty:
         d = pd.read_csv(v5b)
         d = d[d["group"].isin(["flagged", "blind-spot"])]

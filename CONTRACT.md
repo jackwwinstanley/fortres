@@ -98,10 +98,25 @@ all KEV entries added by the history cutoff, or in the 12 months before it; zero
 stored in the `features_*.parquet` files; existing columns are unchanged. The recorded decision is `V5_TRANSFORMS` in `src/common/schema.py`;
 `tests/test_drift_fix.py` recomputes it and fails if it changes. `ALLOWED_FEATURES` is now `V5_FEATURES` (33 features: raw `epss` removed,
 `epss_rank_in_month` and `epss_missing` kept); `V1/V2/V4_FEATURES` are legacy lists for reproducing old results. The final model is a 20-seed LightGBM bag.
-Outputs: `outputs/top500_v5.csv` (primary list; replaces v4 regardless of hits), `v5_report.md`, `v5_top500_contrib.parquet` (contributions averaged over the 20 seeds),
+Outputs: `outputs/top500_v5.csv` (primary list until v6; replaced v4 regardless of hits), `v5_report.md`, `v5_top500_contrib.parquet` (contributions averaged over the 20 seeds),
 `headline.json` (updated: forward-direction and pooled numbers with CVE-level and event-clustered intervals, seed counts). Runlog: `v5_bag` rows (per direction and `pooled`) and
 `v5_logreg` (robustness only) are appended; `v4_*` rows are relabelled "superseded by v5". Descriptive-only analysis `python -m src.analysis.why_attacked`
 (`outputs/why_attacked_*`, `docs/figures/why_attacked_*.png`) uses today's NVD fields, is not time-safe, and feeds nothing into any model or top500 file.
+
+## v6: regularised settings on the v5 features (`python -m src.b.rank`, then `python -m src.models.train_v6`) — the PRIMARY model
+Features, data steps, replicas and scoring are exactly v5's (`ALLOWED_FEATURES` unchanged). v6 was chosen from seven declared variants
+(H monotone, I regularised, F positive weighting, D lambdarank, E rank_xendcg, J rank-average of v5/D/F/H, K XGBoost, skipped) by a rule
+fixed before any result (`python -m src.b.rank`, `outputs/rank_report.md`): forward >= v5, stability >= v5, pooled gain >= 2 and >= the
+noise floor (the pooled spread of the frozen v5 bag over 3 new seed sets, 4); ties go to the earliest of H, I, F, D, E, J, K. Only I qualified.
+Settings are chosen only by leave-one-month-out CV inside the training data (per direction: `outputs/rank_eval.csv`; final: the pooled
+replicas with month-of-year folds, `outputs/v6_runs.csv`). The model is a 20-seed LightGBM bag (seeds 0-19).
+`src/common/primary.py` names the primary model (`PRIMARY = "v6"`), its files and its per-direction settings; every Person B script,
+the dashboard and `scripts/number_sweep.py` read file names from it. Outputs: `outputs/top500_v6.csv` (primary list), `v6_report.md`,
+`v6_top500_contrib.parquet` (contributions averaged over the 20 seeds, same format as v5's), `v6_scores.csv`, `v6_bootstrap.csv`,
+`v6_seed_spread.csv`, `v6_placebo.csv`, `v6_overlap.csv`, `v6_blindspots_compare.csv`, `v6_missing_explanations.csv`,
+`v6_headline_candidate.json`; `src.b.leakage` writes `v6_leakage_results.csv` and `v6_blindspots.csv` with v6's settings.
+`headline.json` now describes v6, with v5's headline kept under `previous`. Runlog: `v6_bag` rows (per direction and `pooled`) carry the
+"headline model" tag; the `v5_bag` rows are relabelled "previous headline model, superseded by v6". All v5 files are kept as history.
 
 ### Text features must be time-safe (Person B)
 `kev_text_score` and `nearest_kev_sim` for a CVE in snapshot month *M* may only use KEV

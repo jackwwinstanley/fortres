@@ -4,7 +4,9 @@ Run:  python -m src.b.leakage
 
 Question: how much better would a model LOOK if it used columns that are only filled in after the
 fact (CONTRACT.md "BANNED")? Same data, features, parameter rule and 20-seed rank-averaged bag as Person A's
-v5 headline model (src/models/train_v5.py); the only difference is the extra banned columns:
+headline model; the only difference is the extra banned columns. The headline model is the PRIMARY one in
+src/common/primary.py (v6 since 2026-11-08; v5's run is kept as history in outputs/leakage_results.csv and
+outputs/v5_blindspots.csv):
   nvd_status (one-hot), n_affected_cpes, n_references, blank-vs-filled CVSS 3 / CVSS 4 / CWE
   indicators, NVD-sourced CVSS 3 score (cvss3_source == nvd@nist.gov), and reference-link features
   from references.csv (refs tagged "Exploit", refs to exploit hosting sites).
@@ -12,12 +14,14 @@ All of these come from today's NVD record, which is updated AFTER exploitation (
 CVEs first; exploit links get added), so they partly encode the answer.
 
 Directions: train 2024 -> test 2025 (forward in time) and train 2025 -> test 2024. Hits use Person A's
-tie-aware scorer and paired bootstrap. Writes outputs/leakage_results.csv, outputs/b_leakage_report.md.
+tie-aware scorer and paired bootstrap. Writes the primary model's leakage results and blind-spot files
+(primary.files(): outputs/v6_leakage_results.csv, outputs/v6_blindspots.csv) and outputs/b_leakage_report.md.
 """
 import duckdb
 import numpy as np
 import pandas as pd
 
+from src.common import primary
 from src.common.paths import DATA_DIR, OUT_DIR
 from src.common.schema import ALLOWED_FEATURES, SHARE_FEATURES, is_banned
 from src.features import drift_fix as dfx
@@ -77,17 +81,17 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
     rows, imps, blind_rows = [], [], []
     for name, tr, te, note in v1.DIRECTIONS:
         Xtr, ytr, Xte = data[tr]["XL"], data[tr]["y"], data[te]["XL"]
-        # Person A's pre-set rule: params chosen by pooled leave-one-month-out AP on the TRAINING replica (v5 features),
-        # reused unchanged for the leaky model so the only difference is the extra columns.
-        params, _, _ = v1.select_lgbm(Xtr[HONEST], ytr, data[tr]["groups"], HONEST, f"v5 train {tr}")
+        # The primary model's settings for this direction (chosen inside the training year only), reused unchanged for
+        # the leaky model so the only difference is the extra columns.
+        params = primary.direction_params(tr, Xtr, ytr, data[tr]["groups"], HONEST)
         scores = {}
         for label, feats in (("honest", HONEST), ("leaky", leaky)):
-            models = [v1.lgbm_model(params, feats, seed=s).fit(Xtr[feats], ytr) for s in BAG_SEEDS]
+            models = [primary.lgbm(params, feats, seed=s).fit(Xtr[feats], ytr) for s in BAG_SEEDS]
             scores[label] = bag([m.predict_proba(Xte[feats])[:, 1] for m in models])
             if label == "leaky":
                 g = pd.Series(np.mean([m.booster_.feature_importance("gain") for m in models], axis=0), index=feats)
                 imps.append((g / g.sum()).rename(name))
-        # blind-spot breakdown of the HONEST bag (= Person A's v5 headline model): positives in the top k, by group
+        # blind-spot breakdown of the HONEST bag (= the primary headline model): positives in the top k, by group
         meta = data[te]["meta"]
         blind_rows.extend(blind_breakdown(te, meta, scores["honest"]))
         res, _, names, k = v1.eval_frame(data[te]["meta"], scores)
@@ -97,8 +101,9 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
                              model=n, hits=r["arbitrary"], expected=round(r["expected"], 2),
                              ci_lo=r["ci"][0], ci_hi=r["ci"][1], ap=round(r["ap"], 4)))
     out = pd.DataFrame(rows)
-    out.to_csv(out_dir / "leakage_results.csv", index=False)
-    pd.DataFrame(blind_rows).to_csv(out_dir / "v5_blindspots.csv", index=False)
+    f = primary.files(out_dir=out_dir)
+    out.to_csv(f["leakage"], index=False)
+    pd.DataFrame(blind_rows).to_csv(f["blindspots"], index=False)
     imp = pd.concat(imps, axis=1).fillna(0)
     imp["mean"] = imp.mean(axis=1)
     imp = imp.sort_values("mean", ascending=False)
@@ -133,7 +138,7 @@ def write_report(out, imp, out_dir):
     leak_share = imp.loc[[c for c in imp.index if c.startswith("leak_")], "mean"].sum()
     lines = [
         "# LEAKAGE EXPERIMENT (issue #8). Not a submission model.", "",
-        "Same data, v5 features, parameter rule and 20-seed bag as the v5 headline model; the leaky model also gets banned "
+        "Same data, v5 features, settings and 20-seed bag as the primary headline model (src/common/primary.py); the leaky model also gets banned "
         "after-the-fact columns (NVD status, CPE/reference counts, blank-vs-filled CVSS/CWE, NVD CVSS, "
         "exploit-tagged reference links). Run: `python -m src.b.leakage`.", "",
         "## In plain words",
