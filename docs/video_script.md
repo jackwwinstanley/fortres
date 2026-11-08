@@ -1,16 +1,16 @@
-# 2-minute demo video: script (draft v1)
+# 2-minute demo video: script (draft v2)
 
 Target: about 290 spoken words, roughly 2:00 at a calm pace. Judges score Discovery 35%, Data use 25%,
 Communication 25% and Impact 15%, so we lead with findings, not code.
-Numbers are from the v4 headline model (`outputs/headline.json`) and Person B's reports; recheck them if the
-final list changes. **[Bracketed text] = what's on screen.**
+Numbers are from the v5 headline model (`outputs/headline.json`), `outputs/leakage_results.csv` (leaky arm 28 on v5; Jack to
+confirm vs 29) and `outputs/explanations_summary.json` (Guardian count, PR #35); recheck them if the final list changes. **[Bracketed text] = what's on screen.**
 
 ---
 
 **0:00–0:15 · Hook** *(Aba)*
 [Dashboard title, then the "Blind spots" tab]
-"Every year, tens of thousands of vulnerabilities are published, and only about one in a thousand ends up being
-added to CISA's list of known-exploited vulnerabilities. We set out to find those few before it happens, using only what was known at the time."
+"Every year, tens of thousands of vulnerabilities are published, and only about one in 855 ends up on
+CISA's list of known-exploited vulnerabilities. We set out to find those few before it happens, using only what was known at the time."
 
 **0:15–0:35 · The surprise: blind spots** *(Aba)*
 [blindspots.png]
@@ -26,13 +26,14 @@ information available at that moment. A model is trained on one year and tested 
 **0:55–1:15 · IBM Granite** *(Aba)*
 [Top 500 tab: reasons column]
 "IBM Granite, IBM's open models running right on our laptop, reads every description. It scores how much each one sounds like past known-exploited
-vulnerabilities and finds its closest match. Granite also writes a one-line reason for each pick, and a checker
-rejects any sentence that mentions a fact we didn't give it."
+vulnerabilities. Granite also writes a one-line reason for each pick; our checker and IBM Granite Guardian reject any
+sentence that isn't supported by the facts we gave it."
 
 **1:15–1:35 · Results, stated honestly** *(Jack)*
 [baselines.png]
-"Our model catches 21 vulnerabilities that were added to KEV across the two test years, against 19 for the best simple rule. In the strictest test, training on 2024 and testing on 2025, we were one behind, 12 to 13.
-That's a small edge, and we show the uncertainty range rather than overclaim."
+"Across the two test years our model catches 21 vulnerabilities that were added to KEV, against 19 for the best simple
+rule. That's a small edge and it could be luck. In the strictest test, training on 2024 and testing on 2025, we were one
+behind, 12 to 13. We show the uncertainty rather than overclaim."
 
 **1:35–1:50 · Two discoveries that protect the result** *(Aba)*
 [drift_epss.png, then leakage.png]
