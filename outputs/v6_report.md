@@ -82,7 +82,7 @@ Single seeds give 26.75 pooled hits on average (min 25, max 28).
 
 v6's spread is 26 to 28 (2), against v5's 21 to 25 (4).
 
-### Blind-spot view on the 75 (`outputs/v6_blindspots.csv`, same definition as the 44-of-75)
+### Blind-spot view on the 75 (`outputs/v6_blindspots_compare.csv`, same definition as the 44-of-75)
 | year | group | exploited | simple rule | v5 | v6 |
 |---|---|---|---|---|---|
 | 2025 | flagged | 21 | 13 | 11 | 14 |
@@ -100,7 +100,7 @@ first three are one Ivanti EPM event, so they're one discovery rather than three
 - **Shuffled:** mean 0.57 (0 to 3).
 - **Difference:** +26.4, one-sided bootstrap p < 0.001.
 
-### Leakage experiment, same settings (`outputs/v6_leakage_results.csv`)
+### Leakage experiment, same settings (`outputs/v6_leakage_check.csv`; the full table with intervals is `outputs/v6_leakage_results.csv` from `src.b.leakage`)
 | arm | forward | stability | pooled |
 |---|---|---|---|
 | honest (v6 settings) | 18 | 9 | 27 |

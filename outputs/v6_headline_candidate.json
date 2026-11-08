@@ -79,7 +79,7 @@
   "2025": 48
  },
  "leakage": {
-  "source": "outputs/v6_leakage_results.csv",
+  "source": "outputs/v6_leakage_check.csv",
   "honest": {
    "pooled_hits": 27,
    "forward_train2024_test2025": 18,

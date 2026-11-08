@@ -12,7 +12,8 @@ def _results(tmp_path, drop=None):
     df = pd.DataFrame(rows, columns=["direction", "model", "hits"])
     if drop is not None:
         df = df[~((df["direction"] == drop[0]) & (df["model"] == drop[1]))]
-    p = tmp_path / "leakage_results.csv"
+    from src.common import primary
+    p = primary.file("leakage", out_dir=tmp_path)   # the primary model's leakage file name
     df.to_csv(p, index=False)
     return p
 

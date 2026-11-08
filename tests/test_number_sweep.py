@@ -50,7 +50,7 @@ def test_research_notes_may_quote_other_results():
     assert ns.check_text("docs/considered_not_adopted.md", "The blend caught 15 vs 13 for the simple rule.", E) == []
 
 
-@pytest.mark.skipif(not (ns.OUT / "headline.json").exists() or not (ns.OUT / "leakage_results.csv").exists(),
+@pytest.mark.skipif(not (ns.OUT / "headline.json").exists() or not (ns.OUT / "v6_leakage_results.csv").exists(),
                     reason="needs the tracked outputs")
 def test_the_repository_passes_the_sweep():
     assert ns.main() == 0

@@ -1,7 +1,7 @@
 # Devpost submission text (DRAFT, for Aba or Jack to paste)
 
 Claude can't log in to Devpost; paste each section into the matching Devpost field. Numbers match `outputs/headline.json`
-(v5) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
+(v6) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
 
 ---
 
@@ -33,7 +33,9 @@ description, the way an analyst would, can help.
   From that we derive a KEV-likeness score (a classifier trained only on earlier years) and the similarity to the
   closest past KEV entry. Phrases that only appear after exploitation ("exploited in the wild", …) are removed first.
 - **Model:** a 20-seed LightGBM bag on exploit signals, EPSS rank within the month, vendor and reporter history, and
-  the Granite text features.
+  the Granite text features, with regularised settings chosen from seven declared variants by a rule fixed before any
+  result. On matched random seeds it beats our previous model by +2 to +5 catches, and part of its in-year skill is
+  recognising vendors it has already seen.
 - **Reasons:** `granite-3.3-2b-instruct` rewrites a fact list into one sentence. A local checker blocks invented
   numbers, products, CVE ids and claims, and IBM Granite Guardian (`granite3-guardian:2b`, via Ollama) checks the rest is
   supported by the facts.
@@ -41,7 +43,7 @@ description, the way an analyst would, can help.
 
 ## Challenges we ran into
 - **Leakage.** Today's NVD record is updated *after* a CVE becomes famous. Every CVE added to KEV in our practice years
-  is marked "Analyzed" today, against 46% of the rest. Adding such fields lifted our model from 21 to 28 catches, too
+  is marked "Analyzed" today, against 46% of the rest. Adding such fields lifted our model from 27 to 33 catches, too
   good to be true, so we banned them and show the test instead.
 - **Drift.** EPSS jumped ~6× from the July 2026 snapshot (cause unknown). Those months are 62% of the 2026 list, so we
   rank EPSS within each month instead of using raw scores.
@@ -49,13 +51,13 @@ description, the way an analyst would, can help.
 
 ## Accomplishments that we're proud of
 - **Blind spots:** 44 of the 75 KEV additions in our practice years had no public attack code and a low EPSS score.
-  The standard rule catches none of them by construction. Our text features (keyword flags plus Granite-embedding
-  similarity to past KEV entries) caught 2 (both Fortinet FortiOS). Either part alone (keyword flags or Granite
-  similarity scores) still catches two or three of the 44; with neither, none. The exact CVEs change between runs, so
-  treat it as noise.
-- **An honest result:** on the strictest forward test (train 2024, test 2025) we're one behind the best simple rule,
-  12 vs 13, and we say so. The stability check is 9 vs 6, so pooled over both years it's 21 vs 19 (+2, 90% range −4 to
-  +8): a small edge that could be luck.
+  The standard rule catches none of them by construction. Our model caught 5 (three from one Ivanti EPM event,
+  two Fortinet FortiOS). In a text-feature ablation on the previous model (v5), either part alone (keyword flags or
+  Granite similarity scores) still caught two or three of the 44; with neither, none. The exact CVEs change between
+  runs, so treat it as noise.
+- **An honest result:** on the strictest forward test (train 2024, test 2025) we're five ahead of the best simple rule,
+  18 vs 13. The stability check is 9 vs 6, so pooled over both years it's 27 vs 19 (+8, 90% range +2 to +14). With
+  only 75 positives that is still a small sample, and we say so.
 - **Reasons people can check:** [TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges] Granite-written reasons passed a groundedness check;
   the rest use a plain
   template.

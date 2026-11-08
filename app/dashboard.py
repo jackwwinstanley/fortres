@@ -3,9 +3,9 @@
 Run:  streamlit run app/dashboard.py
 
 Reads whatever is in outputs/ and shows a placeholder when a file isn't there yet:
-  top500_final.csv or the newest top500_v*.csv, explanations.csv, runlog.csv (via src.b.runlog),
+  top500_final.csv or the primary model's top500 (src/common/primary.py), explanations.csv, runlog.csv (via src.b.runlog),
   text_features.parquet, scoreboard_features.parquet, b_drift.json, blindspot_positives.csv +
-  v2_mechanism.csv (blind spots), leakage_results.csv (leakage experiment).
+  v2_mechanism.csv (blind spots), the primary model's leakage results (leakage experiment).
 """
 import json
 import re
@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT))
 from src.b import runlog  # noqa: E402
 from src.b.charts import blind_spot_counts  # noqa: E402
 from src.b.style import ACCENT, ACCENT_LIGHT, GREYS, WARN  # noqa: E402
+from src.common import primary  # noqa: E402
 
 OUT = ROOT / "outputs"
 FLAG_LABELS = {
@@ -52,8 +53,8 @@ def latest_top500():
     final = OUT / "top500_final.csv"
     if final.exists():
         return "top500_final", pd.read_csv(final)
-    files = sorted(OUT.glob("top500_v*.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[-1]))
-    return (files[-1].stem, pd.read_csv(files[-1])) if files else (None, None)
+    p = primary.file("top500", out_dir=OUT)
+    return (p.stem, pd.read_csv(p)) if p.exists() else (None, None)
 
 
 def style(fig: go.Figure, title: str, x_title: str = "", y_title: str = "") -> go.Figure:
@@ -82,7 +83,7 @@ version, top = latest_top500()
 res = runlog.results()
 best_model = runlog.latest_model(res)
 tf, sb = read("text_features.parquet"), read("scoreboard_features.parquet")
-explanations, drift, leak = read("explanations.csv"), read("b_drift.json"), read("leakage_results.csv")
+explanations, drift, leak = read("explanations.csv"), read("b_drift.json"), read(primary.file("leakage").name)
 expl_summary = read("explanations_summary.json")
 WHY = ROOT / "site" / "data" / "why_traits.csv"
 why = pd.read_csv(WHY) if WHY.exists() else None

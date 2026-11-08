@@ -1,17 +1,17 @@
 {
- "primary": "v5: 20-seed LightGBM bag, drift-selected feature transformations, no raw EPSS",
- "pooled_hits_bag": 21,
+ "primary": "v6: 20-seed LightGBM bag on the v5 features, regularised settings (b/rank candidate I), chosen from seven declared variants by a rule fixed before any result",
+ "pooled_hits_bag": 27,
  "baseline_pooled_hits": 19,
  "forward_train2024_test2025": {
-  "bag_hits": 12,
+  "bag_hits": 18,
   "baseline_hits": 13,
   "diff_cve_level_90": [
-   -6.0,
-   3.0
+   0.0,
+   10.0
   ],
   "diff_event_clustered_90": [
-   -7.0,
-   4.0
+   -2.0,
+   12.0
   ]
  },
  "stability_train2025_test2024": {
@@ -20,41 +20,210 @@
  },
  "pooled": {
   "diff_cve_level_90": [
-   -4.0,
-   8.0
+   2.0,
+   14.0
   ],
   "diff_event_clustered_90": [
-   -4.0,
-   8.0
+   1.0,
+   15.0
   ]
  },
  "seeds": {
   "bag_seeds": 20,
   "single_seed_pooled_hits_mean_min_max": [
-   21.75,
-   17,
-   25
+   26.75,
+   25,
+   28
   ],
-  "placebo": "30 real 5-seed bags vs 30 shuffled-text 5-seed bags"
+  "placebo": "30 real 5-seed bags vs 30 shuffled-label 5-seed bags"
  },
- "v5_minus_v4_pooled_hits": 0,
+ "v6_minus_v5_pooled_hits": 6,
+ "v6_vs_v5": {
+  "forward": {
+   "diff": 6,
+   "diff_cve_level_90": [
+    2.0,
+    10.0
+   ],
+   "diff_event_clustered_90": [
+    1.0,
+    12.0
+   ]
+  },
+  "stability": {
+   "diff": 0,
+   "diff_cve_level_90": [
+    -2.0,
+    2.0
+   ],
+   "diff_event_clustered_90": [
+    -2.0,
+    2.0
+   ]
+  },
+  "pooled": {
+   "diff": 6,
+   "diff_cve_level_90": [
+    2.0,
+    11.0
+   ],
+   "diff_event_clustered_90": [
+    1.0,
+    13.0
+   ]
+  }
+ },
  "placebo_bootstrap_p": 0.0,
  "positives": {
   "2024": 27,
   "2025": 48
  },
+ "final_params": {
+  "num_leaves": 3,
+  "min_child_samples": 200,
+  "n_estimators": 150,
+  "reg_lambda": 30,
+  "scale_pos_weight": 1,
+  "colsample_bytree": 0.4
+ },
+ "seed_sets": {
+  "source": "outputs/v6_seed_spread.csv",
+  "rows": [
+   {
+    "seed_set": "seeds 0-19",
+    "v6_forward": 18,
+    "v6_stability": 9,
+    "v6_pooled": 27,
+    "v5_forward": 12,
+    "v5_stability": 9,
+    "v5_pooled": 21,
+    "v6_minus_v5_pooled": 6
+   },
+   {
+    "seed_set": "seeds 1000-1019",
+    "v6_forward": 18,
+    "v6_stability": 10,
+    "v6_pooled": 28,
+    "v5_forward": 15,
+    "v5_stability": 9,
+    "v5_pooled": 24,
+    "v6_minus_v5_pooled": 4
+   },
+   {
+    "seed_set": "seeds 2000-2019",
+    "v6_forward": 18,
+    "v6_stability": 8,
+    "v6_pooled": 26,
+    "v5_forward": 12,
+    "v5_stability": 9,
+    "v5_pooled": 21,
+    "v6_minus_v5_pooled": 5
+   },
+   {
+    "seed_set": "seeds 3000-3019",
+    "v6_forward": 18,
+    "v6_stability": 9,
+    "v6_pooled": 27,
+    "v5_forward": 15,
+    "v5_stability": 10,
+    "v5_pooled": 25,
+    "v6_minus_v5_pooled": 2
+   }
+  ]
+ },
+ "placebo_like_for_like": {
+  "source": "outputs/v6_placebo.csv",
+  "real_mean": 27.0,
+  "shuffled_labels_mean": 0.57,
+  "real_min_max": [
+   26,
+   28
+  ],
+  "shuffled_min_max": [
+   0,
+   3
+  ]
+ },
+ "list_overlap": {
+  "source": "outputs/v6_overlap.csv",
+  "top500_v6_vs_top500_v5": 429,
+  "top500_v6_vs_baseline_top500_v0": 193,
+  "top500_v5_vs_baseline_top500_v0": 190,
+  "exploit_flag_v6": 498,
+  "exploit_flag_v5": 431,
+  "exploit_flag_baseline": 500
+ },
+ "previous": {
+  "primary": "v5: 20-seed LightGBM bag, drift-selected feature transformations, no raw EPSS",
+  "pooled_hits_bag": 21,
+  "baseline_pooled_hits": 19,
+  "forward_train2024_test2025": {
+   "bag_hits": 12,
+   "baseline_hits": 13,
+   "diff_cve_level_90": [
+    -6.0,
+    3.0
+   ],
+   "diff_event_clustered_90": [
+    -7.0,
+    4.0
+   ]
+  },
+  "stability_train2025_test2024": {
+   "bag_hits": 9,
+   "baseline_hits": 6
+  },
+  "pooled": {
+   "diff_cve_level_90": [
+    -4.0,
+    8.0
+   ],
+   "diff_event_clustered_90": [
+    -4.0,
+    8.0
+   ]
+  },
+  "seeds": {
+   "bag_seeds": 20,
+   "single_seed_pooled_hits_mean_min_max": [
+    21.75,
+    17,
+    25
+   ],
+   "placebo": "30 real 5-seed bags vs 30 shuffled-text 5-seed bags"
+  },
+  "v5_minus_v4_pooled_hits": 0,
+  "placebo_bootstrap_p": 0.0,
+  "positives": {
+   "2024": 27,
+   "2025": 48
+  },
+  "leakage": {
+   "source": "outputs/leakage_results.csv",
+   "honest": {
+    "pooled_hits": 21,
+    "forward_train2024_test2025": 12,
+    "stability_train2025_test2024": 9
+   },
+   "leaky": {
+    "pooled_hits": 28,
+    "forward_train2024_test2025": 17,
+    "stability_train2025_test2024": 11
+   }
+  }
+ },
  "leakage": {
-  "source": "outputs/leakage_results.csv",
+  "source": "outputs/v6_leakage_results.csv",
   "honest": {
-   "pooled_hits": 21,
-   "forward_train2024_test2025": 12,
+   "pooled_hits": 27,
+   "forward_train2024_test2025": 18,
    "stability_train2025_test2024": 9
   },
   "leaky": {
-   "pooled_hits": 28,
-   "forward_train2024_test2025": 17,
-   "stability_train2025_test2024": 11
+   "pooled_hits": 33,
+   "forward_train2024_test2025": 21,
+   "stability_train2025_test2024": 12
   }
  },
- "note": "LOW POWER (75 positives). Use these numbers for headlines; seed-0 rows and earlier versions are not for headline."
+ "note": "LOW POWER (75 positives). v6 is the primary model since 2026-11-08; v5's headline is kept under `previous`. Use these numbers for headlines."
 }

@@ -14,6 +14,7 @@ import subprocess
 import sys
 import time
 
+from src.common import primary
 from src.common.paths import OUT_DIR, REPO_ROOT
 
 PY = sys.executable
@@ -36,7 +37,7 @@ def main(text=False, priors=False, explanations=False):
         step("Granite embeddings", ["-m", "src.b.embed"])
         step("text features", ["-m", "src.b.text_features"])
     step("drift check", ["-m", "src.b.drift"])
-    step("leakage + v5 blind spots", ["-m", "src.b.leakage"])
+    step(f"leakage + {primary.PRIMARY} blind spots", ["-m", "src.b.leakage"])
     step("leakage numbers into headline.json", ["-m", "src.b.headline_leakage"])   # train_v5 rewrites headline.json without this key
     if priors:
         step("track-record priors", ["-m", "src.b.priors"])

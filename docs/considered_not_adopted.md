@@ -1,9 +1,33 @@
 # Considered, not adopted
 
-Ideas we tested and decided **not** to use in the final model (v5, 20-seed LightGBM bag, frozen). They're here so
-nobody re-tries them blind, and so judges can see we looked. LOW POWER throughout: 27 (2024) + 48 (2025) = 75 CVEs added
-to CISA KEV in the two practice years. "Forward" = train 2024 → test 2025; "stability" = train 2025 → test 2024.
-Reference: v5 bag 12 + 9 = 21; best simple rule (public exploit, then EPSS) 13 + 6 = 19 (`outputs/headline.json`).
+Ideas we tested and decided **not** to use in the final model (v6: a 20-seed LightGBM bag on the v5 features with
+regularised settings). They're here so nobody re-tries them blind, and so judges can see we looked. LOW POWER throughout:
+27 (2024) + 48 (2025) = 75 CVEs added to CISA KEV in the two practice years. "Forward" = train 2024 → test 2025;
+"stability" = train 2025 → test 2024. Reference: v6 bag 18 + 9 = 27, best simple rule (public exploit, then EPSS)
+13 + 6 = 19 (`outputs/headline.json`); sections 1-5 were measured against the previous model, v5 (12 + 9 = 21).
+
+## 0. The previous model, v5, and how v6 replaced it
+v5 (`outputs/top500_v5.csv`, `outputs/v5_report.md`, `headline.json` → `previous`) was the headline model until 2026-11-08.
+v6 was chosen from seven declared variants by a rule fixed before any result (`outputs/rank_report.md`):
+forward ≥ v5, stability ≥ v5, and a pooled gain of at least 2 and at least the noise floor of 4 (the spread of v5's own
+pooled hits over three new seed sets, 21 to 25). Ties go to the earliest of H, I, F, D, E, J, K.
+
+| variant (20-seed bag, settings by CV inside the training year) | forward | stability | pooled | result |
+|---|---|---|---|---|
+| v5 (previous) | 12 | 9 | 21 | reference |
+| H monotone in EPSS rank and the four exploit flags only | 13 | 9 | 22 | gain below 4 |
+| **I regularised (became v6)** | **18** | **9** | **27** | **qualified** |
+| F positive weighting (scale_pos_weight by CV) | 14 | 9 | 23 | gain below 4 |
+| D lambdarank (one query per month; one per pool exceeds LightGBM's 10,000-row limit) | 13 | 9 | 22 | gain below 4 |
+| E rank_xendcg | 4 | 7 | 11 | worse |
+| J rank-average of v5, D, F and H | 12 | 9 | 21 | no gain |
+| K XGBoost rank:ndcg | | | | skipped (not installed) |
+
+Outside data, tested separately (`outputs/outside_report.md`, `outputs/outside2_report.md` on branches b/outside and
+b/outside2): VulnCheck KEV was rejected because its dates are hindsight; CISA Vulnrichment flags 1 practice CVE and none
+in 2026; GitHub PoC creation dates plus the monthly EPSS change scored 18 instead of 21 for v5. None was adopted.
+Caveats on v6 itself: on matched seeds it beats v5 by only +2 to +5 (`outputs/v6_seed_spread.csv`), and a vendor-grouped
+diagnostic on v5 halves its 2025 in-year hits (19 → 10, `outputs/rank_vendor_cv.csv`).
 
 ## 1. Track-record priors (Person B, `src/b/priors.py`, `outputs/b_priors_eval.md`)
 Time-safe extra columns: `knn_kev_rate` (share of the 50 most similar earlier CVEs, by Granite embedding, on KEV by the
