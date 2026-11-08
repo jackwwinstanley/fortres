@@ -38,7 +38,12 @@ README.md. Checks:
      file, including which method each workload number belongs to (see `discovery_values`, `check_findings`);
  15. every number in the prose of docs/findings.md must be a value from those source files;
  16. the one-sentence definition of fortres must appear word for word in README.md, docs/findings.md, docs/devpost_final.md,
-     docs/video_script.md, and in site/index.html once that page has a "What we found" section.
+     docs/video_script.md, and in site/index.html once that page has a "What we found" section;
+ 17. every percentage that carries a raw count ("36% (27 of 75)") must be that count's percentage, and the count must come from
+     its source file: fortres and the usual rule from headline.json, the "no warning" group from the blind-spot file, the leakage
+     pair (36% to 44%, 27 to 33 of 75) from the leakage files, "about 2.5 times the work" from discovery_workload.csv, and for the
+     2023 back-test (4 of 22, 5 of 22, 144 of 20,969, "about 26 times better than random") from extra_year_eval.csv; the
+     "rebuild in about N minutes" claim must equal the whole minutes of the train_v6 timing in README.md.
 """
 import json
 import re
@@ -56,7 +61,7 @@ MODEL_CARD = "docs/model_card.md"
 ENTIRE_DOC = "docs/entire.md"
 FINDINGS_DOC = "docs/findings.md"
 DEFINITION = ("Fortres is a triage system for security holes: a statistical model ranks all {scoreboard:,} of 2026's new vulnerabilities "
-              "and picks the {picks} most likely to be attacked, and IBM Granite models help read the descriptions and explain every "
+              "and picks the {picks} to fix first, ranked by the warning signs known at the time, and IBM Granite models help read the descriptions and explain every "
               "pick in plain language.")
 DEFINITION_DOCS = {"README.md", FINDINGS_DOC, "docs/devpost_final.md", "docs/video_script.md"}
 GOV_SUMMARIES = {"watsonx_gov": "watsonx_gov_summary.json", "gov_local": "gov_metrics_summary.json"}
@@ -103,7 +108,10 @@ def expected(out=OUT) -> dict:
     ey = out / "extra_year_eval.csv"
     if ey.exists():
         row = pd.read_csv(ey).set_index("method").loc["v6"]
-        e["extra_year"] = {"hits": int(row["hits"]), "positives": int(row["positives"])}
+        eyd = pd.read_csv(ey).set_index("method")
+        simple = eyd[eyd.index.str.startswith("simple rule")].iloc[0]
+        e["extra_year"] = {"hits": int(row["hits"]), "positives": int(row["positives"]), "simple_hits": int(simple["hits"]),
+                           "k": int(row["k"]), "pool": int(row["pool"]), "lift": float(row["lift_vs_chance"])}
     gs = out / "explanations_summary.json"
     if gs.exists():
         e["guardian"] = json.loads(gs.read_text())
@@ -120,8 +128,14 @@ def expected(out=OUT) -> dict:
         b = pd.read_csv(bs)
         e["blind"] = (int(b.loc[b["group"] == "blind-spot", "exploited"].sum()), int(b["exploited"].sum()))
         e["blind_ours"] = int(b.loc[b["group"] == "blind-spot", "ours_caught"].sum())
+        e["blind_rule"] = int(b.loc[b["group"] == "blind-spot", "baseline_caught"].sum())
     if (out / "discovery_workload.csv").exists():
         e["findings"] = discovery_values(out, e)
+    readme = ROOT / "README.md"
+    if readme.exists():
+        m = re.search(r"train_v6`? took (\d+) min", readme.read_text())
+        if m:
+            e["rebuild_minutes"] = int(m.group(1))
     return e
 
 
@@ -245,9 +259,61 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
         # 14. the 2023 back-test: "N of M" on a line about the older year must be v6's hits and positives from outputs/extra_year_eval.csv
         ey = e.get("extra_year")
         if ey is not None and "older year" in low and "2023" in low:
-            for m in re.finditer(r"\b(\d+) of (\d+)\b", line):
-                if (int(m.group(1)), int(m.group(2))) != (ey["hits"], ey["positives"]):
+            ok_pairs = {(ey["hits"], ey["positives"])}
+            if "simple_hits" in ey:
+                ok_pairs |= {(ey["simple_hits"], ey["positives"]), (ey["k"], ey["pool"])}
+            for m in re.finditer(r"\b(\d+) of (\d[\d,]*)\b", line):
+                if (int(m.group(1)), int(m.group(2).replace(",", ""))) not in ok_pairs:
                     probs.append(f"{where}: 2023 back-test claim {m.group(0)}, outputs/extra_year_eval.csv has {ey['hits']} of {ey['positives']}")
+        # 17. percentages keep their raw count, and the count comes from its source file
+        for m in re.finditer(r"(?<!than )(?<!under )(\d+)% (?:of [^()]{0,60})?\((\d+) of (\d[\d,]*)\)", line):
+            pct, a, b = int(m.group(1)), int(m.group(2)), int(m.group(3).replace(",", ""))
+            if int(100 * a / b + 0.5) != pct:
+                probs.append(f"{where}: {m.group(0)}, but {a} of {b} is {100 * a / b:.1f}%")
+            s0 = max(line.rfind(". ", 0, m.start()), -1) + 1
+            s1 = line.find(". ", m.end())
+            sent = line[s0:s1 if s1 >= 0 else len(line)].lower()
+            ey = e.get("extra_year")
+            if ey is not None and "simple_hits" in ey and ("older year" in low and "2023" in low):
+                want = (ey["simple_hits"] if "usual rule" in sent else ey["hits"], ey["positives"])
+                src = "outputs/extra_year_eval.csv"
+            elif "blind" in e and "no warning" in sent:
+                want, src = e["blind"], "the blind-spot file"
+            elif "blind" in e and "usual rule" in sent:
+                want, src = (e["pooled"][1], e["blind"][1]), "outputs/headline.json (baseline_pooled_hits)"
+            elif "blind" in e and "fortres" in sent:
+                want, src = (e["pooled"][0], e["blind"][1]), "outputs/headline.json (pooled_hits_bag)"
+            else:
+                continue
+            if (a, b) != tuple(want):
+                probs.append(f"{where}: {m.group(0)}, {src} has {want[0]} of {want[1]}")
+        for m in re.finditer(r"from (\d+)% to (\d+)% of [^()]{0,60}\((\d+) to (\d+) of (\d+)\)", line):
+            p1, p2, a, b, n = (int(x) for x in m.groups())
+            if (a, b) != (e["honest"], e["leaky"]) or ("blind" in e and n != e["blind"][1]):
+                probs.append(f"{where}: {m.group(0)}, the leakage files have {e['honest']} to {e['leaky']} of {e['blind'][1] if 'blind' in e else n}")
+            if (int(100 * a / n + 0.5), int(100 * b / n + 0.5)) != (p1, p2):
+                probs.append(f"{where}: {m.group(0)}, but {a} and {b} of {n} are {100 * a / n:.1f}% and {100 * b / n:.1f}%")
+        wk = (e.get("findings") or {}).get("workload")
+        if wk:
+            for m in re.finditer(r"about (\d+(?:\.\d+)?) times the work", low):
+                if abs(float(m.group(1)) - wk["usual"] / wk["fortres_list"]) >= 0.1:
+                    probs.append(f"{where}: {m.group(0)}, outputs/discovery_workload.csv gives {wk['usual']} / {wk['fortres_list']} = {wk['usual'] / wk['fortres_list']:.2f}")
+            for m in re.finditer(r"flagging (?:less than|under) 1% of all holes \((\d+) of (\d[\d,]*)\)", low):
+                k, n = int(m.group(1)), int(m.group(2).replace(",", ""))
+                want_k = e["extra_year"]["k"] if ("older year" in low and "2023" in low and "k" in e.get("extra_year", {})) else wk["fortres_list"]
+                if k != want_k or k / n >= 0.01:
+                    probs.append(f"{where}: {m.group(0)}, the flagged list has {want_k} and must be under 1% of the pool")
+        if "usual rule caught none of them" in low and e.get("blind_rule") not in (None, 0):
+            probs.append(f"{where}: 'usual rule caught none', the blind-spot file has {e['blind_rule']}")
+        ey = e.get("extra_year")
+        if ey is not None and "lift" in ey:
+            for m in re.finditer(r"about (\d+) times better than random", low):
+                if int(m.group(1)) not in (int(ey["lift"]), int(ey["lift"] + 0.5)):
+                    probs.append(f"{where}: {m.group(0)}, outputs/extra_year_eval.csv lift_vs_chance is {ey['lift']}")
+        if e.get("rebuild_minutes") is not None:
+            for m in re.finditer(r"in about (\d+) minutes", low):
+                if int(m.group(1)) != e["rebuild_minutes"]:
+                    probs.append(f"{where}: {m.group(0)}, README.md says train_v6 took {e['rebuild_minutes']} min")
         # 9. leftover TODO markers
         if "TODO(" in line:
             probs.append(f"{where}: leftover TODO( marker")
@@ -318,8 +384,8 @@ def check_findings(rel: str, text: str, e: dict) -> list[str]:
             for m in re.finditer(pat, low):
                 if int(m.group(1)) != f[key]:
                     probs.append(f"{where}: {m.group(0)}, outputs/explanations_summary.json {src} is {f[key]}")
-        if "blind_ours" in e and re.search(r"no warning|blind|of the 44|44 of", low):
-            for m in re.finditer(r"fortres (?:caught|found) (\d+)", low):
+        if "blind_ours" in e and re.search(r"no warning|blind|of the 44|(?<![\d,])44 of", low):
+            for m in re.finditer(r"fortres (?:caught|found) (\d+)(?![\d%])", low):
                 if int(m.group(1)) != e["blind_ours"]:
                     probs.append(f"{where}: {m.group(0)}, the blind-spot file has {e['blind_ours']}")
         if "epss" in low and re.search(r"jump|2024 to 2025 median", low):

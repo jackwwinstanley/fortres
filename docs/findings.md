@@ -6,7 +6,7 @@ checked which holes CISA later added to its Known Exploited Vulnerabilities (KEV
 
 ## What is fortres?
 
-Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
+Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 to fix first, ranked by the warning signs known at the time, and IBM Granite models help read the descriptions and explain every pick in plain language.
 
 - **The ranking is 20 models that vote, each built from 150 small decision trees.** It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.
 - **IBM Granite does the reading and the explaining.** Granite Embedding reads each description and gives the ranking one clue. Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts. If it fails, a plain template sentence is used instead.
