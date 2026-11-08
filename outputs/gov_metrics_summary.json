@@ -1,0 +1,841 @@
+{
+ "generated_at": "2026-11-08T05:13:39+00:00",
+ "sdk": "ibm-watsonx-gov",
+ "sdk_version": "1.5.2",
+ "sdk_requires_python": ">=3.11,<3.14",
+ "python": "3.11.18",
+ "env": ".venv-gov (separate from the project venv)",
+ "claim": "Computed with the IBM watsonx.governance SDK, run locally. No IBM service was called: no credentials were set.",
+ "credentials_used": false,
+ "credentialed_route": "skipped: WATSONX_APIKEY was not set in the environment",
+ "how_local_methods_were_enabled": "As installed, every token/embedding method of Faithfulness, AnswerRelevance, ContextRelevance and AnswerSimilarity fails with no client ('NoneType' object has no attribute 'credentials' / 'watsonx.governance context is missing'). With the SDK's own WATSONX_SERVER=WXGOV environment switch they compute locally via unitxt. Readability ran without it.",
+ "rows": {
+  "file": "outputs/explanations.csv",
+  "n": 500,
+  "which": "all rows",
+  "by_source": {
+   "granite": 347,
+   "template": 153
+  }
+ },
+ "inputs": {
+  "context": "src.b.explain.facts_prose (same facts as the Granite prompt)",
+  "generated_text": "explanations.csv explanation",
+  "ground_truth": "src.b.explain.template (fixed-form sentence from the same facts)",
+  "input_text": "'Why is <CVE> prioritised?' (fixed question we wrote)"
+ },
+ "metrics": [
+  {
+   "column": "faithfulness__token_k_precision",
+   "metric": "FaithfulnessMetric",
+   "method": "token_k_precision",
+   "compares": "output vs facts",
+   "note": "share of the sentence's tokens found in the facts",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 0.7419,
+   "median": 0.7586,
+   "min": 0.4444,
+   "max": 0.8571,
+   "mean_by_source": {
+    "granite": 0.7574,
+    "template": 0.7068
+   },
+   "secs": 0.2
+  },
+  {
+   "column": "faithfulness__sentence_bert_mini_lm",
+   "metric": "FaithfulnessMetric",
+   "method": "sentence_bert_mini_lm",
+   "compares": "output vs facts",
+   "note": "MiniLM embedding similarity, sentence vs facts",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 0.66,
+   "median": 0.6649,
+   "min": 0.4652,
+   "max": 0.8674,
+   "mean_by_source": {
+    "granite": 0.6739,
+    "template": 0.6286
+   },
+   "secs": 0.7
+  },
+  {
+   "column": "answer_similarity__token_recall",
+   "metric": "AnswerSimilarityMetric",
+   "method": "token_recall",
+   "compares": "output vs template",
+   "note": "share of the template sentence's tokens in our sentence",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 0.9135,
+   "median": 0.9286,
+   "min": 0.6471,
+   "max": 1.0,
+   "mean_by_source": {
+    "granite": 0.8754,
+    "template": 1.0
+   },
+   "secs": 0.2
+  },
+  {
+   "column": "answer_similarity__bert_score_recall",
+   "metric": "AnswerSimilarityMetric",
+   "method": "bert_score_recall",
+   "compares": "output vs template",
+   "note": "BERTScore recall vs the template sentence",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 0.9354,
+   "median": 0.9299,
+   "min": 0.7604,
+   "max": 1.0,
+   "mean_by_source": {
+    "granite": 0.9069,
+    "template": 1.0
+   },
+   "secs": 3.0
+  },
+  {
+   "column": "answer_similarity__sentence_bert_mini_lm",
+   "metric": "AnswerSimilarityMetric",
+   "method": "sentence_bert_mini_lm",
+   "compares": "output vs template",
+   "note": "MiniLM embedding similarity vs template",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 0.9484,
+   "median": 0.9434,
+   "min": 0.6337,
+   "max": 1.0,
+   "mean_by_source": {
+    "granite": 0.9256,
+    "template": 1.0
+   },
+   "secs": 0.7
+  },
+  {
+   "column": "answer_relevance__token_recall",
+   "metric": "AnswerRelevanceMetric",
+   "method": "token_recall",
+   "compares": "output vs fixed question",
+   "note": "question is one we wrote; low information",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 0.48,
+   "median": 0.5,
+   "min": 0.25,
+   "max": 0.75,
+   "mean_by_source": {
+    "granite": 0.495,
+    "template": 0.4461
+   },
+   "secs": 0.2
+  },
+  {
+   "column": "text_grade_level__flesch_kincaid_grade",
+   "metric": "TextGradeLevelMetric",
+   "method": "flesch_kincaid_grade",
+   "compares": "output only",
+   "note": "readability (textstat)",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 14.3627,
+   "median": 14.59,
+   "min": 8.4744,
+   "max": 20.4967,
+   "mean_by_source": {
+    "granite": 14.871,
+    "template": 13.2097
+   },
+   "secs": 0.0
+  },
+  {
+   "column": "text_reading_ease__flesch_reading_ease",
+   "metric": "TextReadingEaseMetric",
+   "method": "flesch_reading_ease",
+   "compares": "output only",
+   "note": "readability (textstat)",
+   "where": "local (this machine; IBM watsonx.governance SDK, no IBM service called)",
+   "n": 500,
+   "mean": 42.9899,
+   "median": 44.3765,
+   "min": 1.545,
+   "max": 67.3289,
+   "mean_by_source": {
+    "granite": 41.6469,
+    "template": 46.0358
+   },
+   "secs": 0.0
+  }
+ ],
+ "inventory": [
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "token_k_precision",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "sentence_bert_mini_lm",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing faithfulness using llm_as_judge method"
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "granite_guardian",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "faithfulness_model",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "token_recall",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing answer_relevance using llm_as_judge method"
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "granite_guardian",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "answer_relevance_model",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "token_precision",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "sentence_bert_bge",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "sentence_bert_mini_lm",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing context_relevance using llm_as_judge method"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "granite_guardian",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "context_relevance_model",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "AttributeError: 'NoneType' object has no attribute 'credentials'"
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "token_recall",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "Exception: Failed to evaluate the metric as the watsonx.governance context is missing. Please invoke the evaluate_metrics with correct credentials."
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "bert_score_recall",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "Exception: Failed to evaluate the metric as the watsonx.governance context is missing. Please invoke the evaluate_metrics with correct credentials."
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "sentence_bert_mini_lm",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "Exception: Failed to evaluate the metric as the watsonx.governance context is missing. Please invoke the evaluate_metrics with correct credentials."
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing answer_similarity using llm_as_judge method"
+  },
+  {
+   "metric": "TextGradeLevelMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "TextReadingEaseMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "HAPMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute hap using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "OutputHAPMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute hap using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "PIIMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute pii using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "OutputPIIMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute pii using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "HarmMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute harm using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "SocialBiasMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute social_bias using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "ProfanityMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute profanity using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "ViolenceMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute violence using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "SexualContentMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute sexual_content using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "UnethicalBehaviorMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute unethical_behavior using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "EvasivenessMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute evasiveness using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "JailbreakMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute jailbreak using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "HarmEngagementMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute harm_engagement using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "PromptSafetyRiskMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute prompt_safety_risk using two_level_detection. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "TopicRelevanceMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute topic_relevance using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "KeywordDetectionMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute keyword using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "RegexDetectionMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute regex using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "OutputTokenCountMetric",
+   "method": null,
+   "watsonx_server_env": null,
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "token_k_precision",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "sentence_bert_mini_lm",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing faithfulness using llm_as_judge method"
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "granite_guardian",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute faithfulness using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "faithfulness_model",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: The 'faithfulness_model' method is supported only in On-Prem version. Please run your evaluation in On-Prem version or use one of the other available methods : ['token_k_precision', 'sentence_bert_mini_lm', 'llm_as_judge', 'granite_guardian']"
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "token_recall",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing answer_relevance using llm_as_judge method"
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "granite_guardian",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute answer_relevance using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "answer_relevance_model",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: The 'answer_relevance_model' method is supported only in On-Prem version. Please run your evaluation in On-Prem version or use one of the other available methods : ['token_recall', 'llm_as_judge', 'granite_guardian']"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "token_precision",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "sentence_bert_bge",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "sentence_bert_mini_lm",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing context_relevance using llm_as_judge method"
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "granite_guardian",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute context_relevance using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "ContextRelevanceMetric",
+   "method": "context_relevance_model",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: The 'context_relevance_model' method is supported only in On-Prem version. Please run your evaluation in On-Prem version or use one of the other available methods : ['token_precision', 'sentence_bert_bge', 'sentence_bert_mini_lm', 'llm_as_judge', 'granite_guardian']"
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "token_recall",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "bert_score_recall",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "sentence_bert_mini_lm",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "AnswerSimilarityMetric",
+   "method": "llm_as_judge",
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: llm_judge is required for computing answer_similarity using llm_as_judge method"
+  },
+  {
+   "metric": "TextGradeLevelMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "TextReadingEaseMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  },
+  {
+   "metric": "HAPMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute hap using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "OutputHAPMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute hap using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "PIIMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute pii using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "OutputPIIMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute pii using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "HarmMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute harm using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "SocialBiasMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute social_bias using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "ProfanityMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute profanity using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "ViolenceMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute violence using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "SexualContentMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute sexual_content using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "UnethicalBehaviorMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute unethical_behavior using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "EvasivenessMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute evasiveness using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "JailbreakMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute jailbreak using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "HarmEngagementMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute harm_engagement using granite_guardian. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "PromptSafetyRiskMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute prompt_safety_risk using two_level_detection. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "TopicRelevanceMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute topic_relevance using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "KeywordDetectionMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute keyword using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "RegexDetectionMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "error",
+   "error": "ValueError: IBM WatsonX Governance SDK must be initialized to compute regex using None. Please initialize the client to proceed, or remove this metric from the evaluation."
+  },
+  {
+   "metric": "OutputTokenCountMetric",
+   "method": null,
+   "watsonx_server_env": "WXGOV",
+   "no_credentials_result": "ran",
+   "error": ""
+  }
+ ],
+ "runtime_secs": {
+  "total": 12.1,
+  "inventory": 6.9,
+  "local_scoring_all_rows": 5.1
+ },
+ "pip_freeze": [
+  "Jinja2==3.1.6",
+  "MarkupSafe==3.0.4",
+  "PyJWT==2.15.1",
+  "PyYAML==6.0.3",
+  "Pygments==2.21.0",
+  "aiohappyeyeballs==2.7.1",
+  "aiohttp==3.14.5",
+  "aiosignal==1.4.0",
+  "annotated-doc==0.0.5",
+  "annotated-types==0.8.0",
+  "anyio==4.16.0",
+  "attrs==26.1.0",
+  "bert-score==0.3.13",
+  "boto3==1.43.126",
+  "botocore==1.43.126",
+  "cachetools==6.2.6",
+  "certifi==2026.10.23",
+  "charset-normalizer==3.5.2",
+  "click==8.5.1",
+  "cloudpickle==3.1.2",
+  "contourpy==1.3.3",
+  "cycler==0.12.1",
+  "datasets==5.1.0",
+  "defusedxml==0.7.1",
+  "dill==0.4.1",
+  "diskcache==5.6.3",
+  "evaluate==0.4.6",
+  "fastuuid==0.14.0",
+  "filelock==4.2.9",
+  "fonttools==4.68.0",
+  "frozenlist==1.8.0",
+  "fsspec==2026.7.0",
+  "h11==0.16.0",
+  "h2==4.4.1",
+  "hf-xet==1.8.0",
+  "hpack==4.2.0",
+  "httpcore2==2.16.0",
+  "httpcore==1.0.9",
+  "httpx2==2.16.0",
+  "httpx==0.28.1",
+  "huggingface_hub==1.33.0",
+  "hyperframe==6.1.0",
+  "ibm-cloud-sdk-core==3.25.0",
+  "ibm-watson-openscale==3.1.11",
+  "ibm-watsonx-gov==1.5.2",
+  "idna==3.20",
+  "importlib_metadata==8.9.0",
+  "jiter==0.19.0",
+  "jmespath==1.1.0",
+  "joblib==1.6.0",
+  "jsonschema-specifications==2025.9.1",
+  "jsonschema==4.26.0",
+  "kiwisolver==1.5.1",
+  "lazy_imports==1.2.0",
+  "litellm==1.108.3",
+  "markdown-it-py==4.2.0",
+  "matplotlib==3.11.2",
+  "mdurl==0.1.2",
+  "mpmath==1.3.0",
+  "multidict==7.2.1",
+  "multiprocess==0.70.19",
+  "nest-asyncio==1.6.0",
+  "networkx==3.6.1",
+  "nltk==3.10.4",
+  "numpy==2.4.6",
+  "openai==3.46.0",
+  "packaging==26.3",
+  "pandas==2.2.3",
+  "pillow==13.0.0",
+  "propcache==0.5.4",
+  "protobuf==6.33.6",
+  "pyarrow==26.0.1",
+  "pydantic-settings==2.16.2",
+  "pydantic==2.14.3",
+  "pydantic_core==2.50.4",
+  "pyparsing==3.3.3",
+  "pyphen==0.18.1",
+  "python-dateutil==2.9.0.post0",
+  "python-dotenv==1.2.4",
+  "pytz==2026.6",
+  "referencing==0.37.0",
+  "regex==2026.11.7",
+  "requests==2.34.2",
+  "rich==15.0.0",
+  "rpds-py==2026.9.1",
+  "s3transfer==0.19.3",
+  "safetensors==0.8.0",
+  "scikit-learn==1.7.2",
+  "scipy==1.17.1",
+  "sentence-transformers==6.2.0",
+  "setuptools==84.2.1",
+  "shellingham==1.5.4",
+  "six==1.17.0",
+  "sniffio==1.3.1",
+  "sympy==1.14.0",
+  "textstat==0.7.13",
+  "threadpoolctl==3.8.0",
+  "tiktoken==0.14.0",
+  "tokenizers==0.23.3",
+  "torch==2.15.0",
+  "tqdm==4.70.1",
+  "transformers==5.22.2",
+  "truststore==0.10.5",
+  "typer==0.28.0",
+  "typing-inspection==0.4.5",
+  "typing_extensions==4.16.0",
+  "tzdata==2026.6",
+  "unitxt==1.26.10",
+  "urllib3==2.8.0",
+  "wrapt==1.17.3",
+  "xxhash==4.0.2",
+  "yarl==1.25.1",
+  "zipp==4.1.2"
+ ]
+}
