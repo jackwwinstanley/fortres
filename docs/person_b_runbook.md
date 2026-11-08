@@ -32,7 +32,7 @@ It stops at the first failing step and names it. Every step is safe to re-run.
 | Granite reasons | `src/b/explain.py` (Person A's version after #35) | `outputs/explanations.csv`, `outputs/explanations_summary.json` (tracked) |
 | charts | `src/b/charts.py` | `docs/figures/*.png` (tracked) |
 | story / dashboard data | `src/b/export_story.py` | `site/data/story.json`, `site/data/why_traits.csv` (tracked; `git add -f`, because `.gitignore` has `data/`) |
-| checks | `pytest -q`, `scripts/check_contract.py` | none |
+| checks | `pytest -q`, `scripts/check_contract.py`, `scripts/number_sweep.py` (every number in docs/site/app/README vs the outputs) | none |
 
 Granite fact extraction (#12, `python -m src.b.extract [--profile]`, ~1 h) is **not** part of the refresh. Its output
 `outputs/extracted_features.parquet` is descriptive, and it only needs a re-run if the pools change.

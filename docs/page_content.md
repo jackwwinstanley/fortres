@@ -47,10 +47,9 @@ KEV in our practice years: 25%. 44 of the 75 had no public attack code and a low
 - 31 visible (had public attack code) vs 44 blind spots (Person A's `st.group_of` definition)
 - Simple rule on blind spots: 0. Our v5 model: 2, both Fortinet FortiOS (CVE-2025-24472, CVE-2024-23113)
   (`outputs/v5_blindspots.csv`, from `python -m src.b.leakage`, which reproduces the v5 headline bag: 12 + 9).
-  **Say it honestly: small, and two catches is within noise.** Wording: "our text features (keyword flags plus
-  Granite-embedding similarity to past KEV entries) caught two of 44; without any text features, none." Removing only
-  the two Granite scores still catches 3 (via the keyword flags), so don't credit Granite specifically. Without any text
-  the model catches 3 more visible ones (22 vs 21 overall): the text is a trade-off, not a net gain.
+  **Say it honestly: small.** Wording: "our text features (keyword flags plus Granite-embedding similarity to past KEV
+  entries) caught two of 44; either part alone (keyword flags or Granite similarity scores) still catches two or three of the 44; with neither, none; the exact CVEs change between runs, so treat it as noise." Without any text the model catches 3 more visible ones (22 vs 21 overall): the
+  text is a trade-off, not a net gain.
 
 ## 3. What IBM Granite reads (open models, run locally)
 **Message:** Granite reads the description the way an analyst would and recognises "this sounds like a past KEV entry."
