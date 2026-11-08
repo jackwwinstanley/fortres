@@ -7,7 +7,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import number_sweep as ns  # noqa: E402
 
 E = {"pooled": (21, 19), "forward": (12, 13), "stability": (9, 6), "ranges": {(-4, 8), (-6, 3)},
-     "honest": 21, "leaky": 28, "leaky_split": (17, 11), "blind": (44, 75)}
+     "honest": 21, "leaky": 28, "leaky_split": (17, 11), "blind": (44, 75),
+     "guardian": {"total": 500, "passed_guardian": 347, "template_fallback": 153, "pending": 0,
+                  "guardian_verdicts": {"No": 347, "Yes": 78, "not_run": 75}}}
 FINAL = "docs/writeup_person_b.md"
 
 
@@ -22,7 +24,7 @@ FINAL = "docs/writeup_person_b.md"
     ("We caught 22 vs 19 for the simple rule.", "result pair"),
     ("Our edge is +2, 90% range −5 to +8.", "range"),
     ("43 of the 75 were blind spots.", "blind-spot claim"),
-    ("419 of 500 reasons passed a groundedness check.", "typed by hand"),
+    ("419 of 500 reasons passed a groundedness check.", "Guardian count 419"),
 ])
 def test_each_problem_is_caught(line, needle):
     probs = ns.check_text(FINAL, line, E)
@@ -37,6 +39,7 @@ def test_each_problem_is_caught(line, needle):
     "Pooled +2, 90% range −4 to +8; forward −6 to +3.",
     "44 of the 75 were blind spots.",
     "The 2026 list has 72,670 CVEs; KEV as of 2025-12-29.",
+    "347 of 500 reasons passed a groundedness check.",
 ])
 def test_correct_lines_pass(line):
     assert ns.check_text(FINAL, line, E) == []
@@ -51,3 +54,37 @@ def test_research_notes_may_quote_other_results():
                     reason="needs the tracked outputs")
 def test_the_repository_passes_the_sweep():
     assert ns.main() == 0
+
+
+def test_guardian_prose_needs_the_summary():
+    e = {k: v for k, v in E.items() if k != "guardian"}
+    probs = ns.check_text(FINAL, "347 of 500 reasons passed a groundedness check.", e)
+    assert any("without outputs/explanations_summary.json" in p for p in probs), probs
+
+
+CARD = "docs/model_card.md"
+GOOD_TABLE = """| item | count | field |
+|---|---|---|
+| CVEs with a reason | 500 | `total` |
+| Granite sentences kept (Guardian answered "No") | 347 | `passed_guardian`, `guardian_verdicts.No` |
+| of those: Guardian answered "Yes" | 78 | `guardian_verdicts.Yes` |
+| rows still pending | 0 | `pending` |"""
+
+
+def test_model_card_table_matches_the_summary():
+    assert ns.check_text(CARD, GOOD_TABLE, E) == []
+
+
+@pytest.mark.parametrize("row,needle", [
+    ('| Granite sentences kept | 350 | `passed_guardian`, `guardian_verdicts.No` |', "says 350 for `passed_guardian`"),
+    ('| of those: Guardian answered "Yes" | 79 | `guardian_verdicts.Yes` |', "says 79 for `guardian_verdicts.Yes`"),
+    ('| something new | 5 | `no_such_field` |', "not in outputs/explanations_summary.json"),
+])
+def test_model_card_table_errors(row, needle):
+    probs = ns.check_text(CARD, row, E)
+    assert any(needle in p for p in probs), probs
+
+
+def test_table_check_only_applies_to_the_model_card():
+    row = '| Granite sentences kept | 350 | `passed_guardian` |'
+    assert ns.check_text("docs/considered_not_adopted.md", row, E) == []

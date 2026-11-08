@@ -1,13 +1,15 @@
-duckdb
-pandas
-pyarrow
-numpy
-scikit-learn
-lightgbm
-sentence-transformers
-torch
-streamlit
-plotly
-pytest
-matplotlib
-tabulate
+# Lower bounds only (the versions verified in the clean-clone dry run, Python 3.14.5 / macOS arm64); no upper pins.
+# For the exact versions that reproduce outputs/top500_v5.csv byte for byte, install requirements-lock.txt instead.
+duckdb>=2.0.0
+pandas>=3.1.1
+pyarrow>=26.0.1
+numpy>=2.5.4
+scikit-learn>=1.9.1
+lightgbm>=4.7.0
+sentence-transformers>=6.2.0
+torch>=2.15.0
+streamlit>=1.67.0
+plotly>=7.1.0
+pytest>=9.2.0
+matplotlib>=3.11.2
+tabulate>=0.10.0
