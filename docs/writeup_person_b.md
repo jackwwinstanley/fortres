@@ -4,10 +4,10 @@ For Jack to merge into the main README write-up (#23). Numbers: v4 headline mode
 `outputs/b_*_report.md`. Each section is short on purpose: lead with the finding, then how we know.
 
 ## 1. Blind spots: what the standard signals can't see
-Of the 75 CVEs that were exploited in our two practice years, **44 (59%) were blind spots**: no public exploit
+Of the 75 CVEs added to CISA KEV in our two practice years, **44 (59%) were blind spots**: no public exploit
 code (Exploit-DB, Metasploit, Nuclei, GitHub PoC) and a within-month EPSS rank too low for a top-k EPSS list.
-The best simple rule (public exploit first, then EPSS) catches **0** of them by construction. Our v4 model catches
-**2** (a VMware ESXi flaw in 2024 and a Fortinet flaw in 2025). That's few, but it's the only part of the problem
+The best simple rule (public exploit first, then EPSS) catches **0** of them by construction. Our v5 model catches
+**2** (two Fortinet FortiOS flaws, CVE-2024-23113 and CVE-2025-24472). That's few, but it's the only part of the problem
 where text and vendor history add signal the standard feeds don't have.
 *Figure: `docs/figures/blindspots.png`.*
 
@@ -32,10 +32,10 @@ so v4 drops raw EPSS and ranks it within each snapshot month. Assigner mix (PSI 
 also moved. *Figures: `drift_psi.png`, `drift_epss.png`.*
 
 ## 4. Leakage experiment: what cheating would look like
-Same v4 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
-counts, blank-vs-filled CVSS/CWE, exploit-tagged links): pooled hits jump from **21 to 29** (2025: 12 → 17;
-2024: 9 → 12). The reason is stark: **every** exploited CVE in both practice years is "Analyzed" in today's NVD,
-against about half of the rest, because NVD analyses attacked CVEs first. None of these columns are in our model;
+Same v5 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
+counts, blank-vs-filled CVSS/CWE, exploit-tagged links): pooled hits jump from **21 to 28** (2025: 12 → 17;
+2024: 9 → 11). The reason is stark: **every** CVE added to KEV in both practice years is "Analyzed" in today's NVD,
+against about half of the rest, because NVD analyses KEV-listed CVEs first. None of these columns are in our model;
 an independent column review (`docs/column_review.md`) found no leak.
 *Figure: `leakage.png`.*
 
@@ -45,6 +45,12 @@ percentile within its year, public exploit sources, and the most similar past KE
 (`granite-3.3-2b-instruct`, run locally) rewords them. A checker rejects any sentence that adds a number,
 product, CVE or claim ("critical", "actively exploited") not in the facts; those picks keep the plain template.
 On the v3 list, 373 of 500 passed and 127 fell back.
+
+## Honest results (v5 headline model, `outputs/headline.json`)
+Pooled over both practice years, the v5 model catches **21** CVEs added to KEV against **19** for the best simple rule
+(+2, 90% range −4 to +8). In the strict forward-in-time test (train 2024 → test 2025) it is **one behind**: 12 vs 13
+(range −6 to +3). The stability check (train 2025 → test 2024) is 9 vs 6. The gain is small and could be luck. What holds
+up: the blind spots, the July 2026 shift, and the leakage test.
 
 ## Limits
 Low power (75 positives, so a few hits are within noise). Descriptions are today's NVD text and can be edited

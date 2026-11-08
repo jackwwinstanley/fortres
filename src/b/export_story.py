@@ -79,6 +79,17 @@ def why_traits(P):
                      "to be attacked. Public attack code uses the 2024-25 practice years, attacked by 4 Nov of that year.")}
 
 
+def blind_cves():
+    """The blind-spot CVEs our headline model caught (outputs/v5_blindspots.csv from src.b.leakage), with their KEV vendor."""
+    p = OUT_DIR / "v5_blindspots.csv"
+    kev = pd.read_csv(DATA_DIR / "known_exploited.csv", usecols=["cve_id", "vendor"]).drop_duplicates("cve_id").set_index("cve_id")["vendor"]
+    if p.exists() and "ours_caught_cves" in pd.read_csv(p, nrows=1).columns:
+        d = pd.read_csv(p).query("group == 'blind-spot'").dropna(subset=["ours_caught_cves"])
+        return [{"cve_id": c, "kev_vendor": kev.get(c, ""), "test_replica": int(r.year)}
+                for r in d.itertuples() for c in str(r.ours_caught_cves).split(";") if c]
+    return pd.read_csv(mechanism_file()).query("group == 'blind-spot' and kind == 'gained'")[["cve_id", "kev_vendor", "test_replica"]].to_dict("records")
+
+
 def pools():
     out = {}
     for y, f in ((2024, "replica_2024"), (2025, "replica_2025"), (2026, "scoreboard_features")):
@@ -126,8 +137,7 @@ def main():
         "simple_caught_blind": int(b[b["group"] == "blind-spot"]["Public exploit, then EPSS"].sum()),
         "ours_caught_visible": int(b[b["group"] == "flagged"][mcol].sum()),
         "ours_caught_blind": int(b[b["group"] == "blind-spot"][mcol].sum()),
-        "ours_blind_cves": pd.read_csv(mechanism_file()).query("group == 'blind-spot' and kind == 'gained'")
-        [["cve_id", "kev_vendor", "test_replica"]].to_dict("records"),
+        "ours_blind_cves": blind_cves(),
     }
 
     # 5. what Granite reads: one real description

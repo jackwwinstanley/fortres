@@ -38,7 +38,7 @@ That's a small edge, and we show the uncertainty range rather than overclaim."
 [drift_epss.png, then leakage.png]
 "Two things we caught. One: from July 2026, risk scores suddenly jumped about six times, so we compare each
 hole only with others from the same month instead of trusting raw scores. Two: columns filled in after an attack would inflate our score from 21 to
-29. Every exploited vulnerability is marked 'Analyzed' in today's NVD, so we banned those columns."
+28. Every exploited vulnerability is marked 'Analyzed' in today's NVD, so we banned those columns."
 
 **1:50–2:00 · Close** *(Jack)*
 [Top 500 list, scrolling]

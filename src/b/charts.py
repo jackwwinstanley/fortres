@@ -215,8 +215,15 @@ def blind_spot_counts():
     """Per test year: exploited CVEs split into flagged / blind-spot, and hits of the best simple rule vs our headline
     model in each group. Uses Person A's outputs/blindspot_positives.csv and the newest mechanism file
     (v4_mechanism.csv: gained/lost vs the baseline for the headline model; else v2_mechanism.csv for v1/v2 LightGBM)."""
-    bp = OUT_DIR / "blindspot_positives.csv"
     res = runlog.results()
+    v5b = OUT_DIR / "v5_blindspots.csv"  # written by src.b.leakage from the honest v5 bag (= the headline model)
+    if v5b.exists() and not res.empty:
+        d = pd.read_csv(v5b)
+        d = d[d["group"].isin(["flagged", "blind-spot"])]
+        name = runlog.model_name(runlog.latest_model(res))
+        return d.rename(columns={"baseline_caught": "Public exploit, then EPSS", "ours_caught": name})[
+            ["year", "group", "exploited", "Public exploit, then EPSS", name]].reset_index(drop=True)
+    bp = OUT_DIR / "blindspot_positives.csv"
     if not bp.exists() or res.empty:
         return None
     mf = mechanism_file()
