@@ -67,7 +67,7 @@ One line each, in our words, for how we use the name. They are not IBM's definit
 - **Local checks.** A draft is rejected if it contains a number, name, CVE id or claim that is not in the facts, or a blocked phrase (predictions, severity words, causal links). `tests/test_explain.py` exercises every pattern in the list.
 - **A Granite Guardian groundedness gate.** Guardian (`granite3-guardian:2b`, run locally) must clearly answer "No"; "Yes", empty, unparseable, a timeout or any error means the plain template sentence is used.
 - **Honest labelling.** No sentence is labelled Guardian-checked unless Guardian returned "No" for it. `outputs/explanations.csv` has `source` and `guardian_verdict` for every row.
-- **Counts published, not asserted.** In `outputs/explanations_summary.json`, 347 Granite sentences were kept after a Guardian "No" (`passed_guardian`) and 153 rows use the template (`template_fallback`): Guardian answered "Yes" for 78, and 75 drafts failed a local check and never reached Guardian (`guardian_verdicts`), out of 500 (`total`).
+- **Counts published, not asserted.** In `outputs/explanations_summary.json`, 318 Granite sentences were kept after a Guardian "No" (`passed_guardian`) and 182 rows use the template (`template_fallback`): Guardian answered "Yes" for 90, and 92 drafts failed a local check and never reached Guardian (`guardian_verdicts`), out of 500 (`total`).
 
 **Not mitigated:** Guardian checks that a sentence is *supported by the facts*, not that the facts are true, not causality, and not that they are the full reason the model ranked a CVE highly. So we write "passed a groundedness check", never "verified" (`docs/judge_qa.md`).
 

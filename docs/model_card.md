@@ -140,11 +140,11 @@ Counts, read from `outputs/explanations_summary.json`:
 | item | count | field |
 |---|---|---|
 | CVEs with a reason | 500 | `total` |
-| Granite sentences kept (Guardian answered "No") | 347 | `passed_guardian`, `guardian_verdicts.No` |
-| template sentences used | 153 | `template_fallback` |
-| of those: Guardian answered "Yes" | 78 | `guardian_verdicts.Yes` |
-| of those: draft failed a local check, never shown to Guardian | 75 | `guardian_verdicts.not_run` |
-| Granite drafts sent to Guardian | 425 | `rewritten` |
+| Granite sentences kept (Guardian answered "No") | 318 | `passed_guardian`, `guardian_verdicts.No` |
+| template sentences used | 182 | `template_fallback` |
+| of those: Guardian answered "Yes" | 90 | `guardian_verdicts.Yes` |
+| of those: draft failed a local check, never shown to Guardian | 92 | `guardian_verdicts.not_run` |
+| Granite drafts sent to Guardian | 408 | `rewritten` |
 | rows still pending | 0 | `pending` |
 
 The file also records the models (`granite_model`, `guardian_model`), `prompt_version` and `generated_at`. Why the local checks rejected drafts is tallied in `local_check_failures`.
@@ -164,7 +164,7 @@ So the wording is "passed a groundedness check", never "verified" (`docs/judge_q
 6. **The feature guard checks names, not how a column was computed.** The column review is the check on computation (`docs/column_review.md`, limit 4).
 7. **The June 2026 snapshot uses July signals** because June 2026 signals are missing, a gap in the organisers' data (`docs/DATA_DICTIONARY.md`).
 8. **The Granite-derived scores are kept but not claimed to add hits.** The ablation shows them neutral within noise (`README.md`, "Final feature set").
-9. **The explanations come from a 2-billion-parameter model** and a small groundedness checker; 153 of the sentences fall back to a template (section 7).
+9. **The explanations come from a 2-billion-parameter model** and a small groundedness checker; 182 of the sentences fall back to a template (section 7).
 10. **We do not know the 2026 answer.** We cannot say how many of our 500 will be added to KEV.
 
 Ideas we tested and left out are in `docs/considered_not_adopted.md`.
