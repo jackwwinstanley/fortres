@@ -50,6 +50,9 @@ The first checkpoint is dated 2026-11-07T18:44:05Z and the last 2026-11-08T06:01
   read-only history") among its experimental commands, which matches. Their dates in the summary are the session times in the metadata, not the day the import ran.
 - Only the live checkpoints come from the hooks firing on a commit.
 - The snapshot covers only one machine: Jack's laptop clone. Checkpoints are local, so sessions on any other machine are not in it.
+- A second machine, Aba's laptop, has Entire set up the same way (push off, telemetry off, nothing pushed). Its own snapshot
+  goes in `outputs/entire_summary_aba.json` (`python scripts/entire_summary.py --label aba`) once it has checkpoints, and its
+  table rows name their fields as `aba:n_checkpoints` and so on, so each row is checked against that machine's own file.
 - Two sessions is what Entire recorded here. It is not a count of every Claude Code window the project used.
 
 ## What is published, what is not, and why
