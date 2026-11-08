@@ -43,7 +43,10 @@ README.md. Checks:
      its source file: fortres and the usual rule from headline.json, the "no warning" group from the blind-spot file, the leakage
      pair (36% to 44%, 27 to 33 of 75) from the leakage files, "about 2.5 times the work" from discovery_workload.csv, and for the
      2023 back-test (4 of 22, 5 of 22, 144 of 20,969, "about 26 times better than random") from extra_year_eval.csv; the
-     "rebuild in about N minutes" claim must equal the whole minutes of the train_v6 timing in README.md.
+     "rebuild in about N minutes" claim must equal the whole minutes of the train_v6 timing in README.md;
+ 18. the "AI explanations need checking" band of site/index.html (id="f-ai"): its counts and percentage must be the
+     explanations_summary.json values (total, template_fallback, guardian_verdicts.not_run and .Yes), the 0.80 and the "none
+     flagged" must come from watsonx_gov_summary.json, and it must not say "passed watsonx", "verified", "validated" or "proves".
 """
 import json
 import re
@@ -331,8 +334,48 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
     if rel == ENTIRE_DOC:
         probs += check_entire_doc(rel, text, e.get("entire"), e.get("entire_machines", {}))
     probs += check_gov_numbers(rel, text, e)
+    if rel == "site/index.html":
+        probs += check_ai_band(rel, text, e)
     if "findings" in e and final:
         probs += check_findings(rel, text, e)
+    return probs
+
+
+def check_ai_band(rel: str, text: str, e: dict) -> list[str]:
+    """Rule 18: the findings band id="f-ai" is read as plain text (tags and the chart's aria-label included)."""
+    m = re.search(r'<section[^>]*id="f-ai".*?</section>', text, re.S)
+    if not m:
+        return []
+    g, w = e.get("guardian"), e.get("watsonx_gov")
+    if g is None or w is None:
+        return [f"{rel}: the AI band needs outputs/explanations_summary.json and outputs/watsonx_gov_summary.json"]
+    raw = m.group(0)
+    s = " ".join(re.sub(r"<[^>]+>", " ", raw).split())
+    probs, v = [], g["guardian_verdicts"]
+    mets = {x["column"]: x for x in w["metrics"]}
+    faith, harm, pii = mets["faithfulness__granite_guardian"], mets["harm__granite_guardian"], mets["output_pii"]
+
+    def need(pattern, want, src, text_=s):
+        for mm in re.finditer(pattern, text_, re.I):
+            if str(mm.group(1)) != str(want):
+                probs.append(f"{rel}: AI band says '{mm.group(0)}', {src} is {want}")
+    for mm in re.finditer(r"(\d+)% \((\d+) of (\d+)\)", s):
+        if (int(mm.group(2)), int(mm.group(3)), int(100 * g["template_fallback"] / g["total"] + 0.5)) != (g["template_fallback"], g["total"], int(mm.group(1))):
+            probs.append(f"{rel}: AI band says '{mm.group(0)}', outputs/explanations_summary.json has template_fallback {g['template_fallback']} of {g['total']}")
+    need(r"reason for each of our (\d+) picks", g["total"], "total")
+    need(r"rejected (\d+) drafts", v["not_run"], "guardian_verdicts.not_run")
+    need(r"blocked (\d+) more", v["Yes"], "guardian_verdicts.Yes")
+    need(r"those (\d+) picks show a plain", g["template_fallback"], "template_fallback")
+    need(r"scored all (\d+) final reasons", w["rows"]["n"], "watsonx_gov_summary.json rows.n")
+    need(r"on average (\d\.\d\d) for staying true", f"{faith['mean']:.2f}", "the mean faithfulness")
+    need(r"(\d+) kept, \d+ rejected by our own rules, \d+ blocked", g["passed_guardian"], "passed_guardian", raw)
+    need(r"\d+ kept, (\d+) rejected by our own rules, \d+ blocked", v["not_run"], "guardian_verdicts.not_run", raw)
+    need(r"\d+ kept, \d+ rejected by our own rules, (\d+) blocked", v["Yes"], "guardian_verdicts.Yes", raw)
+    if "none flagged for harm or personal data" in s and (harm["n_ge_0_5"], pii["n_ge_0_5"]) != (0, 0):
+        probs.append(f"{rel}: AI band says none flagged, watsonx_gov_summary.json has harm {harm['n_ge_0_5']} and pii {pii['n_ge_0_5']} at 0.5 or above")
+    for bad in ("passed watsonx", "verified", "validated", "proves"):
+        if bad in s.lower():
+            probs.append(f"{rel}: AI band uses '{bad}'")
     return probs
 
 
