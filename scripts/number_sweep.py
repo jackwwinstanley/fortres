@@ -32,6 +32,7 @@ README.md. Checks:
      and every other number
      in its prose (outside code spans, code blocks, links and list markers) must be a value, date, timestamp or the version
      stored in that file; the doc without the file is an error;
+ 14. on a line about the 2023 back-test ("older year" and 2023), "N of M" must equal v6's hits and positives in outputs/extra_year_eval.csv;
  13. on any line that mentions Entire, "N checkpoints" and "N sessions" must equal n_checkpoints and n_sessions in that file;
  14. the findings (docs/findings.md, and any final document that repeats one): the phrases of each finding must match its source
      file, including which method each workload number belongs to (see `discovery_values`, `check_findings`);
@@ -99,6 +100,10 @@ def expected(out=OUT) -> dict:
         "honest": sum(leak["honest"].values()), "leaky": sum(leak["leaky"].values()),
         "leaky_split": (leak["leaky"].get(2025), leak["leaky"].get(2024)),
     }
+    ey = out / "extra_year_eval.csv"
+    if ey.exists():
+        row = pd.read_csv(ey).set_index("method").loc["v6"]
+        e["extra_year"] = {"hits": int(row["hits"]), "positives": int(row["positives"])}
     gs = out / "explanations_summary.json"
     if gs.exists():
         e["guardian"] = json.loads(gs.read_text())
@@ -237,6 +242,12 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
                 probs.append(f"{where}: Guardian count without outputs/explanations_summary.json to check it against")
             elif int(m.group(1)) != g.get("passed_guardian"):
                 probs.append(f"{where}: Guardian count {m.group(1)} of 500, expected passed_guardian = {g.get('passed_guardian')}")
+        # 14. the 2023 back-test: "N of M" on a line about the older year must be v6's hits and positives from outputs/extra_year_eval.csv
+        ey = e.get("extra_year")
+        if ey is not None and "older year" in low and "2023" in low:
+            for m in re.finditer(r"\b(\d+) of (\d+)\b", line):
+                if (int(m.group(1)), int(m.group(2))) != (ey["hits"], ey["positives"]):
+                    probs.append(f"{where}: 2023 back-test claim {m.group(0)}, outputs/extra_year_eval.csv has {ey['hits']} of {ey['positives']}")
         # 9. leftover TODO markers
         if "TODO(" in line:
             probs.append(f"{where}: leftover TODO( marker")
@@ -534,7 +545,7 @@ def main(root=ROOT) -> int:
     probs = gov_summary_problems(e)
     for f in files(root):
         probs += check_text(str(f.relative_to(root)), f.read_text(errors="ignore"), e)
-    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", "entire", "entire_machines", "findings", *GOV_SUMMARIES)}
+    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("extra_year", "guardian", "entire", "entire_machines", "findings", *GOV_SUMMARIES)}
     shown["gov_summaries"] = sorted(k for k in GOV_SUMMARIES if k in e)
     if "guardian" in e:
         shown["passed_guardian"] = e["guardian"].get("passed_guardian")
