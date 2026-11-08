@@ -1,0 +1,5 @@
+replica,scheme,positives,k,oof_ap,oof_hits_top_k,vendor_known_share
+2024,ungrouped (stratified 5-fold),27,198,0.0333,7,0.849
+2024,"vendor-grouped (whole vendors held out, 5-fold)",27,198,0.0426,6,0.849
+2025,ungrouped (stratified 5-fold),48,243,0.1034,19,0.65
+2025,"vendor-grouped (whole vendors held out, 5-fold)",48,243,0.0424,10,0.65

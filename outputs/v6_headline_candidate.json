@@ -1,0 +1,103 @@
+{
+ "primary": "v6 CANDIDATE (not adopted until Jack's verdict): 20-seed LightGBM bag, v5 features, regularised settings (b/rank candidate I)",
+ "pooled_hits_bag": 27,
+ "baseline_pooled_hits": 19,
+ "forward_train2024_test2025": {
+  "bag_hits": 18,
+  "baseline_hits": 13,
+  "diff_cve_level_90": [
+   0.0,
+   10.0
+  ],
+  "diff_event_clustered_90": [
+   -2.0,
+   12.0
+  ]
+ },
+ "stability_train2025_test2024": {
+  "bag_hits": 9,
+  "baseline_hits": 6
+ },
+ "pooled": {
+  "diff_cve_level_90": [
+   2.0,
+   14.0
+  ],
+  "diff_event_clustered_90": [
+   1.0,
+   15.0
+  ]
+ },
+ "seeds": {
+  "bag_seeds": 20,
+  "single_seed_pooled_hits_mean_min_max": [
+   26.75,
+   25,
+   28
+  ],
+  "placebo": "30 real 5-seed bags vs 30 shuffled-label 5-seed bags"
+ },
+ "v6_minus_v5_pooled_hits": 6,
+ "v6_vs_v5": {
+  "forward": {
+   "diff": 6,
+   "diff_cve_level_90": [
+    2.0,
+    10.0
+   ],
+   "diff_event_clustered_90": [
+    1.0,
+    12.0
+   ]
+  },
+  "stability": {
+   "diff": 0,
+   "diff_cve_level_90": [
+    -2.0,
+    2.0
+   ],
+   "diff_event_clustered_90": [
+    -2.0,
+    2.0
+   ]
+  },
+  "pooled": {
+   "diff": 6,
+   "diff_cve_level_90": [
+    2.0,
+    11.0
+   ],
+   "diff_event_clustered_90": [
+    1.0,
+    13.0
+   ]
+  }
+ },
+ "placebo_bootstrap_p": 0.0,
+ "positives": {
+  "2024": 27,
+  "2025": 48
+ },
+ "leakage": {
+  "source": "outputs/v6_leakage_check.csv",
+  "honest": {
+   "pooled_hits": 27,
+   "forward_train2024_test2025": 18,
+   "stability_train2025_test2024": 9
+  },
+  "leaky": {
+   "pooled_hits": 33,
+   "forward_train2024_test2025": 21,
+   "stability_train2025_test2024": 12
+  }
+ },
+ "final_params": {
+  "num_leaves": 3,
+  "min_child_samples": 200,
+  "n_estimators": 150,
+  "reg_lambda": 30,
+  "scale_pos_weight": 1,
+  "colsample_bytree": 0.4
+ },
+ "note": "CANDIDATE ONLY. LOW POWER (75 positives). headline.json (v5) is unchanged until Jack's verdict."
+}

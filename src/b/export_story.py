@@ -15,6 +15,7 @@ from src.b import runlog
 from src.b.charts import blind_spot_counts, diff90, mechanism_file
 from src.b.explain import cna_name
 from src.b.text_features import FLAGS
+from src.common import primary
 from src.common.paths import DATA_DIR, OUT_DIR, REPO_ROOT
 
 SITE_DATA = REPO_ROOT / "site" / "data"
@@ -87,8 +88,8 @@ def why_traits(P):
 
 
 def blind_cves():
-    """The blind-spot CVEs our headline model caught (outputs/v5_blindspots.csv from src.b.leakage), with their KEV vendor."""
-    p = OUT_DIR / "v5_blindspots.csv"
+    """The blind-spot CVEs our headline model caught (the primary model's blind-spot file from src.b.leakage), with their KEV vendor."""
+    p = primary.file("blindspots")
     kev = pd.read_csv(DATA_DIR / "known_exploited.csv", usecols=["cve_id", "vendor"]).drop_duplicates("cve_id").set_index("cve_id")["vendor"]
     if p.exists() and "ours_caught_cves" in pd.read_csv(p, nrows=1).columns:
         d = pd.read_csv(p).query("group == 'blind-spot'").dropna(subset=["ours_caught_cves"])
@@ -106,8 +107,8 @@ def pools():
 
 
 def latest_top():
-    files = sorted(OUT_DIR.glob("top500_v*.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[-1]))
-    return files[-1].stem, pd.read_csv(files[-1])
+    p = primary.file("top500")
+    return p.stem, pd.read_csv(p)
 
 
 def nearest_kev_one(cve: str, year: int, out_dir=OUT_DIR, data_dir=DATA_DIR) -> dict:
@@ -224,7 +225,7 @@ def main():
                      "spot_the_year_auc": json.loads((OUT_DIR / "b_drift.json").read_text())["spot_the_year_auc"]}
 
     # 7. too good to be true
-    lk = pd.read_csv(OUT_DIR / "leakage_results.csv")
+    lk = pd.read_csv(primary.file("leakage"))
     from src.b.leakage import banned_columns
     an = []
     for y in (2024, 2025):

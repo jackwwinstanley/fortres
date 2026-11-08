@@ -1,15 +1,19 @@
 # Write-up sections: Person B (final draft)
 
-For Jack to merge into the main README write-up (#23). Numbers: v5 headline model, `outputs/headline.json`,
+For Jack to merge into the main README write-up (#23). Numbers: v6 headline model, `outputs/headline.json`,
 `outputs/b_*_report.md`. Each section is short on purpose: lead with the finding, then how we know.
 
-## 0. Results (v5 headline model, `outputs/headline.json`)
-- **Forward test (train 2024 → test 2025): 12 vs 13**, one behind the best simple rule (90% range −6 to +3).
+## 0. Results (v6 headline model, `outputs/headline.json`)
+- **Forward test (train 2024 → test 2025): 18 vs 13**, five ahead of the best simple rule (90% range 0 to +10).
 - Stability check (train 2025 → test 2024): 9 vs 6.
-- Pooled over both: **21 vs 19** (+2, 90% range −4 to +8). The gain is small and could be luck.
-- Leakage test: adding after-the-fact columns lifts the same model from 21 to **28** (17 + 11).
+- Pooled over both: **27 vs 19** (+8, 90% range +2 to +14). Low power: 75 positives, and on matched seeds v6 beats v5 by only +2 to +5.
+- v6 was chosen from seven declared variants by a rule fixed before any result (`outputs/rank_report.md`). The previous
+  model, v5, scored 12 + 9 = 21 (`docs/considered_not_adopted.md`).
+- Caveat: holding out whole vendors roughly halves v5's 2025 in-year hits (19 → 10), so part of the skill is vendor
+  familiarity (`outputs/rank_vendor_cv.csv`).
+- Leakage test: adding after-the-fact columns lifts the same model from 27 to **33** (21 + 12).
 - Blind spots: 44 of 75 CVEs added to KEV had no public exploit code and a low EPSS; the simple rule catches 0 of them,
-  the v5 bag 2.
+  the v6 bag 5 (three of them one Ivanti EPM event).
 - Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
 
 What holds up: the blind spots, the July 2026 EPSS step, and the leakage test.
@@ -17,9 +21,9 @@ What holds up: the blind spots, the July 2026 EPSS step, and the leakage test.
 ## 1. Blind spots: what the standard signals can't see
 Of the 75 CVEs added to CISA KEV in our two practice years, **44 (59%) were blind spots**: no public exploit
 code (Exploit-DB, Metasploit, Nuclei, GitHub PoC) and a within-month EPSS rank too low for a top-k EPSS list.
-The best simple rule (public exploit first, then EPSS) catches **0** of them by construction. Our v5 model catches
-**2** (two Fortinet FortiOS flaws, CVE-2024-23113 and CVE-2025-24472) through its text features (keyword flags plus
-Granite-embedding similarity to past KEV entries). Same v5 setup, one 20-seed bag each:
+The best simple rule (public exploit first, then EPSS) catches **0** of them by construction. Our v6 model catches
+**5**: three from one Ivanti EPM event (CVE-2024-13159, CVE-2024-13160, CVE-2024-13161) and two Fortinet FortiOS flaws
+(CVE-2024-23113, CVE-2025-24472). The text-feature ablation below was run on the previous model (v5), one 20-seed bag each:
 
 | text features removed | blind spots caught | flagged caught | total |
 |---|---|---|---|
@@ -53,9 +57,9 @@ so the model drops raw EPSS and ranks it within each snapshot month (v4/v5). Ass
 also moved. *Figures: `drift_psi.png`, `drift_epss.png`.*
 
 ## 4. Leakage experiment: what cheating would look like
-Same v5 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
-counts, blank-vs-filled CVSS/CWE, exploit-tagged links): pooled hits jump from **21 to 28** (2025: 12 → 17;
-2024: 9 → 11; 29 was the earlier v4 run). The reason is stark: **every** CVE added to KEV in both practice years is "Analyzed" in today's NVD,
+Same v6 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
+counts, blank-vs-filled CVSS/CWE, exploit-tagged links): pooled hits jump from **27 to 33** (2025: 18 → 21;
+2024: 9 → 12; on v5 it was 21 to 28, and 29 was the earlier v4 run). The reason is stark: **every** CVE added to KEV in both practice years is "Analyzed" in today's NVD,
 against about half of the rest, because NVD analyses KEV-listed CVEs first. None of these columns are in our model;
 an independent column review (`docs/column_review.md`) found no leak.
 *Figure: `leakage.png`.*

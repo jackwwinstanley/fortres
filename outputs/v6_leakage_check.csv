@@ -1,0 +1,5 @@
+direction,model,hits,k,settings
+forward_train2024_test2025,honest,18,243,"{""num_leaves"": 2, ""min_child_samples"": 200, ""n_estimators"": 150, ""reg_lambda"": 30, ""scale_pos_weight"": 10, ""colsample_bytree"": 0.4}"
+forward_train2024_test2025,leaky,21,243,"{""num_leaves"": 2, ""min_child_samples"": 200, ""n_estimators"": 150, ""reg_lambda"": 30, ""scale_pos_weight"": 10, ""colsample_bytree"": 0.4}"
+stability_train2025_test2024,honest,9,198,"{""num_leaves"": 3, ""min_child_samples"": 200, ""n_estimators"": 150, ""reg_lambda"": 30, ""scale_pos_weight"": 10, ""colsample_bytree"": 0.6}"
+stability_train2025_test2024,leaky,12,198,"{""num_leaves"": 3, ""min_child_samples"": 200, ""n_estimators"": 150, ""reg_lambda"": 30, ""scale_pos_weight"": 10, ""colsample_bytree"": 0.6}"

@@ -182,7 +182,7 @@ def test_without_granite_nothing_claims_guardian(tmp_path):
 
 
 def test_templates_are_grounded_for_the_tracked_facts():
-    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / "top500_v5.csv"))
+    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / ex.TOP_FILE))
     for _, r in f.iterrows():
         assert ex.check_reason(ex.template(r), ex.facts_text(r)) == [], r["cve_id"]
         for phrase in ex.BLOCKED_PHRASES:                     # the fallback contains none of the blocked phrases
@@ -215,7 +215,9 @@ PHRASE_SENTENCES = {
                        "The ranking model considers the history.", "It shares high similarity to past exploited CVEs with a top 1% IBM Granite KEV-likeness.",
                        "It shares a top 7% KEV-likeness with other 2026 descriptions.", "It has a GitHub proof of concept for a proof of exploit.",
                        "It is a weakness hint of unauthenticated vulnerability.", "It is unauthenticated enterprise-software related.",
-                       "It is an enterprise-software-related flaw."],
+                       "It is an enterprise-software-related flaw.",
+                       "Prioritised because it has a GitHub proof of concept for public exploit code and the reporting organisation's history of exploited CVEs.",
+                       "Prioritised because it has a GitHub proof of concept in public exploit code and a mentioned vendor's history of exploited CVEs."],
     "causal links": ["Placing it in the top group.", "It is placed first.", "Thereby ranking it higher.", "Therefore it ranks high.", "Thus it ranks high.",
                      "Hence it ranks high.", "Reflecting its history.", "Suggesting a pattern.", "It implies a pattern.", "Resulting in a high rank.",
                      "Leading to a high rank.", "It matters due to its exploit code.", "As evidenced by the code."],
@@ -284,7 +286,7 @@ def test_committed_explanations_are_consistent_and_pass_todays_checks():
     assert d["reason"].equals(d["explanation"]) and d["cve_id"].is_unique and len(d) == 500
     assert (d.loc[d["source"] == "granite", "guardian_verdict"] == "No").all()      # a Granite sentence is only ever kept after Guardian said No
     assert (d.loc[d["source"] == "template", "guardian_verdict"] != "No").all()     # nothing claims Guardian passed a template row
-    top = pd.read_csv(ex.OUT_DIR / "top500_v5.csv")
+    top = pd.read_csv(ex.OUT_DIR / ex.TOP_FILE)
     f = ex.facts_for(top).set_index("cve_id")
     for _, r in d[d["source"] == "granite"].iterrows():
         row = f.loc[r["cve_id"]].copy()
@@ -423,7 +425,7 @@ def test_the_example_shown_to_the_model_passes_every_local_check():
 
 
 def test_at_most_three_facts_and_the_template_restates_exactly_those():
-    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / "top500_v5.csv"))
+    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / ex.TOP_FILE))
     for _, r in f.iterrows():
         sel = ex.selected_facts(r)
         assert 1 <= len(sel) <= ex.MAX_FACTS
@@ -510,10 +512,62 @@ def test_unflagged_sentences_with_words_outside_their_facts_are_rejected_by_the_
 
 
 def test_fallback_template_passes_the_new_checks_and_contains_none_of_the_audited_phrases_for_all_500():
-    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / "top500_v5.csv"))
+    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / ex.TOP_FILE))
     assert len(f) == 500
     for _, r in f.iterrows():
         t, facts = ex.template(r), ex.facts_text(r)
         assert ex.local_problems(t, facts) == [], (r["cve_id"], t, ex.local_problems(t, facts))
         for phrase in ex.BLOCKED_PHRASES:
             assert not re.search(rf"\b(?:{phrase})\b", t, re.I), (r["cve_id"], phrase)
+
+
+# ---- the primary model's list (v6): list, contributions and explanations must belong together ----------------------------
+def test_primary_list_and_contribution_file_are_the_same_model():
+    assert (ex.PRIMARY, ex.TOP_FILE, ex.CONTRIB_FILE) == ("v6", "top500_v6.csv", "v6_top500_contrib.parquet")
+    assert ex.latest_top() == str(ex.OUT_DIR / ex.TOP_FILE)
+    top = pd.read_csv(ex.OUT_DIR / ex.TOP_FILE)["cve_id"].tolist()
+    assert pd.read_parquet(ex.OUT_DIR / ex.CONTRIB_FILE)["cve_id"].tolist() == top
+
+
+def test_facts_for_refuses_a_list_that_is_not_in_the_contribution_file():
+    top = pd.read_csv(ex.OUT_DIR / "top500_v5.csv").head(500)
+    foreign = top[~top["cve_id"].isin(pd.read_parquet(ex.OUT_DIR / ex.CONTRIB_FILE)["cve_id"])]
+    if foreign.empty:
+        pytest.skip("v5 list is contained in the v6 contribution file")
+    with pytest.raises(AssertionError, match="same model"):
+        ex.facts_for(foreign)
+
+
+def test_committed_explanations_cover_exactly_the_primary_list_in_order():
+    d = pd.read_csv(ex.OUT_DIR / "explanations.csv")
+    assert d["cve_id"].tolist() == pd.read_csv(ex.OUT_DIR / ex.TOP_FILE)["cve_id"].tolist()
+    s = json.loads((ex.OUT_DIR / "explanations_summary.json").read_text())
+    assert s["top_list"] == ex.TOP_FILE and s["total"] == 500
+
+
+def test_classify_splits_the_cache_into_kept_changed_failed_new_and_retry():
+    its = {c: dict(cve_id=c, facts=f"- CVE: {c}\n- Public exploit code: Metasploit", key=f"k-{c}") for c in "abcdefg"}
+    good = "Prioritised because it has public exploit code (Metasploit)."
+    rec = lambda c, **kw: dict(cve_id=c, key=f"k-{c}", explanation=good, source="granite", guardian_verdict="No", draft=good, **kw)  # noqa: E731
+    recs = {
+        "a": rec("a"),                                                                         # same key, passes -> kept
+        "b": {**rec("b"), "key": "old"},                                                       # facts changed -> changed
+        "c": {**rec("c"), "draft": "Prioritised because it is the most critical flaw."},       # same key, fails today's checks -> failed
+        "d": dict(cve_id="d", key="k-d", explanation="T", source="template", guardian_verdict="Yes", draft=good),   # a template row stays
+        "e": dict(cve_id="e", key="k-e", explanation="T", source="template", guardian_verdict="not_run", draft=None),  # never drafted -> retry
+        "f": dict(cve_id="f", key="k-f", explanation="T", source="template", guardian_verdict="not_run", draft="bad draft"),  # drafted and rejected: kept
+    }
+    got = ex.classify(list(its.values()), recs)           # "g" has no record at all
+    assert got == {"kept": ["a", "d", "f"], "changed": ["b"], "failed": ["c"], "new": ["g"], "retry": ["e"]}
+
+
+def test_the_driver_list_pattern_blocks_the_join_but_not_a_separate_clause_or_the_template():
+    facts = "- CVE: CVE-2026-1\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: path traversal"
+    ok = "Prioritised because it has a GitHub proof of concept for public exploit code and it is a path traversal weakness."
+    assert not any(p.startswith("blocked phrase") for p in ex.check_reason(ok, facts))
+    epss = "Prioritised because it has a GitHub proof of concept for public exploit code and its EPSS percentile within its month is in the top 9%."
+    assert not any(p.startswith("blocked phrase") for p in ex.local_problems(epss, facts + "\n- EPSS percentile within its month: top 9%"))     # a separate clause
+    join = "Prioritised because it has a GitHub proof of concept for public exploit code and the reporting organisation's history of exploited CVEs."
+    assert any("proof of concept" in p for p in ex.check_reason(join, facts))
+    f = ex.facts_for(pd.read_csv(ex.OUT_DIR / ex.TOP_FILE))                    # the driver-only templates say 'public exploit code and the reporting ...'
+    assert all(not any(p.startswith("blocked phrase") for p in ex.check_reason(ex.template(r), ex.facts_text(r))) for _, r in f.iterrows())

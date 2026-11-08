@@ -1,0 +1,6 @@
+seed_set,forward_hits,stability_hits,pooled_hits,used_for_noise_floor
+seeds 0-19 (the headline bag),12,9,21,no (reference)
+seeds 1000-1019,15,9,24,yes
+seeds 2000-2019,12,9,21,yes
+seeds 3000-3019,15,10,25,yes
+spread (max - min over the 3 new sets),3,1,4,noise floor = pooled spread

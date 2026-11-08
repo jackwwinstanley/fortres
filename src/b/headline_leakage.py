@@ -1,4 +1,5 @@
-"""Put the leakage experiment's hit counts into outputs/headline.json, read from outputs/leakage_results.csv.
+"""Put the leakage experiment's hit counts into outputs/headline.json, read from the primary model's leakage file
+(src/common/primary.py: outputs/v6_leakage_results.csv).
 
 Run:  python -m src.b.headline_leakage
 
@@ -10,6 +11,7 @@ import json
 
 import pandas as pd
 
+from src.common import primary
 from src.common.paths import OUT_DIR
 
 # headline.json key -> `direction` value in leakage_results.csv (same naming as the other headline.json blocks)
@@ -17,10 +19,11 @@ DIRECTIONS = {"forward_train2024_test2025": "train2024_test2025", "stability_tra
 ARMS = ("honest", "leaky")
 
 
-def leakage_summary(csv_path=OUT_DIR / "leakage_results.csv") -> dict:
+def leakage_summary(csv_path=None) -> dict:
     """Pooled hits plus the forward / stability split for the honest and the leaky model."""
+    csv_path = primary.file("leakage") if csv_path is None else csv_path
     df = pd.read_csv(csv_path)
-    out = {"source": "outputs/leakage_results.csv"}
+    out = {"source": f"outputs/{csv_path.name}"}
     for arm in ARMS:
         per_dir = {}
         for key, direction in DIRECTIONS.items():
@@ -38,7 +41,7 @@ def update_headline(out_dir=OUT_DIR) -> dict:
     head = json.loads(path.read_text())
     note = head.pop("note", None)
     head.pop("leakage", None)
-    head["leakage"] = leakage_summary(out_dir / "leakage_results.csv")
+    head["leakage"] = leakage_summary(primary.file("leakage", out_dir=out_dir))
     if note is not None:
         head["note"] = note
     path.write_text(json.dumps(head, indent=1))  # same format train_v5.py writes

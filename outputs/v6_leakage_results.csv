@@ -1,0 +1,11 @@
+direction,replica,note,k,positives,model,hits,expected,ci_lo,ci_hi,ap
+train2024_test2025,2025,primary (forward in time),243,48,CVSS 3 first,5,5.12,1.0,9.0,0.0063
+train2024_test2025,2025,primary (forward in time),243,48,EPSS first,8,8.0,4.0,13.0,0.0322
+train2024_test2025,2025,primary (forward in time),243,48,"Exploit code, then EPSS",13,13.0,8.0,20.0,0.048
+train2024_test2025,2025,primary (forward in time),243,48,honest,18,18.0,11.0,25.0,0.079
+train2024_test2025,2025,primary (forward in time),243,48,leaky,21,21.0,14.0,28.0,0.13
+train2025_test2024,2024,stability check (NOT forward in time),198,27,CVSS 3 first,0,0.26,0.0,0.0,0.003
+train2025_test2024,2024,stability check (NOT forward in time),198,27,EPSS first,3,3.0,1.0,6.0,0.0147
+train2025_test2024,2024,stability check (NOT forward in time),198,27,"Exploit code, then EPSS",6,6.0,2.0,10.0,0.0242
+train2025_test2024,2024,stability check (NOT forward in time),198,27,honest,9,9.0,5.0,15.0,0.0453
+train2025_test2024,2024,stability check (NOT forward in time),198,27,leaky,12,12.0,7.0,18.0,0.1065
