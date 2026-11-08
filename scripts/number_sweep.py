@@ -16,17 +16,21 @@ README.md. Checks:
   6. "N of M" blind-spot claims must equal the v5 blind-spot totals;
   7. Guardian counts in prose ("N of 500 ... passed") must equal `passed_guardian` in outputs/explanations_summary.json
      (without that file, any such count is an error);
+  8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it
+     names in outputs/explanations_summary.json (dotted names such as `guardian_verdicts.No` are looked up inside objects);
   9. no leftover "TODO(" markers in any checked file;
  10. explanation counts in prose: "N template(s)" must equal `template_fallback` and "N pending" must equal `pending`
      (only on lines that are about the reasons/explanations/Guardian);
-  8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it
-     names in outputs/explanations_summary.json (dotted names such as `guardian_verdicts.No` are looked up inside objects);
-  9. watsonx.governance numbers, in every checked file: a sentence or clause that names watsonx.governance is HOSTED unless it
+ 11. watsonx.governance numbers, in every checked file: a sentence or clause that names watsonx.governance is HOSTED unless it
      says the scores were computed locally (or names a local-only metric: token overlap, BERTScore, readability), then it is
      LOCAL. Every decimal and every "N of M" in a HOSTED clause must come from outputs/watsonx_gov_summary.json, and in a
      LOCAL clause from outputs/gov_metrics_summary.json, so one file can never feed the other's claim. A number claimed
      without its summary file is an error. The summaries' own `claim` must say "hosted on IBM watsonx.governance" (hosted)
-     and must not say "hosted" (local).
+     and must not say "hosted" (local);
+ 12. docs/entire.md: every row `| item | N | `field` |` must equal that field of outputs/entire_summary.json, and every other number
+     in its prose (outside code spans, code blocks, links and list markers) must be a value, date, timestamp or the version
+     stored in that file; the doc without the file is an error;
+ 13. on any line that mentions Entire, "N checkpoints" and "N sessions" must equal n_checkpoints and n_sessions in that file.
 """
 import json
 import re
@@ -41,6 +45,7 @@ FINAL_DOCS = {"docs/writeup_person_b.md", "docs/devpost_final.md", "docs/judge_q
               "docs/page_content.md", "README.md", "site/index.html"}
 MINUS = "[−-]"
 MODEL_CARD = "docs/model_card.md"
+ENTIRE_DOC = "docs/entire.md"
 GOV_SUMMARIES = {"watsonx_gov": "watsonx_gov_summary.json", "gov_local": "gov_metrics_summary.json"}
 GOV_NAME = re.compile(r"watsonx[ .]?governance", re.I)
 GOV_LOCAL = re.compile(r"\blocal(?:ly)?\b|no ibm service|token[- ]overlap|word[- ]overlap|bert ?score|readab|flesch|"
@@ -85,6 +90,9 @@ def expected(out=OUT) -> dict:
     gs = out / "explanations_summary.json"
     if gs.exists():
         e["guardian"] = json.loads(gs.read_text())
+    es = out / "entire_summary.json"
+    if es.exists():
+        e["entire"] = json.loads(es.read_text())
     for kind, name in GOV_SUMMARIES.items():
         if (out / name).exists():
             e[kind] = json.loads((out / name).read_text())
@@ -129,6 +137,14 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
                 if tot == e["leaky"] or (x, y) == e["leaky_split"]:
                     if (tot, (x, y)) != (e["leaky"], e["leaky_split"]):
                         probs.append(f"{where}: leaky split {m.group(0)}, expected {e['leaky']} {e['leaky_split']}")
+        # 13. Entire counts wherever Entire is mentioned
+        if "entire" in low and "entire" in e:
+            for m in re.finditer(r"\b(\d[\d,]*) (?:entire )?checkpoints?\b", low):
+                if int(m.group(1).replace(",", "")) != e["entire"].get("n_checkpoints"):
+                    probs.append(f"{where}: {m.group(1)} checkpoints, outputs/entire_summary.json has n_checkpoints = {e['entire'].get('n_checkpoints')}")
+            for m in re.finditer(r"\b(\d[\d,]*) (?:claude code )?sessions?\b", low):
+                if int(m.group(1).replace(",", "")) != e["entire"].get("n_sessions"):
+                    probs.append(f"{where}: {m.group(1)} sessions, outputs/entire_summary.json has n_sessions = {e['entire'].get('n_sessions')}")
         if not final:
             continue
         # 4. result pairs against the simple rule / baseline
@@ -171,6 +187,8 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
                     probs.append(f"{where}: pending count {m.group(1)}, expected pending = {g.get('pending')}")
     if rel == MODEL_CARD:
         probs += check_guardian_table(rel, text, e)
+    if rel == ENTIRE_DOC:
+        probs += check_entire_doc(rel, text, e.get("entire"))
     probs += check_gov_numbers(rel, text, e)
     return probs
 
@@ -271,15 +289,85 @@ def check_guardian_table(rel: str, text: str, e: dict) -> list[str]:
     return probs
 
 
+def _numbers_in(summary: dict) -> set[int]:
+    """Every integer stored anywhere in the summary (booleans are not numbers)."""
+    found = set()
+    if isinstance(summary, dict):
+        for v in summary.values():
+            found |= _numbers_in(v)
+    elif isinstance(summary, list):
+        for v in summary:
+            found |= _numbers_in(v)
+    elif isinstance(summary, int) and not isinstance(summary, bool):
+        found.add(summary)
+    return found
+
+
+def _dates_in(summary: dict) -> set[str]:
+    """Every YYYY-MM-DD that appears as a key or as the start of a stored timestamp."""
+    found = set()
+    if isinstance(summary, dict):
+        for k, v in summary.items():
+            found |= set(re.findall(r"\d{4}-\d\d-\d\d", str(k))) | _dates_in(v)
+    elif isinstance(summary, str):
+        found |= set(re.findall(r"\d{4}-\d\d-\d\d", summary))
+    return found
+
+
+def _strip_entire_prose(text: str) -> str:
+    text = re.sub(r"```.*?```", " ", text, flags=re.S)                  # fenced code blocks
+    text = re.sub(r"`[^`\n]*`", " ", text)                              # inline code spans
+    text = re.sub(r"\]\([^)]*\)", "]", text)                             # link targets
+    text = re.sub(r"https?://\S+", " ", text)                           # bare URLs
+    return re.sub(r"(?m)^\s*(?:#+\s*)?\d+[.)]\s", " ", text)            # list numbers and numbered headings
+
+
+ENTIRE_TOKEN = re.compile(r"(?<![\w.#/-])(\d{4}-\d\d-\d\dT[\d:]+Z|\d{4}-\d\d-\d\d|\d+\.\d+\.\d+|\d[\d,]*)(?![\w-])")
+
+
+def check_entire_doc(rel: str, text: str, summary: dict | None) -> list[str]:
+    """docs/entire.md: table rows tie a number to a named field; every other number in the prose must be a value in the summary."""
+    if summary is None:
+        return [f"{rel}: this document needs outputs/entire_summary.json to check its numbers against"]
+    probs = []
+    for n, line in enumerate(text.splitlines(), 1):                    # rows like  | label | 30 | `n_checkpoints` |
+        m = re.match(r"^\|[^|]*\|\s*(\d[\d,]*)\s*\|([^|]*`[^|]*)\|\s*$", line)
+        if not m:
+            continue
+        for f in re.findall(r"`([A-Za-z_][\w.\-]*)`", m.group(2)):
+            want = _field(summary, f)
+            if want is None:
+                probs.append(f"{rel}:{n}: table names `{f}`, which is not in outputs/entire_summary.json")
+            elif int(m.group(1).replace(",", "")) != want:
+                probs.append(f"{rel}:{n}: table says {m.group(1)} for `{f}`, summary has {want}")
+    allowed_ints, allowed_dates = _numbers_in(summary), _dates_in(summary)
+    stamps = {summary.get(k) for k in ("generated_at", "first_checkpoint_at", "last_checkpoint_at")}
+    for n, line in enumerate(_strip_entire_prose(text).splitlines(), 1):
+        for tok in ENTIRE_TOKEN.findall(line):
+            if re.fullmatch(r"\d{4}-\d\d-\d\dT[\d:]+Z", tok):
+                ok = tok in stamps
+            elif re.fullmatch(r"\d{4}-\d\d-\d\d", tok):
+                ok = tok in allowed_dates
+            elif tok.count(".") == 2:
+                ok = tok == summary.get("entire_version")
+            else:
+                ok = int(tok.replace(",", "")) in allowed_ints
+            if not ok:
+                probs.append(f"{rel}: the number {tok!r} in the prose is not in outputs/entire_summary.json (write it in words, in a code span, or fix it)")
+    return probs
+
+
 def main(root=ROOT) -> int:
     e = expected(root / "outputs")
     probs = gov_summary_problems(e)
     for f in files(root):
         probs += check_text(str(f.relative_to(root)), f.read_text(errors="ignore"), e)
-    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", *GOV_SUMMARIES)}
+    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k not in ("guardian", "entire", *GOV_SUMMARIES)}
     shown["gov_summaries"] = sorted(k for k in GOV_SUMMARIES if k in e)
     if "guardian" in e:
         shown["passed_guardian"] = e["guardian"].get("passed_guardian")
+    if "entire" in e:
+        shown["entire"] = [e["entire"].get("n_checkpoints"), e["entire"].get("n_sessions")]
     print(f"number sweep: expected {json.dumps(shown)}")
     if probs:
         print(f"{len(probs)} problem(s):")

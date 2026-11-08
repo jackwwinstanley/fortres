@@ -1,0 +1,23 @@
+{
+ "generated_at": "2026-11-08T06:42:18Z",
+ "entire_version": "0.13.1",
+ "n_checkpoints": 30,
+ "n_sessions": 2,
+ "first_checkpoint_at": "2026-11-07T18:44:05Z",
+ "last_checkpoint_at": "2026-11-08T06:01:26Z",
+ "checkpoints_by_day": {
+  "2026-11-07": 21,
+  "2026-11-08": 9
+ },
+ "agents": [
+  "Claude Code"
+ ],
+ "push_sessions": false,
+ "contains_transcripts": false,
+ "checkpoints_by_origin": {
+  "imported": 27,
+  "live": 3
+ },
+ "time_basis": "UTC",
+ "n_checkpoints_unparsed": 0
+}

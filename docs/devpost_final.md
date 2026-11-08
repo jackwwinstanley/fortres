@@ -77,8 +77,16 @@ description, the way an analyst would, can help.
   priors from similar past CVEs) on more practice years; see `docs/considered_not_adopted.md`.
 - Run the Granite steps on watsonx so they're governed and repeatable.
 
+## Best Use of Entire
+We used Entire as an audit trail for the AI-assisted part of the work: Claude Code sessions captured as checkpoints and linked to
+commits, inside our own repository. The evidence we publish is a counts-and-timestamps file (30 checkpoints from 2 sessions in
+`outputs/entire_summary.json`) made by a script that never reads a prompt or transcript, with tests that fail if a path or an
+address ever reaches it. The checkpoints themselves stay on one laptop with `push_sessions` off, because transcripts contain
+personal data; the remote has no Entire refs, and the page `docs/entire.md` has the read-only commands to check that. Most
+checkpoints are imports of earlier history, since we enabled Entire part-way through, and we say so.
+
 ## Built with
-python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly
+python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly, entire
 
 ## Links
 - Code: https://github.com/jackwwinstanley/ibm-breach
