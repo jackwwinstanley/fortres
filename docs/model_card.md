@@ -15,7 +15,7 @@ How to read the citations: every number below is read from a file in the repo, a
 Rank the 72,670 CVEs in `data/scoreboard_2026.csv` so that the 500 at the top contain as many as possible of the CVEs CISA adds to its Known Exploited Vulnerabilities (KEV) catalog by 2026-11-04 (`README.md`).
 
 The thing being ranked for is **a listing event, "added to CISA KEV after the end of its snapshot month"**. It is not "attacked", and it is not a probability of attack. Output: the ranked list
-`outputs/top500_v6.csv`, and one plain-English reason per CVE in `outputs/explanations.csv` (written for the v5 list; reasons for v6's new picks are pending, see `outputs/v6_missing_explanations.csv`).
+`outputs/top500_v6.csv`, and one plain-English reason per CVE in `outputs/explanations.csv`, written for the v6 list (`top_list` in `outputs/explanations_summary.json`; `outputs/v6_missing_explanations.csv` lists none missing).
 
 ## 2. Model
 

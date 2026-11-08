@@ -20,8 +20,14 @@ cmp outputs/top500_v5.csv /tmp/top500_v5_committed.csv && echo "identical"   # b
 python -m src.models.train_v6                           # primary model (v6) -> outputs/top500_v6.csv and its checks
 python scripts/check_top500.py outputs/top500_v6.csv    # format check: PASS
 ```
-v6 is the primary model (`src/common/primary.py`); `train_v6` reuses v5's features and data steps above. The v5 timing
-below is for the v5 steps; `train_v6` adds its own checks (placebo, leakage, seed sets) on top.
+v6 is the primary model (`src/common/primary.py`); `train_v6` reuses v5's features and data steps above. In a fresh clone
+`python -m src.models.train_v6` took 6 min 23 s with no caches, including its checks (placebo, leakage, seed sets), and
+rewrote `outputs/top500_v6.csv` byte-for-byte identical to the committed file. The v5 timing below is for the v5 steps.
+
+**Both checkers need the competition data.** `scripts/check_top500.py` and `scripts/check_contract.py` compare the IDs with
+`data/scoreboard_2026.csv`. Without `data/` they stop with one line, "needs data/scoreboard_2026.csv (competition data, not
+in the repo)", and a non-zero exit. The rebuild steps say the same about `data/vulnerabilities.csv`. `pytest -q` runs
+without `data/` (3 tests that need it are skipped).
 - **Time:** a full rebuild takes about 10 minutes on a laptop CPU. In a fresh clone it took 8 min 38 s: replicas 1 s,
   features 6 s, train_v5 8 min 30 s (most of it hyper-parameter grids and the placebo). Allow up to ~30 minutes on a
   slower machine.

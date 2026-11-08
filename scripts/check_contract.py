@@ -10,7 +10,7 @@ import pyarrow.parquet as pq  # noqa: E402
 
 from scripts.check_top500 import check as check_top500  # noqa: E402
 from src.common import schema as S  # noqa: E402
-from src.common.paths import OUT_DIR  # noqa: E402
+from src.common.paths import OUT_DIR, SCOREBOARD_CSV, missing_data_message  # noqa: E402
 
 
 def _type_ok(t: pa.DataType, code: str) -> bool:
@@ -77,7 +77,7 @@ def check_embeddings(out: Path) -> list[str]:
     return probs
 
 
-def main(out: Path = OUT_DIR) -> int:
+def main(out: Path = OUT_DIR, scoreboard: Path = SCOREBOARD_CSV) -> int:
     results = []  # (name, problems | None)
     for name, spec in S.SCHEMAS.items():
         p = out / name
@@ -93,8 +93,10 @@ def main(out: Path = OUT_DIR) -> int:
     else:
         results.append((S.EMB_NPY, None))
     tops = sorted(out.glob(S.TOP500_PATTERN))
-    if tops:
-        results += [(t.name, check_top500(t)) for t in tops]
+    if tops and not Path(scoreboard).exists():
+        results += [(t.name, [missing_data_message(scoreboard)]) for t in tops]
+    elif tops:
+        results += [(t.name, check_top500(t, scoreboard)) for t in tops]
     else:
         results.append(("top500_vN.csv", None))
 
