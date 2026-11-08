@@ -37,7 +37,7 @@
   <section class="step" data-s="cost"><div class="card">
     <span class="num blue">$4.99M</span>
     <h2>Miss it, and it gets <mark>expensive</mark>.</h2>
-    <p>That's the average cost of one data breach, from IBM's 2026 report. So choosing which holes to fix first is a five-million-dollar decision. And it's ordinary people's passwords and bank details that leak, maybe your mom's.</p>
+    <p>That's the average cost of one data breach worldwide, from IBM's Cost of a Data Breach Report 2026. So choosing which holes to fix first is a five-million-dollar decision. And it's ordinary people's passwords and bank details that leak.</p>
   </div></section>
 
   <section class="step" data-s="cloud"><div class="card">
@@ -64,8 +64,8 @@
     <span class="num mint">52&times;<small>better than chance</small></span>
     <h2>We flag <mark>under 1%</mark> of holes and find over a third of the ones that matter.</h2>
     <p>Only 1 in 855 holes ever gets added to CISA's list. 1 in 16 of fortres's picks did. In our 2024 and 2025 test, fortres flagged 441 of 64,119 holes (0.69%) and caught 27 of the 75 that landed on the list (36%). The top of the list is sharpest: of its top 100 each year, 1 in 9 got added.</p>
-    <div class="vs sm"><div><span class="num mint">27</span><span class="l">fortres</span></div><div><span class="num blue">11</span><span class="l">EPSS score alone</span></div><div><span class="num amber">5</span><span class="l">by severity</span></div></div>
-    <span class="note">5.4&times; better than patching by severity · 2.5&times; better than EPSS alone</span>
+    <div class="vs sm"><div><span class="num mint">27</span><span class="l">fortres</span></div><div><span class="num" style="color:var(--mute)">19</span><span class="l">usual rule</span></div><div><span class="num blue">11</span><span class="l">EPSS score alone</span></div><div><span class="num amber">5</span><span class="l">by severity</span></div></div>
+    <span class="note"><span class="count" data-to="27">27</span> vs <span class="count" data-to="19">19</span> for the usual rule: +8, 90% range from +2 to +14 · 18 to 13 in 2025, 9 to 6 in 2024 · 2.5&times; EPSS alone · 5.4&times; severity</span>
   </div></section>
 
   <section class="step" data-s="work"><div class="card">
@@ -85,7 +85,7 @@
   <section class="step" data-s="blindOurs"><div class="card">
     <span class="num mint">5<small>of those 44</small></span>
     <h2>Fortres still spotted <mark>5 of the quiet ones</mark>.</h2>
-    <p>It reads what each hole lets an attacker do, so it can flag one even when nobody has posted attack code. Five is small, and three come from one Ivanti event. The usual approach catches none of them.</p>
+    <p>Five is small, and three come from one Ivanti event. But the usual rule can't see this group at all.</p>
   </div></section>
 
   <section class="step" data-s="read"><div class="card">
@@ -98,7 +98,7 @@
   <section class="step" data-s="rank"><div class="card">
     <span class="num blue">0.59<small>seconds</small></span>
     <h2>Then a model <mark>ranks all 72,670</mark>, on a laptop.</h2>
-    <p>It weighs public attack code, warning scores, the vendor's track record and what Granite read. Twenty models vote, and the top 500 make the list. Ten million holes would take 79 seconds. That's more than a century of holes at today's pace.</p>
+    <p>It weighs public attack code, warning scores, the vendor's track record and what Granite read. Twenty models vote, and the top 500 make the list. Projected from a timing test: ten million holes would take about 79 seconds. That's more than a century of holes at today's pace.</p>
   </div></section>
 
   <section class="step" data-s="check"><div class="card">
@@ -113,7 +113,7 @@
   <section class="step" data-s="trust"><div class="card">
     <span class="num mint">27<small>not 33</small></span>
     <h2>We could have claimed 33. <mark>We didn't.</mark></h2>
-    <p>Some data only shows up after an attack. Using it would have added 6 catches, so we left it out. We also reran it with four sets of random seeds and got 26 to 28 every time. Trained on shuffled answers, it catches less than 1.</p>
+    <p>Some data only shows up after an attack. Using it would have taken us from 27 to 33, so we left it out. We also reran it with four sets of random seeds and got 26 to 28 every time. Trained on shuffled answers, it catches less than 1.</p>
   </div></section>
 
   <section class="step" data-s="close"><div class="card">
