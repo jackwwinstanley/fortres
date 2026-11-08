@@ -263,3 +263,10 @@ def test_model_size_wording_is_checked():
     assert ns.check_findings("docs/judge_qa.md", "The ranking is 20 models that vote, each built from 150 small decision trees.", EF) == []
     probs = ns.check_findings("docs/judge_qa.md", "The ranking is 20 models that vote, each built from 100 small decision trees.", EF)
     assert any("150 trees" in p for p in probs), probs
+
+
+def test_the_2023_back_test_claim_is_checked():
+    e = {**E, "extra_year": {"hits": 4, "positives": 22}}
+    assert ns.check_text(FINAL, "On an older year the model never saw, 2023, it caught 4 of 22.", e) == []
+    probs = ns.check_text(FINAL, "On an older year the model never saw, 2023, it caught 9 of 22.", e)
+    assert any("2023 back-test claim" in p for p in probs), probs
