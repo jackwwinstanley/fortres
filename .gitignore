@@ -9,3 +9,12 @@ outputs/pool.csv
 .pytest_cache/
 outputs/b_texts.parquet
 outputs/.cache/
+# virtual environments (any name) and env files
+.venv*
+venv/
+.env
+.env.*
+# the raw datathon data may be a real folder or a symlink to one: `data/` alone does not match a symlink
+/data
+# Person B step outputs that the runbook says are not tracked (PNG previews)
+outputs/b_*.png
