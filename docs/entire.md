@@ -49,13 +49,16 @@ The first checkpoint is dated 2026-11-07T18:44:05Z and the last 2026-11-08T06:01
   imports (strategy `import`); the CLI lists `entire import claude-code` ("Import existing Claude Code transcripts as local,
   read-only history") among its experimental commands, which matches. Their dates in the summary are the session times in the metadata, not the day the import ran.
 - Only the live checkpoints come from the hooks firing on a commit.
-- The snapshot covers one laptop's clone. Checkpoints are local, so a teammate's sessions on another machine are not in it.
+- The snapshot covers only one machine: Jack's laptop clone. Checkpoints are local, so sessions on any other machine are not in it.
 - A second machine, Aba's laptop, has Entire set up the same way (push off, telemetry off, nothing pushed). Its own snapshot
   goes in `outputs/entire_summary_aba.json` (`python scripts/entire_summary.py --label aba`) once it has checkpoints, and its
   table rows name their fields as `aba:n_checkpoints` and so on, so each row is checked against that machine's own file.
 - Two sessions is what Entire recorded here. It is not a count of every Claude Code window the project used.
 
 ## What is published, what is not, and why
+In one sentence: the repository is public and the transcripts contain personal details (home-folder paths and
+e-mail-shaped strings), so we publish counts only and keep the transcripts on the laptop.
+
 Published in the repository: this page, `docs/entire_demo.md`, `scripts/entire_summary.py` with its tests, and
 `outputs/entire_summary.json`. The JSON has counts and timestamps only. The script refuses to write a file whose keys or values
 contain a slash, a backslash, an at-sign or a personal marker, and a test fails if the file ever does. It never reads prompts or
@@ -67,7 +70,7 @@ kept out of git with `.git/info/exclude`, a file that is local to the clone.
 
 Why: the repository is public, and the documentation says that if the repository is public, so are its checkpoints. Transcripts
 contain personal data. We counted with a script, without reading them, how many lines of the local checkpoint data contain a home-folder path or
-an at-sign, and both occur in every checkpoint, including e-mail-shaped strings. Entire's documentation describes redaction as "a safety net rather than a guarantee", and
+an at-sign, and both occur in every checkpoint, including e-mail-shaped strings. Entire's documentation describes its redaction as a safety net that should not be relied on alone, and
 says its layer that redacts e-mail addresses and phone numbers is off by default. So we do not publish transcripts, checkpoint exports or prompts anywhere.
 
 Two further facts. Commits made while Entire is on can carry an `Entire-Checkpoint` trailer; some commits on `main` do. It is an
@@ -95,7 +98,7 @@ git ls-remote origin 'refs/entire/*'
 git branch -r | grep -i 'origin/entire/'
 cat outputs/entire_summary.json
 ```
-The first two print nothing (the `grep` also exits with status one when it finds nothing); that is the proof that no Entire data is on
+The first two print nothing (the `grep` also exits with status one when it finds nothing); that shows no Entire data is on
 the remote. The `grep` looks for Entire's own branch names (`entire/...`), so it ignores this project's branch `a/entire`. The last prints the counts above.
 
 Avoid, when recording or sharing a screen: `entire status` (it lists active sessions with the opening words of each session's latest
