@@ -71,7 +71,7 @@ each CVE only with others from the same month.
 ## 5. Too good to be true (the leakage test)
 **Message:** Some fields in today's database leak the answer. With them, our model would look like it catches 28
 instead of 21, so we don't use them.
-- Honest v5 bag 21 (12 + 9) vs with after-the-fact columns 28 (17 + 11) (`outputs/leakage_results.csv`; on v4 it was 29)
+- Honest v5 bag 21 (12 + 9) vs with after-the-fact columns 28 (17 + 11) (`outputs/leakage_results.csv`; 29 was the earlier v4 run)
 - 100% of CVEs added to KEV are marked "Analyzed" in today's NVD, vs 46% of the others (`story.json → leak`)
 - No leak in the honest model: independent column review (`docs/column_review.md`) and Person A's audit (`outputs/v5_report.md`)
 

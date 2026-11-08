@@ -1,8 +1,7 @@
 # Devpost submission text (DRAFT, for Aba or Jack to paste)
 
 Claude can't log in to Devpost; paste each section into the matching Devpost field. Numbers match `outputs/headline.json`
-(v5) and the Person B reports. Re-check the Guardian count and the leaky-arm figure (28 on v5) after PR #35 and Jack's
-call on 28 vs 29.
+(v5) and the Person B reports. Fill the Guardian count from `outputs/explanations_summary.json` after PR #35 merges.
 
 ---
 
@@ -54,7 +53,8 @@ description, the way an analyst would, can help.
   the Granite text features it caught none, at the cost of a few visible catches (overall 21 with text vs 22 without).
 - **An honest result:** 21 vs 19 for the best simple rule across both years (+2, 90% range −4 to +8). On the
   strictest forward test we're one behind (12 vs 13), and we say so.
-- **Reasons people can check:** 419 of 500 Granite-written reasons passed a groundedness check; the rest use a plain
+- **Reasons people can check:** [passed_guardian] of 500 Granite-written reasons passed a groundedness check (fill from
+  `outputs/explanations_summary.json`); the rest use a plain
   template.
 
 ## What we learned
@@ -68,8 +68,8 @@ description, the way an analyst would, can help.
 
 ## What's next for Before the Breach
 - More practice years, so a difference of 2 means something.
-- Properly test two promising hints: blending the model with the simple rule, and "track record" priors from similar
-  past CVEs.
+- Revisit two ideas we considered but did not adopt (blending the model with the simple rule, and "track record"
+  priors from similar past CVEs) on more practice years; see `docs/considered_not_adopted.md`.
 - Run the Granite steps on watsonx so they're governed and repeatable.
 
 ## Built with

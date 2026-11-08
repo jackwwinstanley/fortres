@@ -48,7 +48,8 @@ def main():
     impact = pd.crosstab(d["impact_type"].fillna("unlabelled"), d["group"], normalize="columns").reindex(columns=list(gs)) * 100
 
     lines = ["# What do the blind spots look like? (DESCRIPTIVE ONLY)", "",
-             "Labels by IBM Granite (granite-3.3-2b-instruct) from descriptions, with a consistency guard. "
+             "Labels by IBM Granite (granite-3.3-2b-instruct): small local model, noisy (21% of rows corrected by the "
+             "consistency guard). Small groups. "
              "Post-hoc description of the practice years; never used to build or select a model. "
              "Small groups: read as rough shares.", "",
              "## Login and network", "", flags.round(0).astype(int).to_markdown(), "",

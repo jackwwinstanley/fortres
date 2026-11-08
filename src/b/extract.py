@@ -13,7 +13,7 @@ contradicts (e.g. 'wordpress_plugin' when WordPress is never mentioned; 'unauthe
 (replica 2024 / 2025 and the scoreboard). Time-safety: it reads only the description, with post-attack
 phrases already stripped (outputs/b_texts.parquet), exactly like the txt_* flags.
 
-Status: DESCRIPTIVE. The feature freeze has passed, so these columns are used to describe the blind spots
+Status: DESCRIPTIVE. Small local model, noisy (21% of rows corrected by the consistency guard). The feature freeze has passed, so these columns are used to describe the blind spots
 and the top 500 (dashboard and write-up), not as model inputs.
 Which CVEs: per pool, the top N by kev_text_score plus the top N by within-month EPSS rank, every CVE
 in the newest top-500 list (label-blind). `--profile` additionally labels every exploited replica CVE into the cache for

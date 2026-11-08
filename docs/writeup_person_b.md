@@ -35,7 +35,7 @@ also moved. *Figures: `drift_psi.png`, `drift_epss.png`.*
 ## 4. Leakage experiment: what cheating would look like
 Same v5 model, plus columns NVD fills in *after* a CVE gets attention (analysis status, reference and product
 counts, blank-vs-filled CVSS/CWE, exploit-tagged links): pooled hits jump from **21 to 28** (2025: 12 → 17;
-2024: 9 → 11; the earlier v4 run gave 29). The reason is stark: **every** CVE added to KEV in both practice years is "Analyzed" in today's NVD,
+2024: 9 → 11; 29 was the earlier v4 run). The reason is stark: **every** CVE added to KEV in both practice years is "Analyzed" in today's NVD,
 against about half of the rest, because NVD analyses KEV-listed CVEs first. None of these columns are in our model;
 an independent column review (`docs/column_review.md`) found no leak.
 *Figure: `leakage.png`.*
@@ -46,19 +46,16 @@ month, public exploit sources, IBM Granite KEV-likeness and the model's stronges
 (`granite-3.3-2b-instruct`, open model run locally) rewords them. A local checker rejects any sentence that adds a
 number, product, CVE id or blocked claim ("critical", "actively exploited", …), and IBM Granite Guardian
 (`granite3-guardian:2b`, run locally via Ollama) checks that the rest is supported by the facts. Sentences that fail
-keep the plain template. On the v5 list, **419 of 500 passed a groundedness check** and 81 use the template (Person A's
-PR #35; Guardian checks support by the facts, not truth or style).
+keep the plain template. The current counts are in `outputs/explanations_summary.json` (`passed_guardian`,
+`template_fallback`); Guardian checks support by the facts, not truth, fluency or causality ("passed a groundedness check",
+never "verified").
 
-## 6. Understanding the errors, and two hints
-- **The model and the simple rule fail in opposite ways** (`outputs/b_error_analysis.md`). In the forward test the rule
-  alone catches five high-EPSS CVEs with public exploit code from vendors rarely on KEV (FreeType, Erlang, Dassault,
-  Adobe ×2). The model alone catches four enterprise/edge CVEs whose descriptions read like past KEV entries (Fortinet,
-  Cisco ISE, Citrix NetScaler, VMware).
-- *Hint, not established:* a pre-declared 50/50 blend of the two rankings caught 15 in the forward test (single seeds
-  15.3 vs 12.6), but the idea came from reading those errors and gave no gain in the stability direction (9 vs 9).
-- *Hint, not established:* time-safe "track record" priors (`src/b/priors.py`: share of the 50 most similar earlier CVEs
-  on KEV, and past-KEV product counts) lifted the v5 bag to 24 (15 + 9), but single-seed means didn't move (21.6 vs
-  21.75), so the gain may be seed luck (`outputs/b_priors_eval.md`).
+## 6. Understanding the errors
+The model and the simple rule fail in **opposite** ways (`outputs/b_error_analysis.md`). In the forward test the rule
+alone catches five high-EPSS CVEs with public exploit code from vendors rarely on KEV (FreeType, Erlang, Dassault, Adobe
+×2). The model alone catches four enterprise/edge CVEs whose descriptions read like past KEV entries (Fortinet, Cisco ISE,
+Citrix NetScaler, VMware). Ideas we tested from this (track-record priors, a 50/50 blend) were **considered, not
+adopted**; see `docs/considered_not_adopted.md`.
 
 ## Honest results (v5 headline model, `outputs/headline.json`)
 Pooled over both practice years, the v5 model catches **21** CVEs added to KEV against **19** for the best simple rule

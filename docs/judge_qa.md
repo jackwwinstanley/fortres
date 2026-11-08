@@ -70,14 +70,14 @@ make the model compare each flaw only with others from the same month, so the ju
 Groundedness: whether each sentence is supported by the facts we gave Granite. It does **not** check that the
 sentence is true about the world, and it doesn't judge style. On top of it we run our own checks (no invented numbers,
 products or CVE ids; no words like "critical" or "actively exploited"). Anything that fails gets a plain template
-sentence instead. Current count: 419 of 500 reasons passed (`outputs/explanations_summary.json`, Jack's PR #35).
+sentence instead. The current count is in `outputs/explanations_summary.json` (`passed_guardian` of `total`); read it from there on the day.
 
 **What's the most interesting thing you found?**
 That the standard signals can't see most of the flaws that end up on KEV. 44 of 75 had no public attack code and a low
 risk score. Our model caught 2 of them, and without the Granite text features 0; but without the text it caught three
 more of the visible ones (22 vs 21 overall), so the text trades visible catches for blind spots. Also, the model and the simple rule fail in *opposite* ways. The rule catches high-EPSS flaws with public
 code from vendors rarely on KEV; the model catches enterprise and edge products whose descriptions read like past KEV
-entries. A simple 50/50 mix looked promising, but it's not established (`outputs/b_error_analysis.md`).
+entries. We tried a simple 50/50 mix and did not adopt it (`docs/considered_not_adopted.md`).
 
 **Are WordPress plugins and XSS really safe?**
 No. They rarely end up on CISA's KEV list (3 of 13,777 and 22 of 31,018), but KEV leans toward enterprise and
@@ -85,8 +85,8 @@ government software. They're widely attacked in practice; they're just not what 
 
 **What would you do with more time?**
 - More practice years. 75 positives is too few to tell 21 from 19 reliably.
-- Test the model + rule blend and the "track record" priors properly (seed and placebo checks), since both looked
-  promising on the strict test (`outputs/b_priors_eval.md`, `outputs/b_error_analysis.md`).
+- Revisit the model + rule blend and the "track record" priors on more practice years. Both were considered and not
+  adopted (`docs/considered_not_adopted.md`).
 - Run the Granite steps on watsonx so they're governed and repeatable.
 - Ask CISA-adjacent analysts which reasons they find useful.
 
