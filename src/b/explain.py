@@ -22,6 +22,7 @@ crash or restart resumes instead of starting over. outputs/explanations_summary.
 Nothing in a file may say Guardian checked a sentence unless the Guardian model actually returned "No" for it.
 """
 import argparse
+import functools
 import hashlib
 import json
 import os
@@ -30,6 +31,7 @@ import socket
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 
@@ -67,9 +69,24 @@ DRIVER_GROUPS = {
     "description similarity to past exploited CVEs": ["kev_text_score", "nearest_kev_sim"],
     "weakness wording in the description": list(TAGS),
 }
-BLOCKED_PHRASES = [r"will be exploited", r"is being exploited", r"confirmed"]
-CLAIMS = (r"critical|severe|severity|actively|in the wild|ransomware|zero[- ]day|has been exploited|being exploited|known exploited")
+# Every phrase a sentence may not contain (regular expressions, matched as whole words, case-insensitive). One constant, grouped by class.
+BLOCKED_PHRASES = [
+    # claims that exploitation happened, is happening or will happen (none of this is in the facts)
+    r"will be exploited", r"is being exploited", r"being exploited", r"has been exploited", r"known exploited", r"confirmed",
+    r"actively", r"in the wild", r"ransomware", r"zero[- ]day",
+    # severity and intensity words the facts do not contain
+    r"critical", r"severe", r"severity", r"high[- ]impact", r"highly", r"serious", r"dangerous", r"widespread", r"widely",
+    # nonsense seen in generated text
+    r"exploit templates?",
+]
 MAX_WORDS = 45
+# real tokens that contain a lowercase-then-uppercase letter pair; any other such token is treated as two words glued together
+CAMEL_OK = {"GitHub", "ExploitDB", "WordPress", "LightGBM"}
+# domain words that are legitimate but not in the general vocabulary (lower case)
+DOMAIN_WORDS = {"github", "exploitdb", "wordpress", "lightgbm", "epss", "kev", "cve", "cves", "ibm", "granite", "nuclei", "metasploit",
+                "vpn", "sql", "xss", "cisa", "db", "plugin", "plugins", "poc"}
+VOCAB_PATH = Path(__file__).with_name("explain_vocab.txt")  # dictionary-validated words seen in generated sentences; rebuilt with --build-vocab
+MAX_ATTEMPTS = 3  # attempt 0 = original prompt (greedy); 1 = prompt with an avoid-list (greedy); 2 = same, sampled with a fixed seed
 
 
 def cna_name(assigner: str) -> str | None:
@@ -138,7 +155,7 @@ def template(r) -> str:
     if epss_notable(r):
         parts.append(f"its EPSS score is in the top {top_pct(r['epss_pct'])}% of its month")
     if similarity(r) == "high":
-        parts.append("its description is highly similar to past exploited CVEs")
+        parts.append("its description has high similarity to past exploited CVEs")
     elif kev_like_notable(r):
         parts.append("IBM Granite rates its description as very similar to past exploited CVEs")
     if r["drivers"]:
@@ -196,22 +213,50 @@ def check_reason(reason: str, facts: str) -> list[str]:
             if reason.find(w) == 0 or reason[max(0, reason.find(w) - 2):reason.find(w)] in (". ", "; "):
                 continue  # sentence-initial capital, not a name
             problems.append(f"name {w}")
-    for claim in re.findall(rf"\b({CLAIMS})\b", reason, re.I):
-        problems.append(f"unsupported claim '{claim}'")
     for phrase in BLOCKED_PHRASES:
-        if re.search(rf"\b{phrase}\b", reason, re.I):
-            problems.append(f"blocked phrase '{phrase}'")
+        m = re.search(rf"\b(?:{phrase})\b", reason, re.I)
+        if m:
+            problems.append(f"blocked phrase '{m.group(0).lower()}'")
     for c in re.findall(r"CVE-\d{4}-\d+", reason):
         if c not in facts:
             problems.append(f"cve {c}")
     return problems
 
 
+@functools.lru_cache(maxsize=1)
+def vocabulary() -> frozenset:
+    """Words a generated sentence may use (besides the words of its own facts). An empty or missing file fails closed:
+    every word is then unknown and every draft falls back to the template."""
+    if not VOCAB_PATH.exists():
+        return frozenset()
+    return frozenset(w.strip() for w in VOCAB_PATH.read_text().split() if w.strip()) | DOMAIN_WORDS
+
+
+def glue_problems(text: str, facts: str) -> list[str]:
+    """Words joined without a space or garbled: (1) a lowercase letter directly followed by an uppercase letter inside a word
+    ('availableGitHub'), except CAMEL_OK and tokens that appear exactly so in the facts; (2) a one-letter word glued to a capitalised
+    word ('aKEV'); (3) any word that is neither in the facts, DOMAIN_WORDS nor the vocabulary ('vulnerabilityin', 'proof-ofof-concept')."""
+    probs = []
+    fact_tokens = set(re.findall(r"[A-Za-z][A-Za-z0-9]*", facts))
+    fact_lower = {t.lower() for t in fact_tokens}
+    vocab = vocabulary()
+    for tok in re.findall(r"[A-Za-z]+", re.sub(r"'s\b", "", text)):
+        if re.search(r"[a-z][A-Z]", tok) and tok not in CAMEL_OK and tok not in fact_tokens:
+            probs.append(f"glued words '{tok}'")
+        elif re.match(r"[aA][A-Z][a-z]", tok) and tok not in CAMEL_OK and tok not in fact_tokens:
+            probs.append(f"glued words '{tok}'")
+        elif len(tok) >= 2 and tok.lower() not in vocab and tok.lower() not in fact_lower and tok.lower() not in DOMAIN_WORDS:
+            probs.append(f"unknown or joined word '{tok}'")
+        elif len(tok) == 1 and tok.lower() not in ("a", "s") and tok not in fact_tokens:
+            probs.append(f"stray letter '{tok}'")
+    return list(dict.fromkeys(probs))
+
+
 def local_problems(draft: str, facts: str) -> list[str]:
-    """Completeness, length, unsupported-claims and phrase checks; an empty draft is a problem."""
+    """Completeness, length, unsupported-claims, phrase and glue checks; an empty draft is a problem."""
     if not draft or not draft.strip():
         return ["empty"]
-    probs = check_reason(draft, facts)
+    probs = check_reason(draft, facts) + glue_problems(draft, facts)
     if not draft.rstrip().endswith("."):
         probs.append("incomplete sentence")
     if len(draft.split()) > MAX_WORDS:
@@ -266,20 +311,32 @@ SYSTEM_PROMPT = ("Write ONE plain-English sentence of at most 30 words saying wh
                  "if it is high.")
 
 
+RETRY_ADDENDUM = (" Use plain, neutral words with normal spacing and spelling. Do not use any of these words or phrases: " +
+                  ", ".join(["high-impact", "highly", "serious", "dangerous", "widespread", "widely", "actively", "in the wild", "ransomware",
+                             "zero-day", "confirmed", "critical", "severe", "exploit template"]) + ".")
+
+
 class GraniteRewriter:
-    """Loads granite-3.3-2b-instruct once; call it with a fact row to get one sentence."""
+    """Loads granite-3.3-2b-instruct once; call it with a fact row to get one sentence. attempt 0 uses the original prompt (greedy);
+    attempts 1 and 2 add RETRY_ADDENDUM, and attempt 2 samples with a fixed seed derived from the CVE id."""
 
     def __init__(self):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
+        self.torch = torch
         self.device = "mps" if torch.backends.mps.is_available() else "cpu"
         self.tok = AutoTokenizer.from_pretrained(GRANITE)
         self.model = AutoModelForCausalLM.from_pretrained(GRANITE, torch_dtype=torch.float16 if self.device == "mps" else None).to(self.device)
 
-    def __call__(self, r) -> str:
-        msgs = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": facts_text(r)}]
+    def __call__(self, r, attempt: int = 0) -> str:
+        system = SYSTEM_PROMPT + (RETRY_ADDENDUM if attempt else "")
+        msgs = [{"role": "system", "content": system}, {"role": "user", "content": facts_text(r)}]
         enc = self.tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt", return_dict=True).to(self.device)
-        gen = self.model.generate(**enc, max_new_tokens=90, do_sample=False)
+        kw = dict(max_new_tokens=90, do_sample=False)
+        if attempt >= 2:
+            self.torch.manual_seed(int(re.sub(r"\D", "", str(r["cve_id"])) or 0) % 100003 + attempt)
+            kw = dict(max_new_tokens=90, do_sample=True, temperature=0.7, top_p=0.9)
+        gen = self.model.generate(**enc, **kw)
         return self.tok.decode(gen[0, enc["input_ids"].shape[1]:], skip_special_tokens=True).strip().split("\n")[0]
 
 
@@ -305,6 +362,18 @@ def load_cache(path) -> dict:
     return recs
 
 
+def load_history(path) -> list[dict]:
+    """Every record ever written to the cache, in order (the cache is append-only)."""
+    recs = []
+    if path.exists():
+        for line in path.read_text().splitlines():
+            try:
+                recs.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return recs
+
+
 RETRY = {"timeout", "error"}  # transient Guardian failures are retried on restart; model answers are final
 
 
@@ -323,9 +392,19 @@ def rows_frame(items: list[dict], recs: dict) -> pd.DataFrame:
 
 
 def write_atomic(df: pd.DataFrame, path) -> None:
+    assert (df["reason"] == df["explanation"]).all(), "reason must be an exact copy of explanation"
     tmp = path.with_suffix(path.suffix + ".tmp")
     df.to_csv(tmp, index=False)
     os.replace(tmp, path)
+
+
+def problem_class(p: str) -> str:
+    """Group a local-check problem for the summary ('number 7' -> 'number not in facts')."""
+    for prefix, label in (("number ", "number not in facts"), ("name ", "name not in facts"), ("cve ", "cve id not in facts"),
+                          ("unknown or joined word", "unknown or joined word"), ("glued words", "glued words"), ("stray letter", "stray letter")):
+        if p.startswith(prefix):
+            return label
+    return p
 
 
 def summarize(df: pd.DataFrame, extra: dict | None = None) -> dict:
@@ -343,41 +422,118 @@ def summarize(df: pd.DataFrame, extra: dict | None = None) -> dict:
         "guardian_calls_answered": int(ran),
         "notes": "passed_guardian = Granite sentences kept because Guardian answered No; rewritten = Granite drafts that passed the local checks and were sent to "
                  "Guardian; template_fallback = template sentences used (draft failed a local check, Guardian did not clearly say No, or Granite was not run). "
-                 "guardian_ran is true only if the Guardian model returned a Yes or No at least once.",
+                 "guardian_ran is true only if the Guardian model returned a Yes or No at least once; template rows whose guardian_verdict is not_run were never "
+                 "shown to Guardian.",
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), **(extra or {})}
 
 
+def run_stats(items: list[dict], recs: dict, history: list[dict]) -> dict:
+    """Extra summary fields, derived from the cache only (so they survive crashes and resumes): local-check failures by class (a row can
+    count under several), and the rows whose first, cached Granite sentence failed TODAY's checks and were regenerated."""
+    by_id = {it["cve_id"]: it for it in items}
+    fails = {}
+    for it in items:
+        r = recs.get(it["cve_id"])
+        if r and r["key"] == it["key"] and r["guardian_verdict"] == "not_run":
+            probs = r.get("problems") or local_problems(r.get("draft") or "", it["facts"])    # older records did not store the problems
+            for c in {problem_class(p) for p in probs}:
+                fails[c] = fails.get(c, 0) + 1
+    first = {}
+    for r in history:
+        first.setdefault(r["cve_id"], r)
+    inv_classes, regen, passed = {}, 0, 0
+    for c, r0 in first.items():
+        it, r = by_id.get(c), recs.get(c)
+        if not it or not r or r0["key"] != it["key"] or r is r0 or r.get("attempt", 0) < 1:
+            continue
+        if r0["source"] == "granite" and r0["guardian_verdict"] == "No":
+            probs = local_problems(r0.get("draft") or r0["explanation"], it["facts"])
+            if probs:
+                regen += 1
+                passed += r["source"] == "granite"
+                for k in {problem_class(p) for p in probs}:
+                    inv_classes[k] = inv_classes.get(k, 0) + 1
+    return {"local_check_failures": dict(sorted(fails.items(), key=lambda kv: -kv[1])),
+            "invalidated_by_new_checks": regen, "invalidated_by_class": inv_classes,
+            "regenerated_passed_guardian": passed, "regenerated_template_fallback": regen - passed}
+
+
 def process(items: list[dict], draft_fn, guardian=guardian_verdict, out_dir=OUT_DIR, log=print) -> pd.DataFrame:
-    """Run (or resume) the gate over `items` (dicts with cve_id, facts, prose, template, key). Writes the cache, explanations.csv and
-    the summary after every CVE."""
+    """Run (or resume) the gate over `items` (dicts with cve_id, facts, prose, template, key). draft_fn(item, attempt) returns a draft.
+    Cached Granite sentences that fail TODAY's local checks are invalidated and regenerated (attempts 1..MAX_ATTEMPTS-1, local failures only),
+    then go through Guardian. Writes the cache, explanations.csv and the summary after every CVE."""
     cache_dir = out_dir / ".cache"
     cache_dir.mkdir(exist_ok=True)
     cache_path = cache_dir / "explain_cache.jsonl"
     recs = load_cache(cache_path)
-    extra = {"top_list": None}
+    invalidated = {}
+    for it in items:
+        r = recs.get(it["cve_id"])
+        if r and r["key"] == it["key"] and r["source"] == "template":
+            r["explanation"] = it["template"]                  # template rows always show today's template wording
+        if r and r["key"] == it["key"] and r["source"] == "granite":
+            probs = local_problems(r.get("draft") or r["explanation"], it["facts"])
+            if probs:
+                invalidated[it["cve_id"]] = probs
+                del recs[it["cve_id"]]
+    if invalidated:
+        log(f"{len(invalidated)} cached Granite sentences fail the current local checks and will be regenerated")
     write_atomic(rows_frame(items, recs), out_dir / "explanations.csv")
     with open(cache_path, "a") as cache:
         for i, it in enumerate(items, 1):
             r = recs.get(it["cve_id"])
             if r and r["key"] == it["key"] and r["guardian_verdict"] not in RETRY:
                 continue                                       # finished earlier: resume
-            draft = draft_fn(it) if draft_fn else None
-            d = decide(draft, it["facts"], it["prose"], it["template"], guardian) if draft_fn else \
-                dict(explanation=it["template"], source="template", guardian_verdict="not_run", problems=["granite not run"])
-            if d["source"] == "template" and d["problems"] and d["guardian_verdict"] == "not_run" and draft_fn:
-                log(f"{it['cve_id']}: kept template, Granite draft rejected locally: {d['problems']}")
-            rec = dict(cve_id=it["cve_id"], key=it["key"], draft=draft, **{k: d[k] for k in ("explanation", "source", "guardian_verdict")})
+            if not draft_fn:
+                d, draft, attempt = dict(explanation=it["template"], source="template", guardian_verdict="not_run", problems=["granite not run"]), None, 0
+            else:
+                for attempt in range(1 if it["cve_id"] in invalidated else 0, MAX_ATTEMPTS):
+                    draft = draft_fn(it, attempt)
+                    d = decide(draft, it["facts"], it["prose"], it["template"], guardian)
+                    if d["source"] == "granite" or d["guardian_verdict"] != "not_run":
+                        break                                  # accepted, or Guardian already judged it: no retry
+                if d["source"] == "template" and d["guardian_verdict"] == "not_run":
+                    log(f"{it['cve_id']}: kept template, Granite draft rejected locally: {d['problems']}")
+            rec = dict(cve_id=it["cve_id"], key=it["key"], draft=draft, attempt=attempt, problems=d["problems"],
+                       **{k: d[k] for k in ("explanation", "source", "guardian_verdict")})
             cache.write(json.dumps(rec) + "\n")
             cache.flush()
             recs[it["cve_id"]] = rec
             df = rows_frame(items, recs)
             write_atomic(df, out_dir / "explanations.csv")
-            (out_dir / "explanations_summary.json").write_text(json.dumps(summarize(df, extra), indent=1))
+            (out_dir / "explanations_summary.json").write_text(json.dumps(summarize(df, run_stats(items, recs, load_history(cache_path))), indent=1))
             if i % 25 == 0:
                 log(f"  {i}/{len(items)} done; {summarize(df)['passed_guardian']} passed Guardian so far")
     df = rows_frame(items, recs)
     write_atomic(df, out_dir / "explanations.csv")
+    (out_dir / "explanations_summary.json").write_text(json.dumps(summarize(df, run_stats(items, recs, load_history(cache_path))), indent=1))
     return df
+
+
+def _dictionary_knows(w: str, words: set) -> bool:
+    """General-English check with simple inflections (the system word list has base forms only)."""
+    w = w.lower()
+    if w in words:
+        return True
+    for suf, repl in (("s", ""), ("es", ""), ("ies", "y"), ("ed", ""), ("ed", "e"), ("ied", "y"), ("d", ""), ("ing", ""), ("ing", "e"),
+                      ("ly", ""), ("ness", ""), ("ity", "e"), ("er", ""), ("ers", "")):
+        if w.endswith(suf) and len(w) - len(suf) >= 3 and w[:-len(suf)] + repl in words:
+            return True
+    return bool(w.endswith("ing") and len(w) > 5 and w[:-4] in words)
+
+
+def build_vocab(cache_path=None, out_path=VOCAB_PATH, dictionary="/usr/share/dict/words") -> int:
+    """Rebuild explain_vocab.txt: words seen in generated drafts that a general English dictionary confirms. Garbled or joined words
+    ('vulnerabilityin', 'ofof') are not confirmed, so they never enter the vocabulary. Needs the system word list; run it on purpose."""
+    cache_path = cache_path or OUT_DIR / ".cache" / "explain_cache.jsonl"
+    words = {w.strip().lower() for w in open(dictionary, errors="ignore") if w.strip().isalpha()}
+    seen = set()
+    for r in load_cache(cache_path).values():
+        seen |= {t.lower() for t in re.findall(r"[A-Za-z]+", re.sub(r"'s\b", "", r.get("draft") or ""))}
+    keep = sorted(w for w in seen if len(w) >= 2 and _dictionary_knows(w, words) and w not in DOMAIN_WORDS)
+    out_path.write_text("\n".join(keep) + "\n")
+    vocabulary.cache_clear()
+    return len(keep)
 
 
 def latest_top() -> str:
@@ -399,13 +555,14 @@ def main(top_path=None, granite=False, limit=None, use_guardian=True):
         items.append(dict(cve_id=r["cve_id"], facts=facts, prose=facts_prose(r), template=t, key=cache_key(facts), row=r))
     holder = {}
 
-    def draft_fn(it):  # the model is loaded on first use, so resuming a finished run costs nothing
+    def draft_fn(it, attempt=0):  # the model is loaded on first use, so resuming a finished run costs nothing
         holder.setdefault("w", GraniteRewriter())
-        return holder["w"](it["row"])
+        return holder["w"](it["row"], attempt)
 
     guardian = guardian_verdict if use_guardian else (lambda facts, draft: "not_run")
     df = process(items, draft_fn if granite else None, guardian)
-    summary = summarize(df, {"top_list": os.path.basename(top_path)})
+    summary = json.loads((OUT_DIR / "explanations_summary.json").read_text())
+    summary["top_list"] = os.path.basename(top_path)
     (OUT_DIR / "explanations_summary.json").write_text(json.dumps(summary, indent=1))
     assert df["cve_id"].is_unique and len(df) == len(top)
     keep = ["cve_id", "tags", "exploits", "epss", "epss_pct", "kev_text_pct", "nearest_kev_sim", "drivers"]
@@ -422,5 +579,9 @@ if __name__ == "__main__":
     ap.add_argument("--granite", action="store_true")
     ap.add_argument("--limit", type=int)
     ap.add_argument("--no-guardian", action="store_true")
+    ap.add_argument("--build-vocab", action="store_true", help="rebuild src/b/explain_vocab.txt from the cached drafts and exit")
     a = ap.parse_args()
-    main(a.top, a.granite, a.limit, use_guardian=not a.no_guardian)
+    if a.build_vocab:
+        print(f"wrote {VOCAB_PATH} ({build_vocab()} words)")
+    else:
+        main(a.top, a.granite, a.limit, use_guardian=not a.no_guardian)
