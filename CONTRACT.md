@@ -22,7 +22,7 @@ so the other person can pull them. `.npy` and `emb*` files (embeddings, hundreds
 | A | `outputs/top500_vN.csv` | single column `cve_id`, exactly 500 unique scoreboard IDs | best score first |
 | A | `outputs/runlog.csv` | `timestamp, version, replica, k, hits, baseline_exploit_epss_hits, notes`; **append-only** | chronological |
 | B | `outputs/explanations.csv` | `cve_id`, `explanation` (one sentence), `source` (`granite` or `template`), `guardian_verdict` (`No` = Granite Guardian found the sentence grounded; `Yes`, `empty`, `unparseable`, `timeout`, `error` = template used; `not_run` = Guardian not asked; `pending` = not yet processed), `reason` (a copy of `explanation`, kept so the existing dashboard keeps working) | top-500 order |
-| B | `outputs/explanations_summary.json` | `total`, `passed_guardian`, `rewritten`, `template_fallback`, `pending`, `guardian_ran`, `guardian_verdicts`, `local_check_failures` (by reason), `invalidated_by_new_checks`, `invalidated_by_class`, `regenerated_passed_guardian`, `regenerated_template_fallback`, models | – |
+| B | `outputs/explanations_summary.json` | `total`, `passed_guardian`, `rewritten`, `template_fallback`, `pending`, `guardian_ran`, `guardian_verdicts`, `prompt_version`, `rows_regenerated_for_new_prompt`, `local_check_failures` (by reason), `invalidated_by_new_checks`, `invalidated_by_class`, `regenerated_passed_guardian`, `regenerated_template_fallback`, models | – |
 
 ## Exact replica definition (Person A, `python -m src.replicas`)
 For Y in {2024, 2025}:
