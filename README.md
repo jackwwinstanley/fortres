@@ -44,15 +44,15 @@ cmp outputs/top500_v5.csv /tmp/top500_v5_committed.csv && echo "identical"   # b
 Not used by the model: `nvd_status`, `n_affected_cpes`, `n_references`, CVSS (baseline only), `cwe_ids`, references, affected products, any 2026 KEV information.
 Results and caveats (low power: 75 positives): `outputs/v1_report.md`. Run: `python -m src.replicas && python -m src.features.build && python -m src.models.train_v1`.
 
-## Results (v5, `outputs/headline.json`; low power: 75 CVEs added to KEV in the two practice years)
-| test | v5 (20-seed bag) | best simple rule (public exploit, then EPSS) |
+## Results (v6, `outputs/v6_headline_candidate.json`; low power: 75 CVEs added to KEV in the two practice years)
+| test | v6 (20-seed bag) | best simple rule (public exploit, then EPSS) |
 |---|---|---|
-| forward: train 2024 → test 2025 | 12 | 13 |
+| forward: train 2024 → test 2025 | 18 | 13 |
 | stability: train 2025 → test 2024 | 9 | 6 |
-| pooled | 21 | 19 (+2, 90% range −4 to +8) |
+| pooled | 27 | 19 (+8, 90% range +2 to +14) |
 
-Leakage test (after-the-fact NVD columns added, never submitted): 21 → 28 (`outputs/leakage_results.csv`). Blind spots: 44 of 75 KEV additions had no
-public exploit code and a low EPSS; the simple rule catches 0 of them, the v5 bag 2 (`outputs/v5_blindspots.csv`). Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
+Leakage test (after-the-fact NVD columns added, never submitted): 27 → 33 (`outputs/v6_leakage_results.csv`). Blind spots: 44 of 75 KEV additions had no
+public exploit code and a low EPSS; the simple rule catches 0 of them, the v6 bag 5, three of them one Ivanti EPM event (`outputs/v6_blindspots.csv`). Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
 IBM Granite and IBM Granite Guardian are open models run locally; nothing here runs on watsonx. Ideas tested and not adopted: `docs/considered_not_adopted.md`.
 Regenerate Person B outputs with `python -m src.b.refresh_all`; `python scripts/number_sweep.py` checks every number in docs/site/app/README against the outputs.
 

@@ -46,7 +46,7 @@ One line each, in our words, for how we use the name. They are not IBM's definit
 - **A fixed history cutoff.** Every KEV-based feature uses KEV rows dated on or before 31 December of the year before the pool; no 2026 KEV information is used (`CONTRACT.md`, "History-cutoff rule"; built in `src/features/build.py`).
 - **Post-attack wording removed.** Phrases such as "exploited in the wild" are removed from descriptions before embedding and before the keyword flags (`src/b/phrases.py`). The description scan in `outputs/v5_report.md` ("Leakage audit") finds none left.
 - **An independent column review** of every model input, with its source and whether it was known at the snapshot (`docs/column_review.md`).
-- **A labelled leakage experiment, never submitted.** The same model with the banned columns added goes from 21 to 28 pooled hits (honest 12 + 9, with after-the-fact columns 17 + 11) (`src/b/leakage.py`, `outputs/leakage_results.csv`, copied into `outputs/headline.json` under `leakage`; write-up in `outputs/b_leakage_report.md`).
+- **A labelled leakage experiment, never submitted.** The same model with the banned columns added goes from 27 to 33 pooled hits (honest 18 + 9, with after-the-fact columns 21 + 12) (`src/models/train_v6.py`, `outputs/v6_leakage_results.csv`, copied into `outputs/v6_headline_candidate.json` under `leakage`; the v5 version, 21 to 28, is written up in `outputs/b_leakage_report.md`).
   It shows what leaked information looks like and that the submitted model does not have it.
 - **Forward-in-time testing first**, so the headline test never trains on the future (`outputs/headline.json`).
 
@@ -107,7 +107,7 @@ Raw EPSS has a PSI of 2.866 against the scoreboard (`outputs/v4_report.md`).
 - **A like-for-like placebo** against shuffled text columns (`outputs/headline.json`, `seeds.placebo`, `placebo_bootstrap_p`).
 - **Small trees, and settings chosen by month-held-out cross-validation on the training year only**, never on a test year (`CONTRACT.md`, "Model rules"; parameters in `outputs/v5_report.md`).
 - **Forward direction reported first; the reverse direction labelled "NOT forward in time"** (`outputs/v5_report.md`, `outputs/leakage_results.csv`).
-- **We do not claim a gain.** Forward the model is one hit behind the simple rule (12 vs 13); pooled it is 21 vs 19 with a range of −4 to +8 (`outputs/headline.json`).
+- **We claim only a small-sample gain.** Forward the model is five ahead of the simple rule (18 vs 13); pooled it is 27 vs 19 with a range of +2 to +14 (`outputs/v6_headline_candidate.json`), on 75 positives.
 
 **Not mitigated:** more data was not available. We cannot tell 21 from 19.
 

@@ -1,4 +1,4 @@
-# Model card: Before the Breach ranking model (v5)
+# Model card: Before the Breach ranking model (v6)
 
 **Status:** final and frozen. The model is the 20-seed LightGBM bag called v5; the submitted list is `outputs/top500_v5.csv`.
 **LOW POWER:** the model is tested on 75 CVEs added to CISA KEV in two practice years, so no result below is strong evidence of a gain.
@@ -80,21 +80,21 @@ The guard is `BANNED_NAMES` and `check_feature_list` in `src/common/schema.py`, 
 ## 4. Evaluation
 
 A **hit** is a CVE added to KEV after its snapshot month that lands in the top *k*. *k* scales 500 to each pool's size (`CONTRACT.md`, "Scoring rule"); the values are in `outputs/leakage_results.csv`.
-The interval is a 90% bootstrap range for (v5 bag minus the simple rule). "CVE-level" resamples CVEs; "event-clustered" treats positives added to KEV by the same vendor on the same date as one event (`outputs/v5_report.md`).
+The interval is a 90% bootstrap range for (v6 bag minus the simple rule). "CVE-level" resamples CVEs; "event-clustered" treats positives added to KEV by the same vendor on the same date as one event (`outputs/v6_report.md`, `outputs/v6_bootstrap.csv`).
 
-| test | k | positives | v5 bag | simple rule | difference | 90% interval, CVE-level / event-clustered |
+| test | k | positives | v6 bag | simple rule | difference | 90% interval, CVE-level / event-clustered |
 |---|---|---|---|---|---|---|
-| **forward:** train 2024, test 2025 | 243 | 48 | 12 | 13 | −1 | −6 to +3 / −7 to +4 |
-| stability: train 2025, test 2024 (**not forward in time**) | 198 | 27 | 9 | 6 | +3 | not stored in `headline.json`; `outputs/v5_report.md` gives +0 to +7 for both |
-| **pooled** | 441 | 75 | 21 | 19 | +2 | −4 to +8 / −4 to +8 |
+| **forward:** train 2024, test 2025 | 243 | 48 | 18 | 13 | +5 | 0 to +10 / −2 to +12 |
+| stability: train 2025, test 2024 (**not forward in time**) | 198 | 27 | 9 | 6 | +3 | 0 to +7 / 0 to +7 |
+| **pooled** | 441 | 75 | 27 | 19 | +8 | +2 to +14 / +1 to +15 |
 
-Sources: bag and rule hits, intervals and positives from `outputs/headline.json`; *k* from `outputs/leakage_results.csv`; differences and the pooled *k* are subtractions and a sum of those.
+Sources: bag and rule hits, intervals and positives from `outputs/v6_headline_candidate.json` and `outputs/v6_bootstrap.csv`; *k* from `outputs/leakage_results.csv`; differences and the pooled *k* are subtractions and a sum of those.
 
 What this does and does not show:
 
-- Forward in time, the model is **one hit behind** the simple rule. In the other direction it is three ahead. Pooled it is two ahead, and the interval runs from −4 to +8, so **we cannot tell 21 from 19**.
-- Single seeds of the same model average 21.75 pooled hits (lowest 17, highest 25) (`outputs/headline.json`, `seeds`), so one seed's result is not a safe number.
-- A like-for-like placebo compares real 5-seed bags with bags trained on shuffled text columns (`outputs/headline.json`, `seeds.placebo`; gap and p-value in `outputs/v5_report.md`). It shows the text columns carry some signal; it does not show the model beats the simple rule.
+- Forward in time, the model is **five hits ahead** of the simple rule. In the other direction it is three ahead. Pooled it is eight ahead (interval +2 to +14). With 75 positives that is still a small sample, and on matched seeds v6 beats v5 by only +2 to +5 (`outputs/v6_seed_spread.csv`).
+- Single seeds of the same model average 26.75 pooled hits (lowest 25, highest 28) (`outputs/v6_headline_candidate.json`, `seeds`), so one seed's result is not a safe number.
+- A like-for-like placebo compares 30 real 5-seed bags with 30 bags trained on labels shuffled within each month: 27.0 against 0.57 pooled hits (`outputs/v6_placebo.csv`). It shows the model learns from the labels; it does not by itself show the model beats the simple rule.
 - Other simple rules, pooled hits over both directions (`outputs/leakage_results.csv`): highest CVSS 3 first 5, highest EPSS first 11, exploit code then EPSS 19.
 
 ## 5. Leakage result
@@ -103,23 +103,23 @@ We deliberately re-ran the same model with the banned after-the-fact columns add
 
 | model | forward (train 2024, test 2025) | stability (train 2025, test 2024) | pooled |
 |---|---|---|---|
-| honest (the submitted model) | 12 | 9 | 21 |
-| with after-the-fact columns | 17 | 11 | 28 |
+| honest (the submitted model) | 18 | 9 | 27 |
+| with after-the-fact columns | 21 | 12 | 33 |
 
-Source: `outputs/leakage_results.csv`, copied into `outputs/headline.json` (`leakage`). Adding the columns lifts the same model from 21 to 28, which shows what leaked information looks like. The honest model does not have them.
+Source: `outputs/v6_leakage_results.csv`, copied into `outputs/v6_headline_candidate.json` (`leakage`). Adding the columns lifts the same model from 27 to 33, which shows what leaked information looks like. The honest model does not have them.
 
 ## 6. Blind spots
 
-A **blind spot** is a KEV addition with no public exploit code (Exploit-DB, Metasploit, Nuclei, GitHub proof of concept) and a within-month EPSS rank too low to reach a top-*k* EPSS list (`group_of` in `src/models/stress_v2.py`). Source: `outputs/v5_blindspots.csv`, summed over both years.
+A **blind spot** is a KEV addition with no public exploit code (Exploit-DB, Metasploit, Nuclei, GitHub proof of concept) and a within-month EPSS rank too low to reach a top-*k* EPSS list (`group_of` in `src/models/stress_v2.py`). Source: `outputs/v6_blindspots.csv`, summed over both years.
 
-| group | KEV additions | caught by the simple rule | caught by v5 |
+| group | KEV additions | caught by the simple rule | caught by v6 |
 |---|---|---|---|
-| flagged (public exploit code) | 31 | 19 | 19 |
-| **blind spot** | **44** | **0** | **2** |
+| flagged (public exploit code) | 31 | 19 | 22 |
+| **blind spot** | **44** | **0** | **5** |
 | unflagged but EPSS-visible | 0 | 0 | 0 |
-| all | 75 | 19 | 21 |
+| all | 75 | 19 | 27 |
 
-- **44 of the 75** KEV additions are blind spots. The simple rule cannot catch them by construction, and the v5 model catches 2: `CVE-2025-24472` and `CVE-2024-23113` (`ours_caught_cves` in `outputs/v5_blindspots.csv`).
+- **44 of the 75** KEV additions are blind spots. The simple rule cannot catch them by construction, and the v6 model catches 5: `CVE-2024-13159`, `CVE-2024-13160`, `CVE-2024-13161` (one Ivanti EPM event), `CVE-2025-24472` and `CVE-2024-23113` (`v6_caught_cves` in `outputs/v6_blindspots.csv`).
 - The two catches come from the text features (keyword flags and Granite similarity). In the ablation in `docs/writeup_person_b.md` (section 1), removing one text part still leaves some blind-spot catches and removing both leaves none, and the exact CVEs change between runs. **Two catches is within noise.** We report the blind spots as the finding, not the two catches as a result.
 - Without any text features the model catches more flagged CVEs, so the text features trade visible catches for blind-spot catches rather than adding net hits (`docs/writeup_person_b.md`, section 1).
 

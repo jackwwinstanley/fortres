@@ -45,8 +45,8 @@ never a model input (enforced by `tests/test_site_data_isolation.py`). Older CVE
 KEV in our practice years: 25%. 44 of the 75 had no public attack code and a low risk score, and the rule caught none of them.
 - Best simple rule: 6 of 27 (2024), 13 of 48 (2025) → 19 of 75 (`outputs/runlog.csv`, `baseline_exploit_epss`)
 - 31 visible (had public attack code) vs 44 blind spots (Person A's `st.group_of` definition)
-- Simple rule on blind spots: 0. Our v5 model: 2, both Fortinet FortiOS (CVE-2025-24472, CVE-2024-23113)
-  (`outputs/v5_blindspots.csv`, from `python -m src.b.leakage`, which reproduces the v5 headline bag: 12 + 9).
+- Simple rule on blind spots: 0. Our v6 model: 5: three from one Ivanti EPM event (CVE-2024-13159/13160/13161) and two
+  Fortinet FortiOS (CVE-2025-24472, CVE-2024-23113) (`outputs/v6_blindspots.csv`, the v6 headline bag: 18 + 9).
   **Say it honestly: small.** Wording: "our text features (keyword flags plus Granite-embedding similarity to past KEV
   entries) caught two of 44; either part alone (keyword flags or Granite similarity scores) still catches two or three of the 44; with neither, none; the exact CVEs change between runs, so treat it as noise." Without any text the model catches 3 more visible ones (22 vs 21 overall): the
   text is a trade-off, not a net gain.
@@ -70,9 +70,9 @@ each CVE only with others from the same month.
 - No June 2026 snapshot exists in the organisers' data; June's CVEs are scored in July.
 
 ## 5. Too good to be true (the leakage test)
-**Message:** Some fields in today's database leak the answer. With them, our model would look like it catches 28
-instead of 21, so we don't use them.
-- Honest v5 bag 21 (12 + 9) vs with after-the-fact columns 28 (17 + 11) (`outputs/leakage_results.csv`; 29 was the earlier v4 run)
+**Message:** Some fields in today's database leak the answer. With them, our model would look like it catches 33
+instead of 27, so we don't use them.
+- Honest v6 bag 27 (18 + 9) vs with after-the-fact columns 33 (21 + 12) (`outputs/v6_leakage_results.csv`; on v5 it was 21 vs 28, and 29 was the earlier v4 run)
 - 100% of CVEs added to KEV are marked "Analyzed" in today's NVD, vs 46% of the others (`story.json → leak`)
 - No leak in the honest model: independent column review (`docs/column_review.md`) and Person A's audit (`outputs/v5_report.md`)
 
@@ -81,15 +81,15 @@ instead of 21, so we don't use them.
 keywords; groups overlap, and each CVE is counted once, in its first matching group).
 - 175 no login needed · 146 takes over the machine · 12 browser bugs · 8 read files they shouldn't · 7 get admin
   powers · 4 network edge devices · 4 database attacks · 1 WordPress plugin · 143 other kinds (`story.json → top`,
-  list `outputs/top500_v5.csv`, groups from `txt_*` flags)
+  list `outputs/top500_v6.csv`, groups from `txt_*` flags)
 - Each one has a one-sentence reason (see section 8).
 
 ## 7. The honest result
-**Message:** Tested on the past two years, we caught 21 CVEs that were added to KEV, against 19 for the best simple rule.
-That's a small edge, and the uncertainty range says it could be luck. In the strictest test (train on 2024, test on
-2025) we were one behind: 12 vs 13.
-- v5 20-seed bag: 12 (2025) + 9 (2024) = 21 vs 13 + 6 = 19; pooled difference +2, 90% range −4 to +8;
-  forward 12 vs 13 (−6 to +3); stability 9 vs 6 (`outputs/headline.json`)
+**Message:** Tested on the past two years, we caught 27 CVEs that were added to KEV, against 19 for the best simple rule.
+In the strictest test (train on 2024, test on 2025) we were five ahead: 18 vs 13. With 75 positives it is still a small
+sample.
+- v6 20-seed bag: 18 (2025) + 9 (2024) = 27 vs 13 + 6 = 19; pooled difference +8, 90% range +2 to +14;
+  forward 18 vs 13 (0 to +10); stability 9 vs 6 (`outputs/v6_headline_candidate.json`)
 - What we're sure of: the blind spots are real, EPSS jumped from July 2026, and we didn't use leaking data.
 
 ## 8. Granite reason examples (fill from the final list)
