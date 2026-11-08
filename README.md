@@ -1,8 +1,18 @@
+**What is fortres?** Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
+The ranking is 20 decision-tree models that vote, not a chatbot; IBM Granite reads the descriptions for one clue and writes a checked one-sentence reason for each pick.
+
 # IBM "Before the Breach" – predicting which CVEs get exploited
 
 Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and submit
 `top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
 CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
+
+## What we found
+All four are from files in this repository; the full list of ten, with sources, is in [docs/findings.md](docs/findings.md).
+1. **Most holes on CISA's list gave no warning.** In our 2024 and 2025 test, 44 of the 75 had no public attack code and a low EPSS score. The usual rule catches 0 of them, and fortres caught 5, three of which come from one Ivanti event.
+2. **Severity labels hide danger.** 1 in 9 entries added to CISA's list from 2021 to 2025 (162 of 1,484) is rated only Medium.
+3. **Data that arrives after an attack makes results look better than they are.** In our 2024 and 2025 test, fields NVD fills in later would raise 27 catches to 33, so we left them out.
+4. **Less work for the same catch.** In our 2024 and 2025 test, fortres's list of 441 catches 27. To catch the same 27, the usual rule needs 1,116 fixes, sorting by severity needs 6,858, and EPSS alone needs 10,026.
 
 ## Reproduce the final list
 This rebuild **rewrites `outputs/` in place**, so run it in a fresh clone, not in a working copy with changes.

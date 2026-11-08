@@ -12,6 +12,19 @@ Before the Breach: which 2026 vulnerabilities end up on CISA's known-exploited l
 We rank 2026's 72,670 new vulnerabilities to find the ones most likely to be added to CISA KEV, using only what was
 known at the time, with a plain-English reason for each pick from IBM Granite.
 
+## What it is
+Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
+
+The ranking is 20 decision-tree models that vote, not a chatbot: it's fast, it can be tested against what really happened, and it runs on a laptop. Granite Embedding reads each description and gives the ranking one clue, Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts (a plain template is used if it fails). It doesn't predict who gets attacked, the language model never decides the ranking, and it still misses most holes that give no warning.
+
+## What we found
+The full list of ten, with sources, is in `docs/findings.md`.
+1. **Most holes on CISA's list gave no warning.** In our 2024 and 2025 test, 44 of the 75 had no public attack code and a low EPSS score. The usual rule catches 0 of them, and fortres caught 5, three of which come from one Ivanti event.
+2. **Severity labels hide danger.** 1 in 9 entries added to CISA's list from 2021 to 2025 (162 of 1,484) is rated only Medium, so a team that fixes Critical and High first reaches these last.
+3. **Data that arrives after an attack makes results look better than they are.** In our 2024 and 2025 test, fields NVD fills in later would raise 27 catches to 33, so we left them out.
+4. **Outside data can carry hindsight dates.** In Metasploit, for 249 of the 490 pairs of a hole and a module, the link to the hole was added more than 30 days after the module, and some 2025 holes are new numbers for exploits from 2010.
+5. **Less work for the same catch.** In our 2024 and 2025 test, fortres's list of 441 catches 27. To catch the same 27, the usual rule needs 1,116 fixes, sorting by severity needs 6,858, and EPSS alone needs 10,026.
+
 ## Inspiration
 Every year tens of thousands of software flaws are published, and only about 1 in 855 ends up on CISA's Known Exploited
 Vulnerabilities (KEV) list. Security teams can only patch a few hundred, so which ones first? The standard answer is
