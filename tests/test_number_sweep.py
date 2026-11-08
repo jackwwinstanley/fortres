@@ -370,3 +370,41 @@ def test_rule_18_none_flagged_needs_zero_flags_and_the_summaries():
     assert any("none flagged" in p for p in ns.check_text(SITE, BAND, flagged))
     assert any("needs outputs/explanations_summary.json" in p for p in ns.check_text(SITE, BAND, E))
     assert ns.check_text(SITE, "<section id=\"f-other\">36% (182 of 500)</section>", E) == []
+
+
+# ---- rule 19: the "27 not 33" card is percentages only, each computed from its source ---------------------------------------------
+CARD_X = {**X, "seed_sets": (26, 28)}
+FAIR = """<section class="step" data-s="trust"><div class="card">
+    <span class="num mint">36%<small>not 44%</small></span>
+    <h2>We could have claimed 44%. <mark>We claim 36%.</mark></h2>
+    <p>Some data only appears after a hole is attacked, like NVD marking it as reviewed. Using it would have lifted our catch rate from 36% to 44%, so we left it out. Rerun with new random seeds: 35% to 37% every time. Trained on shuffled answers, it catches almost nothing.</p>
+    <p>On an older year (2023), we caught 18% and the usual rule caught 23%. We report it anyway.</p>
+    <p>Anyone can rebuild the exact same 500 from our code in about 6 minutes.</p>
+  </div></section>"""
+
+
+def test_rule_19_the_correct_card_passes():
+    assert ns.check_text(SITE, FAIR, CARD_X) == []
+
+
+@pytest.mark.parametrize("old,new,needle", [
+    ("36%<small>not 44%</small>", "37%<small>not 44%</small>", "gives 36% and 44%"),
+    ("36%<small>not 44%</small>", "36%<small>not 45%</small>", "gives 36% and 44%"),
+    ("We claim 36%", "We claim 40%", "gives 44% and 36%"),
+    ("from 36% to 44%", "from 36% to 43%", "gives 36% and 44%"),
+    ("35% to 37% every time", "35% to 38% every time", "the lowest and highest seed set out of 75 gives 35% and 37%"),
+    ("we caught 18%", "we caught 19%", "v6 and the usual rule out of 22 gives 18% and 23%"),
+    ("usual rule caught 23%", "usual rule caught 25%", "v6 and the usual rule out of 22 gives 18% and 23%"),
+    ("every time.", "every time (27 of 75).", "raw count '27'"),
+    ("caught 23%.", "caught 23% (5 of 22).", "raw count '5 of 22'"),
+    ("in about 6 minutes", "in about 10 minutes", "README.md says train_v6 took 6 min"),
+])
+def test_rule_19_wrong_card_is_caught(old, new, needle):
+    assert old in FAIR
+    probs = ns.check_text(SITE, FAIR.replace(old, new), CARD_X)
+    assert any(needle in p for p in probs), probs
+
+
+def test_rule_19_needs_its_sources_and_only_applies_to_that_card():
+    assert any("fair card needs" in p for p in ns.check_text(SITE, FAIR, E))
+    assert ns.check_text(SITE, '<section class="step" data-s="other">36% not 44%, 27 and 33</section>', E) == []

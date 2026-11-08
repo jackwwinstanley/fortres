@@ -50,7 +50,9 @@ def test_page_numbers_equal_the_headline_and_blind_spot_files():
     assert f"{f['bag_hits']} to {f['baseline_hits']} in 2025" in html and f"{s['bag_hits']} to {s['baseline_hits']} in 2024" in html
     lo, hi = h["pooled"]["diff_cve_level_90"]
     assert f"+{h['pooled_hits_bag'] - h['baseline_pooled_hits']}" in html and f"from +{lo:.0f} to +{hi:.0f}" in html
-    assert f"{h['leakage']['honest']['pooled_hits']} to {h['leakage']['leaky']['pooled_hits']}" in html
+    total = int(b["exploited"].sum())  # the "27 not 33" card shows percentages of the 75, not the raw counts
+    pct = lambda n: int(100 * n / total + 0.5)
+    assert f"from {pct(h['leakage']['honest']['pooled_hits'])}% to {pct(h['leakage']['leaky']['pooled_hits'])}%" in html
 
 
 @need
