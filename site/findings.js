@@ -66,6 +66,7 @@
     reasons(sec, v, D) {
       const R = D.reasons;
       v.append(bricks([...rep(R.passed_guardian, C.mint), ...rep(R.local_failed, C.amber), ...rep(R.guardian_rejected, C.coral)], 25, 3, 0.5));
+      v.insertAdjacentHTML('beforeend', '<p class="lbl" style="margin-top:10px">one brick per pick · <span style="color:var(--caught)">■</span> reason kept · <span style="color:#f1c21b">■</span> rejected by our rules · <span style="color:var(--miss)">■</span> blocked by Guardian</p>');
     },
     events(sec, v, D) {
       const t0 = Date.parse('2024-01-01'), t1 = Date.parse('2026-01-01');

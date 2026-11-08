@@ -199,6 +199,17 @@
       <figure class="fv"><div class="viz tiles" role="img" aria-label="18 tiles, one per idea tried; one kept"></div></figure>
     </section>
 
+    <section class="fd tone-blue" id="f-ai" data-viz="reasons">
+      <div class="ft">
+        <span class="fk">06</span>
+        <span class="fbig"><b>36%</b><small>(182 of 500)</small></span>
+        <h3>AI explanations need checking.</h3>
+        <p>IBM Granite drafted a reason for each of our 500 picks, using only that hole's facts. Our own rules rejected 92 drafts, most often for using a word that isn't in the facts. IBM Granite Guardian then checked the rest against the facts and blocked 90 more. Those 182 picks show a plain fixed sentence instead. Afterwards, IBM watsonx.governance scored all 500 final reasons: on average 0.80 for staying true to the facts, and none flagged for harm or personal data.</p>
+        <code>outputs/explanations_summary.json, outputs/watsonx_gov_summary.json</code>
+      </div>
+      <figure class="fv"><div class="viz" role="img" aria-label="500 bricks, one per pick: 318 kept, 92 rejected by our own rules, 90 blocked by Granite Guardian"></div></figure>
+    </section>
+
     <h2 class="qah">Questions judges ask</h2>
     <dl class="qa">
       <div><dt>Is fortres an LLM?</dt><dd>No. The ranking is 20 models that vote, each built from 150 small decision trees. IBM Granite reads the descriptions to give the ranking one clue, and writes the plain reason for each pick, which Granite Guardian checks against the facts.</dd></div>

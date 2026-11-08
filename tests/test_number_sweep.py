@@ -321,3 +321,52 @@ def test_rule_17_percentages_without_a_known_subject_are_only_checked_for_arithm
 def test_the_definition_is_the_fix_first_wording():
     assert "to fix first, ranked by the warning signs known at the time" in ns.DEFINITION
     assert "most likely to be attacked" not in ns.DEFINITION
+
+
+# ---- rule 18: the "AI explanations need checking" band of site/index.html ---------------------------------------------------------
+AI = {**E, "guardian": {"total": 500, "passed_guardian": 318, "template_fallback": 182, "pending": 0,
+                        "guardian_verdicts": {"No": 318, "Yes": 90, "not_run": 92}},
+      "watsonx_gov": {"rows": {"n": 500}, "metrics": [
+          {"column": "faithfulness__granite_guardian", "mean": 0.8011, "n_ge_0_5": 495},
+          {"column": "harm__granite_guardian", "mean": 0.0, "n_ge_0_5": 0}, {"column": "output_pii", "mean": 0.0, "n_ge_0_5": 0}]}}
+BAND = """<section class="fd tone-blue" id="f-ai" data-viz="reasons">
+  <div class="ft"><span class="fk">06</span><span class="fbig"><b>36%</b><small>(182 of 500)</small></span>
+    <h3>AI explanations need checking.</h3>
+    <p>IBM Granite drafted a reason for each of our 500 picks, using only that hole's facts. Our own rules rejected 92 drafts, most often
+    for using a word that isn't in the facts. IBM Granite Guardian then checked the rest against the facts and blocked 90 more. Those 182
+    picks show a plain fixed sentence instead. Afterwards, IBM watsonx.governance scored all 500 final reasons: on average 0.80 for staying
+    true to the facts, and none flagged for harm or personal data.</p></div>
+  <figure class="fv"><div class="viz" role="img" aria-label="500 bricks, one per pick: 318 kept, 92 rejected by our own rules, 90 blocked by Granite Guardian"></div></figure>
+</section>"""
+SITE = "site/index.html"
+
+
+def test_rule_18_the_correct_ai_band_passes():
+    assert ns.check_text(SITE, BAND, AI) == []
+
+
+@pytest.mark.parametrize("old,new,needle", [
+    ("<b>36%</b><small>(182 of 500)</small>", "<b>37%</b><small>(182 of 500)</small>", "has template_fallback 182 of 500"),
+    ("<b>36%</b><small>(182 of 500)</small>", "<b>36%</b><small>(180 of 500)</small>", "has template_fallback 182 of 500"),
+    ("rejected 92 drafts", "rejected 91 drafts", "guardian_verdicts.not_run is 92"),
+    ("blocked 90 more", "blocked 80 more", "guardian_verdicts.Yes is 90"),
+    ("Those 182", "Those 183", "template_fallback is 182"),
+    ("each of our 500 picks", "each of our 499 picks", "total is 500"),
+    ("scored all 500 final", "scored all 400 final", "rows.n is 500"),
+    ("on average 0.80", "on average 0.85", "the mean faithfulness is 0.80"),
+    ("318 kept, 92 rejected", "320 kept, 92 rejected", "passed_guardian is 318"),
+    ("92 rejected by our own rules, 90 blocked", "92 rejected by our own rules, 91 blocked", "guardian_verdicts.Yes is 90"),
+    ("scored all 500 final reasons", "verified all 500 final reasons and scored all 500 final reasons", "uses 'verified'"),
+    ("scored all 500 final reasons", "scored all 500 final reasons (passed watsonx)", "uses 'passed watsonx'"),
+])
+def test_rule_18_wrong_ai_band_is_caught(old, new, needle):
+    assert old in BAND
+    probs = ns.check_text(SITE, BAND.replace(old, new), AI)
+    assert any(needle in p for p in probs), probs
+
+
+def test_rule_18_none_flagged_needs_zero_flags_and_the_summaries():
+    flagged = {**AI, "watsonx_gov": {**AI["watsonx_gov"], "metrics": [*AI["watsonx_gov"]["metrics"][:2], {"column": "output_pii", "n_ge_0_5": 2}]}}
+    assert any("none flagged" in p for p in ns.check_text(SITE, BAND, flagged))
+    assert any("needs outputs/explanations_summary.json" in p for p in ns.check_text(SITE, BAND, E))
+    assert ns.check_text(SITE, "<section id=\"f-other\">36% (182 of 500)</section>", E) == []
