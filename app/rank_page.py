@@ -4,8 +4,8 @@ import time
 from pathlib import Path
 
 import pandas as pd
-import altair as alt
 import numpy as np
+import streamlit.components.v1 as components
 import streamlit as st
 
 from app import style as ui
@@ -72,32 +72,30 @@ def build_table(res: pd.DataFrame, S: Scorer, facts: pd.DataFrame, exp: pd.DataF
     return pd.DataFrame(rows, columns=["Rank here", "Rank in all 2026", "CVE", "What it lets an attacker do", "Vendor / reporter", "EPSS percentile in month", "Public exploit code", "Reason", "Reason type", "score", "in_top"])
 
 
-AXIS = dict(labelColor=ui.MUTED, titleColor=ui.MUTED, labelFont="IBM Plex Mono, ui-monospace, Menlo, monospace", titleFont="IBM Plex Sans, system-ui, sans-serif", titleFontWeight=400, domainColor=ui.LINE, tickColor=ui.LINE, grid=False)
+MAX_BRICKS = 2400
 
 
-def _theme(chart):
-    return chart.configure(background=ui.BG).configure_view(strokeWidth=0).configure_axis(**AXIS)
+def brick_args(in_top: "np.ndarray", exploit: "np.ndarray", origin: "np.ndarray", top_n: int) -> dict:
+    """Downsample rows (already in rank order) to bricks: top_n rows are 'top'; a brick shows exploit code if any of its rows has it."""
+    n = len(in_top)
+    per = int(np.ceil(n / MAX_BRICKS)) if n > MAX_BRICKS else 1
+    states, orig = [], []
+    for start in range(0, n, per):
+        end = min(start + per, n)
+        top = start < top_n
+        states.append((2 if top else 0) + int(exploit[start:end].any()))
+        orig.append(int(origin[start]) // per)
+    return dict(states=states, origin=orig, per=per, top_n=top_n, n_total=n)
 
 
-def signals_chart(cve: str, facts: pd.DataFrame) -> alt.Chart:
+def field_height(n_bricks: int) -> int:
+    return int(np.ceil(n_bricks / 100)) * 12 + 56
+
+
+def signal_rows(cve: str, facts: pd.DataFrame) -> list[tuple[str, float, str]]:
     f = facts.loc[cve]
-    d = pd.DataFrame({"signal": ["EPSS percentile in month", "IBM Granite KEV-likeness (percentile)", "Similarity to past KEV entries", "Public exploit sources (of 4)"],
-                      "value": [float(f["epss_pct"] if pd.notna(f["epss_pct"]) else 0), float(f["kev_text_pct"]), float(f["nearest_kev_sim"]), len(f["exploits"]) / 4]})
-    y = alt.Y("signal:N", sort=None, title=None, axis=alt.Axis(labelLimit=260, labelFont="IBM Plex Sans, system-ui, sans-serif", ticks=False, domain=False))
-    bars = alt.Chart(d).mark_bar(color=ui.ACCENT, height=8).encode(x=alt.X("value:Q", scale=alt.Scale(domain=[0, 1.12]), axis=None), y=y, tooltip=[alt.Tooltip("signal:N", title="signal"), alt.Tooltip("value:Q", format=".2f", title="value")])
-    text = bars.mark_text(align="left", dx=6, color=ui.TEXT, font="IBM Plex Mono, ui-monospace, Menlo, monospace").encode(text=alt.Text("value:Q", format=".2f"))
-    return _theme(bars + text).properties(height=160)
-
-
-def dist_chart(df: pd.DataFrame, n: int) -> alt.Chart:
-    cut = float(df["score"].nlargest(n).min())
-    counts, edges = np.histogram(df["score"].to_numpy(), bins=60, range=(0, 1))
-    d = pd.DataFrame({"from": edges[:-1], "to": edges[1:], "CVEs": counts})
-    x = alt.X("from:Q", bin="binned", title="v6 score", scale=alt.Scale(domain=[0, 1]), axis=alt.Axis(format=".1f", values=[i / 10 for i in range(11)]))
-    bars = alt.Chart(d).mark_bar(color=ui.ACCENT, opacity=0.75).encode(x=x, x2="to:Q", y=alt.Y("CVEs:Q", title="CVEs", axis=alt.Axis(tickCount=4)), tooltip=[alt.Tooltip("from:Q", format=".2f", title="score from"), alt.Tooltip("CVEs:Q", format=",", title="CVEs")])
-    rule = alt.Chart(pd.DataFrame({"x": [cut], "t": [f"top {n:,} cut-off"]})).mark_rule(color=ui.CORAL, strokeWidth=2).encode(x="x:Q")
-    label = alt.Chart(pd.DataFrame({"x": [cut], "t": [f"top {n:,} cut-off"]})).mark_text(align="right", baseline="top", dx=-8, color=ui.CORAL, font="IBM Plex Mono, ui-monospace, Menlo, monospace", fontSize=13).encode(x="x:Q", y=alt.value(2), text="t:N")
-    return _theme(bars + rule + label).properties(height=224)
+    return [("EPSS percentile in month", float(f["epss_pct"] if pd.notna(f["epss_pct"]) else 0), ui.ACCENT), ("IBM Granite KEV-likeness (percentile)", float(f["kev_text_pct"]), ui.ACCENT2),
+            ("Similarity to past KEV entries", float(f["nearest_kev_sim"]), ui.ACCENT2), ("Public exploit sources (of 4)", len(f["exploits"]) / 4, ui.GREEN)]
 
 
 def render():
@@ -144,13 +142,19 @@ def render():
         tab = build_table(res, S, facts, exp, df)
         bar.progress(100)
         bar.empty()
-        st.session_state["res"] = dict(tab=tab, secs=secs, name=source[0], dropped=df.attrs.get("dropped_bad_ids", 0))
+        pos = pd.Series(np.arange(len(df)), index=df["cve_id"])
+        st.session_state["res"] = dict(tab=tab, secs=secs, name=source[0], dropped=df.attrs.get("dropped_bad_ids", 0), origin=pos.reindex(tab["CVE"]).to_numpy(), fresh=True)
     if "res" not in st.session_state:
         if not msg:
             st.markdown("<div style='height:24px'></div>" + ui.panel("Choose a file or a sample, then press Run."), unsafe_allow_html=True)
+            st.markdown('<div class="fx-h">The whole 2026 scoreboard, ranked by v6</div>', unsafe_allow_html=True)
+            order = S.order
+            preview = brick_args(np.arange(len(order)) < TOP, S.sb[list(ex.EXPLOIT_SRC)].to_numpy()[order].max(axis=1) > 0, np.argsort(np.argsort(S.ids.astype(str)))[order], TOP)
+            components.html(ui.brick_field(**preview), height=field_height(len(preview["states"])))
         st.caption("v6 model, trained on our 2024 and 2025 test pools, loaded from saved files. Granite text scores were computed in our earlier run.")
         return
     r = st.session_state["res"]
+    fresh = r.pop("fresh", False)
     tab = r["tab"]
     n_all = len(tab)
     st.markdown(ui.banner(f"Scored {n_all:,} in {r['secs']:.2f} s on this laptop"), unsafe_allow_html=True)
@@ -161,8 +165,12 @@ def render():
     head = tab.head(n)
     ex_n = int((head["Public exploit code"] == "yes").sum())
     st.markdown(ui.cards([(f"{n_all:,}", "rows scored", None), (f"{int(tab['in_top'].sum()):,}", "are in Fortres's 2026 top 500", None),
-                          (f"{ex_n:,} of {len(head):,}", f"of your top {len(head):,} have public exploit code", ex_n / max(len(head), 1)), (f"{len(head):,}", "top N selected", None)]), unsafe_allow_html=True)
-    st.altair_chart(dist_chart(tab, n), use_container_width=True, theme=None)
+                          (f"{ex_n:,} of {len(head):,}", f"of your top {len(head):,} have public exploit code", ex_n / max(len(head), 1)), (f"{len(head):,}", "top N selected", None)], fresh=fresh), unsafe_allow_html=True)
+    if fresh:
+        with st.container(key="fx-js"):
+            components.html(ui.COUNT_JS, height=0)
+    field = brick_args(np.arange(n_all) < n, (tab["Public exploit code"] == "yes").to_numpy(), r["origin"], n)
+    components.html(ui.brick_field(**field), height=field_height(len(field["states"])))
     f1, f2, f3, f4 = st.columns([3, 3, 2, 1.4], vertical_alignment="bottom")
     q = f1.text_input("Search by CVE id", placeholder="CVE-2026-")
     vend = f2.multiselect("Vendor / reporter", sorted(v for v in tab["Vendor / reporter"].unique() if v))
@@ -179,7 +187,7 @@ def render():
     if view.empty:
         st.markdown(ui.panel("No CVEs match these filters."), unsafe_allow_html=True)
     else:
-        st.markdown(ui.table(view.head(25).to_dict("records")), unsafe_allow_html=True)
+        st.markdown(ui.table(view.head(25).to_dict("records"), fresh=fresh), unsafe_allow_html=True)
     show = view.drop(columns=["score", "in_top"]).head(5000).copy()
     show["Status"] = show["Reason type"].map(ui.short_label)
     show["Public exploit code"] = show["Public exploit code"].map({"yes": "Yes", "no": "No"})
@@ -194,7 +202,7 @@ def render():
             row = show.iloc[picked[0]]
             st.markdown(ui.detail(row["CVE"], int(row["Rank in all 2026"]), len(S.ids), row["Reason type"], row["Reason"]), unsafe_allow_html=True)
             if row["CVE"] in S.index.index:
-                st.altair_chart(signals_chart(row["CVE"], facts), use_container_width=True, theme=None)
+                st.markdown(ui.signals(signal_rows(row["CVE"], facts)), unsafe_allow_html=True)
             else:
                 st.markdown(ui.panel("This CVE is not in the 2026 scoreboard, so the Granite text score is not available."), unsafe_allow_html=True)
         else:
