@@ -34,7 +34,7 @@ check" (not "verified").
 ## Likely questions
 
 **Is fortres an LLM?**
-No. The ranking is a set of 20 tree-based models that vote, each made of 150 small trees. IBM Granite reads the descriptions to give the ranking one clue, and writes the plain reason for each pick, which Granite Guardian checks against the facts.
+No. The ranking is 20 models that vote, each built from 150 small decision trees. IBM Granite reads the descriptions to give the ranking one clue, and writes the plain reason for each pick, which Granite Guardian checks against the facts.
 
 **Why not use an LLM to rank?**
 A ranking model can be tested against known outcomes, and it gives the same answer every time. A language model can make things up, so we only let it explain.

@@ -8,7 +8,7 @@ checked which holes CISA later added to its Known Exploited Vulnerabilities (KEV
 
 Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
 
-- **The ranking is a set of 20 tree-based models that vote, each made of 150 small trees.** It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.
+- **The ranking is 20 models that vote, each built from 150 small decision trees.** It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.
 - **IBM Granite does the reading and the explaining.** Granite Embedding reads each description and gives the ranking one clue. Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts. If it fails, a plain template sentence is used instead.
 - **What it is not.** It doesn't predict who gets attacked. The language model never decides the ranking. And it still misses most holes that give no warning.
 
@@ -55,11 +55,11 @@ Fortres is a triage system for security holes: a statistical model ranks all 72,
 **Source:** `outputs/explanations_summary.json` (`guardian_verdicts`, `local_check_failures`).
 
 ### 9. Less work for the same catch
-**441 fixes, not 10,026.** In our 2024 and 2025 test, fortres's list of 441 catches 27. To catch the same 27, the usual rule needs 1,116 fixes, sorting by severity needs 6,858, and EPSS alone needs 10,026.
-**Why it matters:** the order decides how much of a team's time goes to holes nobody uses. The depths add the two test years together. Fortres's own 27th catch sits at position 353, so 441 is the cautious figure.
+**441 fixes, not 10,026.** Fortres caught those 27 with a list of only 441 fixes in our 2024 and 2025 test. To reach the same 27, the usual rule would have to go 1,116 deep, sorting by severity 6,858, and EPSS alone 10,026.
+**Why it matters:** the order decides how much of a team's time goes to holes nobody uses. The depths add the two test years together, and fortres's 27th catch is at position 353, so 441 is the cautious figure.
 **Source:** `outputs/discovery_workload.csv`, written by `scripts/discovery_tables.py`.
 
 ### 10. Risk scores jumped in July 2026
-**6.37 times.** The median EPSS score of holes in the 2026 snapshots from July on is 6.37 times the median of our 2024 and 2025 practice pools. We don't know why.
-**Why it matters:** a model trained on raw scores would treat most of 2026 as high risk, so fortres compares each hole only with others from the same month.
+**6.37×.** From the July 2026 snapshots on, EPSS scores were 6.37 times the 2024 to 2025 median, so fortres compares each hole only with others scored in the same month.
+**Why it matters:** a model trained on raw scores would treat most of 2026 as high risk. We compared median with median, and we don't know why the scores rose.
 **Source:** `outputs/discovery_epss_jump.csv`, written by `scripts/discovery_tables.py`.

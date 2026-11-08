@@ -279,15 +279,15 @@ def check_findings(rel: str, text: str, e: dict) -> list[str]:
             for m in re.finditer(r"\b1 in (\d+)\b", line):
                 if int(m.group(1)) != f["one_in"]:
                     probs.append(f"{where}: {m.group(0)}, the Medium share is 1 in {f['one_in']}")
-        if "catch the same" in low or re.search(r"\bfixes\b", low):             # each workload number must sit with its own method
+        if re.search(r"(?:catch|reach) the same", low) or re.search(r"\bfixes\b", low):             # each workload number must sit with its own method
             for key, label in WORKLOAD_LABELS.items():
                 for clause in re.split(r",\s|;| and (?=epss|sorting|the usual)", low):
                     m = re.search(rf"{label}\b[^.\d]{{0,25}}?{NUM}\b", clause) or re.search(rf"\b{NUM} \(?(?:fixes )?(?:for )?{label}\b", clause)
                     if m and _n(m.group(1)) >= 100 and _n(m.group(1)) != f["workload"][key]:
                         probs.append(f"{where}: workload for {key} is {m.group(1)}, outputs/discovery_workload.csv has {f['workload'][key]:,}")
-            for m in re.finditer(rf"fortres(?:'s list of| needs)? {NUM}\b", low):
-                if _n(m.group(1)) not in (f["workload"]["fortres_list"], f["workload"]["fortres_depth"]):
-                    probs.append(f"{where}: fortres workload {m.group(1)}, expected {f['workload']['fortres_list']}")
+            for m in re.finditer(rf"fortres(?:'s list of| needs)? {NUM}\b|list of (?:only )?{NUM} fixes", low):
+                if _n(m.group(1) or m.group(2)) not in (f["workload"]["fortres_list"], f["workload"]["fortres_depth"]):
+                    probs.append(f"{where}: fortres workload {m.group(1) or m.group(2)}, expected {f['workload']['fortres_list']}")
         if "metasploit" in low and "30 days" in low:
             for m in re.finditer(rf"\b{NUM} of (?:the )?{NUM}\b", line):
                 if (_n(m.group(1)), _n(m.group(2))) not in (f["msf"], f["vulncheck"]):
@@ -311,13 +311,13 @@ def check_findings(rel: str, text: str, e: dict) -> list[str]:
             for m in re.finditer(r"fortres (?:caught|found) (\d+)", low):
                 if int(m.group(1)) != e["blind_ours"]:
                     probs.append(f"{where}: {m.group(0)}, the blind-spot file has {e['blind_ours']}")
-        if "epss" in low and re.search(r"jump", low):
+        if "epss" in low and re.search(r"jump|2024 to 2025 median", low):
             for m in re.finditer(r"(\d+(?:\.\d+)?) ?(?:×|x\b|times)", low):
                 k = len(m.group(1).split(".")[1]) if "." in m.group(1) else 0
                 if float(m.group(1)) != round(f["epss_jump"], k):
                     probs.append(f"{where}: EPSS jump {m.group(0)}, outputs/discovery_epss_jump.csv has {f['epss_jump']}")
     for n, line in enumerate(text.splitlines(), 1):                     # the ranking's size, wherever it is described
-        for m in re.finditer(r"\b(\d+) tree-based models\b[^.]*?\b(\d+) small trees\b", line):
+        for m in re.finditer(r"\b(\d+) models that vote\b[^.]*?\b(\d+) small decision trees\b", line):
             if (int(m.group(1)), int(m.group(2))) != (f["seeds"], f["trees"]):
                 probs.append(f"{rel}:{n}: {m.group(0)}, outputs/headline.json has {f['seeds']} models of {f['trees']} trees")
     needs_definition = rel in DEFINITION_DOCS or (rel == "site/index.html" and "what we found" in text.lower())

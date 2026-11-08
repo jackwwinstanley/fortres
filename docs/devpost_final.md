@@ -15,7 +15,7 @@ known at the time, with a plain-English reason for each pick from IBM Granite.
 ## What it is
 Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
 
-The ranking is a set of 20 tree-based models that vote, each made of 150 small trees, not a chatbot: it's fast, it can be tested against what really happened, and it runs on a laptop. Granite Embedding reads each description and gives the ranking one clue, Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts (a plain template is used if it fails). It doesn't predict who gets attacked, the language model never decides the ranking, and it still misses most holes that give no warning.
+The ranking is 20 models that vote, each built from 150 small decision trees, not a chatbot: it's fast, it can be tested against what really happened, and it runs on a laptop. Granite Embedding reads each description and gives the ranking one clue, Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts (a plain template is used if it fails). It doesn't predict who gets attacked, the language model never decides the ranking, and it still misses most holes that give no warning.
 
 ## What we found
 The full list of ten, with sources, is in `docs/findings.md`.
@@ -23,7 +23,7 @@ The full list of ten, with sources, is in `docs/findings.md`.
 2. **Severity labels hide danger.** 1 in 9 entries added to CISA's list from 2021 to 2025 (162 of 1,484) is rated only Medium, so a team that fixes Critical and High first reaches these last.
 3. **Data that arrives after an attack makes results look better than they are.** In our 2024 and 2025 test, fields NVD fills in later would raise 27 catches to 33, so we left them out.
 4. **Outside data can carry hindsight dates.** In Metasploit, for 249 of the 490 pairs of a hole and a module, the link to the hole was added more than 30 days after the module, and some 2025 holes are new numbers for exploits from 2010.
-5. **Less work for the same catch.** In our 2024 and 2025 test, fortres's list of 441 catches 27. To catch the same 27, the usual rule needs 1,116 fixes, sorting by severity needs 6,858, and EPSS alone needs 10,026.
+5. **Less work for the same catch.** Fortres caught those 27 with a list of only 441 fixes in our 2024 and 2025 test. To reach the same 27, the usual rule would have to go 1,116 deep, sorting by severity 6,858, and EPSS alone 10,026.
 
 ## Inspiration
 Every year tens of thousands of software flaws are published, and only about 1 in 855 ends up on CISA's Known Exploited

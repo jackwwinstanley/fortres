@@ -223,6 +223,9 @@ def test_correct_findings_lines_pass():
 @pytest.mark.parametrize("line,needle", [
     ("To catch the same 27, sorting by severity needs 10,026, and EPSS alone needs 6,858.", "workload for severity"),
     ("To catch the same 27, the usual rule needs 1,200 fixes.", "workload for usual"),
+    ("To reach the same 27, sorting by severity 10,026, and EPSS alone 6,858.", "workload for severity"),
+    ("Fortres caught those 27 with a list of only 500 fixes.", "fortres workload 500"),
+    ("EPSS scores were 7 times the 2024 to 2025 median.", "EPSS jump"),
     ("1 in 8 entries (162 of 1,484) is rated only Medium.", "the Medium share"),
     ("161 of 1,484 entries are rated only Medium.", "Medium claim"),
     ("In Metasploit, 250 of the 490 pairs were added more than 30 days later.", "Metasploit claim"),
@@ -257,6 +260,6 @@ def test_new_banned_words(line):
 
 
 def test_model_size_wording_is_checked():
-    assert ns.check_findings("docs/judge_qa.md", "A set of 20 tree-based models that vote, each made of 150 small trees.", EF) == []
-    probs = ns.check_findings("docs/judge_qa.md", "A set of 20 tree-based models that vote, each made of 100 small trees.", EF)
+    assert ns.check_findings("docs/judge_qa.md", "The ranking is 20 models that vote, each built from 150 small decision trees.", EF) == []
+    probs = ns.check_findings("docs/judge_qa.md", "The ranking is 20 models that vote, each built from 100 small decision trees.", EF)
     assert any("150 trees" in p for p in probs), probs
