@@ -1,0 +1,1739 @@
+{
+"flagged": [
+{
+"cve_id": "CVE-2026-23552",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-23552\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-24018",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-24018\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-67181",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-67181\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2025-15545",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2025-15545\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-34121",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it's a CVE with unauthenticated and authentication-bypass weaknesses, and its ranking is influenced by the reporting organisation's history of exploiting similar CVEs and the specific wording of the weakness description.",
+"facts": "- CVE: CVE-2026-34121\n- Weakness hints: unauthenticated, authentication-bypass\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, weakness wording in the description"
+},
+{
+"cve_id": "CVE-2026-33033",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-33033\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-59230",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-59230\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-71300",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-71300\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-64640",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-64640\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2025-60012",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2025-60012\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-78329",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-78329\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-66752",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-66752\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-54415",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-54415\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-24072",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-24072\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-29146",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-29146\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-25854",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-25854\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-85649",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-85649\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-53694",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-53694\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-29145",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-29145\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-46591",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-46591\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-86350",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-86350\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-8161",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-8161\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2025-36911",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2025-36911\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-66746",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-66746\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-8697",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-8697\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-39816",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-39816\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-42779",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-42779\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-13233",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-13233\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-5268",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it's a CVE with unauthenticated and authentication-bypass weaknesses, and its ranking is influenced by the reporting organisation's history of exploiting similar CVEs and the specific wording of the weakness description.",
+"facts": "- CVE: CVE-2026-5268\n- Weakness hints: unauthenticated, authentication-bypass\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, weakness wording in the description"
+},
+{
+"cve_id": "CVE-2026-24306",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-24306\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-62183",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-62183\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-78122",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-78122\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-41729",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-41729\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-71206",
+"category": "misstates the driver fact: 'history of exploiting similar CV",
+"sentence": "Prioritised because it has a GitHub proof of concept in public exploit code and the reporting organisation's history of exploiting similar CVEs.",
+"facts": "- CVE: CVE-2026-71206\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: public exploit code, the reporting organisation's history of exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-46725",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it allows remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-46725\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-27180",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-27180\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-76639",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 4%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-76639\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-53787",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has public exploit code in a Nuclei template and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it allows remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-53787\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-86426",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it allows remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-86426\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-23697",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 2%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-23697\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-53913",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 4%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-53913\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-48909",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has public exploit code in Exploit-DB, a Nuclei template, and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it allows for remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-48909\n- Public exploit code: Exploit-DB, a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-73034",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has public exploit code in a Nuclei template and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it allows remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-73034\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-58231",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 1%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-58231\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-26215",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 8%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-26215\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 8%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2025-71389",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2025-71389\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-22679",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 7%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-22679\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-26221",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 1%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-26221\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-73519",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-73519\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-42796",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-42796\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-65008",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-65008\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-66748",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 4%, and it allows remote code execution.",
+"facts": "- CVE: CVE-2026-66748\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-70553",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 2%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-70553\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-73678",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 2%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-73678\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2025-71334",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it allows remote code execution without authentication.",
+"facts": "- CVE: CVE-2025-71334\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-53805",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-53805\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-58480",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 6%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-58480\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 6%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-54390",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 6%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-54390\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 6%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-83527",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a CVE-2026-83527, its EPSS percentile within its month is in the top 1%, and it allows unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-83527\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, authentication-bypass"
+},
+{
+"cve_id": "CVE-2026-71981",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 3%, and it allows remote code execution.",
+"facts": "- CVE: CVE-2026-71981\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-56121",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 2%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-56121\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-66747",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 6%, and it allows unauthenticated exploitation.",
+"facts": "- CVE: CVE-2026-66747\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 6%\n- Weakness hints: remote code execution, unauthenticated"
+},
+{
+"cve_id": "CVE-2026-58116",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 5%, and it allows remote code execution.",
+"facts": "- CVE: CVE-2026-58116\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2020-36963",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a CVE-2020-36963, its EPSS percentile within its month is in the top 6%, and it allows unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2020-36963\n- EPSS percentile within its month: top 6%\n- Weakness hints: unauthenticated, authentication-bypass"
+},
+{
+"cve_id": "CVE-2026-0625",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a CVE-2026-0625, its EPSS percentile within its month is in the top 2%, and it allows unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-0625\n- EPSS percentile within its month: top 2%\n- Weakness hints: unauthenticated, authentication-bypass"
+},
+{
+"cve_id": "CVE-2026-14917",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a CVE-2026-14917, its EPSS percentile within its month is in the top 9%, and it allows unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-14917\n- EPSS percentile within its month: top 9%\n- Weakness hints: unauthenticated, authentication-bypass"
+},
+{
+"cve_id": "CVE-2026-48546",
+"category": "'allows ...' turns the weakness hints into a capability",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 10%, and it allows remote code execution.",
+"facts": "- CVE: CVE-2026-48546\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 10%\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-86206",
+"category": "'a vulnerability with a specific template for exploitation'",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 2%, and it is a vulnerability with a specific template for exploitation.",
+"facts": "- CVE: CVE-2026-86206\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 2%"
+},
+{
+"cve_id": "CVE-2026-17594",
+"category": "'a vulnerability with a specific template for exploitation'",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 6%, and it is a vulnerability with a specific template for exploitation.",
+"facts": "- CVE: CVE-2026-17594\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 6%"
+},
+{
+"cve_id": "CVE-2026-1207",
+"category": "'a vulnerability with a specific template for exploitation'",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it is a vulnerability with a specific template for exploitation.",
+"facts": "- CVE: CVE-2026-1207\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%"
+},
+{
+"cve_id": "CVE-2025-71258",
+"category": "'a vulnerability with a specific template for exploitation'",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it is a vulnerability with a specific template for exploitation.",
+"facts": "- CVE: CVE-2025-71258\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%"
+},
+{
+"cve_id": "CVE-2025-71259",
+"category": "'a vulnerability with a specific template for exploitation'",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it is a vulnerability with a specific template for exploitation.",
+"facts": "- CVE: CVE-2025-71259\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%"
+},
+{
+"cve_id": "CVE-2026-16723",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, as indicated by CVE-2026-16723.",
+"facts": "- CVE: CVE-2026-16723\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-19650",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a vulnerability, identified as CVE-2026-19650, and it is an unauthenticated weakness.",
+"facts": "- CVE: CVE-2026-19650\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-2636",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a vulnerability in enterprise-software, identified by CVE-2026-2636.",
+"facts": "- CVE: CVE-2026-2636\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: enterprise-software"
+},
+{
+"cve_id": "CVE-2025-14857",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, as indicated by CVE-2025-14857.",
+"facts": "- CVE: CVE-2025-14857\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-1880",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a privilege escalation weakness, as indicated by CVE-2026-1880.",
+"facts": "- CVE: CVE-2026-1880\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: privilege escalation"
+},
+{
+"cve_id": "CVE-2026-94132",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, as indicated by CVE-2026-94132.",
+"facts": "- CVE: CVE-2026-94132\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-57827",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, it is a weakness that is unauthenticated, and it is identified by CVE-2026-57827.",
+"facts": "- CVE: CVE-2026-57827\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-86283",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a privilege escalation weakness, as indicated by CVE-2026-86283.",
+"facts": "- CVE: CVE-2026-86283\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: privilege escalation"
+},
+{
+"cve_id": "CVE-2026-24291",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a vulnerability in enterprise-software, identified by CVE-2026-24291.",
+"facts": "- CVE: CVE-2026-24291\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: enterprise-software"
+},
+{
+"cve_id": "CVE-2025-71243",
+"category": "claims the CVE id indicates/identifies the facts ('as indica",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, as indicated by CVE-2025-71243.",
+"facts": "- CVE: CVE-2025-71243\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution"
+},
+{
+"cve_id": "CVE-2026-0227",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it's an unauthenticated vulnerability affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-0227\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-84388",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, it's an unauthenticated vulnerability, and it affects web-browsers.",
+"facts": "- CVE: CVE-2026-84388\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated, web-browser"
+},
+{
+"cve_id": "CVE-2026-0405",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a top 7% EPSS percentile within its month, its description similarity to past exploited CVEs is high, and it involves an authentication-bypass weakness affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-0405\n- EPSS percentile within its month: top 7%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: authentication-bypass, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-71209",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it's an unauthenticated vulnerability affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-71209\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-40140",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a top 7% EPSS percentile within its month, it's an unauthenticated vulnerability, and it affects VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-40140\n- EPSS percentile within its month: top 7%\n- Weakness hints: unauthenticated, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-67363",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, it's an unauthenticated vulnerability, and it affects VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-67363\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-0258",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 5%, and it is an unauthenticated vulnerability affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-0258\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-28466",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-28466\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-47865",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because it has a top 3% EPSS percentile within its month, its IBM Granite KEV-likeness within the 2026 pool is in the top 8%, and it involves an authentication-bypass weakness affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-47865\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%\n- Weakness hints: authentication-bypass, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-0229",
+"category": "'affecting / affects <product class>' from a text tag",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it's an unauthenticated weakness affecting VPN/firewall/edge-devices.",
+"facts": "- CVE: CVE-2026-0229\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, VPN/firewall/edge-device"
+},
+{
+"cve_id": "CVE-2026-8053",
+"category": "'specifically targeting ...'",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, specifically targeting web-browsers.",
+"facts": "- CVE: CVE-2026-8053\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution, web-browser"
+},
+{
+"cve_id": "CVE-2026-102127",
+"category": "'specifically targeting ...'",
+"sentence": "Prioritised because it's an unauthenticated CVE, specifically targeting VPN/firewall/edge-devices, and its ranking is influenced by the reporting organisation's history of exploited CVEs and description similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-102127\n- Weakness hints: unauthenticated, VPN/firewall/edge-device\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, description similarity to past exploited CVEs"
+},
+{
+"cve_id": "CVE-2026-66906",
+"category": "'poses a ... risk'",
+"sentence": "Prioritised because it has a GitHub proof of concept for a path traversal weakness, its EPSS percentile within its month is in the top 9%, and it poses a path traversal risk.",
+"facts": "- CVE: CVE-2026-66906\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 9%\n- Weakness hints: path traversal"
+},
+{
+"cve_id": "CVE-2026-63520",
+"category": "'shares a top N% ... with other 2026 descriptions' (comparis",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it shares a top 7% IBM Granite KEV-likeness with other 2026 descriptions.",
+"facts": "- CVE: CVE-2026-63520\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%"
+},
+{
+"cve_id": "CVE-2026-8051",
+"category": "'shares a top N% ... with other 2026 descriptions' (comparis",
+"sentence": "Prioritised because it has a top 1% EPSS percentile within its month, it shares a top 1% IBM Granite KEV-likeness with other 2026 pool descriptions, and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-8051\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Description similarity to past exploited CVEs: high"
+},
+{
+"cve_id": "CVE-2026-78214",
+"category": "'significantly contribute to its ranking'",
+"sentence": "Prioritised because it has unauthenticated and authentication-bypass vulnerabilities, and the reporting organisation's history of exploited CVEs, along with the weakness wording in the description, significantly contribute to its ranking.",
+"facts": "- CVE: CVE-2026-78214\n- Weakness hints: unauthenticated, authentication-bypass\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, weakness wording in the description"
+},
+{
+"cve_id": "CVE-2025-57792",
+"category": "'the ranking model considers ... as main drivers' / 'as high",
+"sentence": "Prioritised because it's an unauthenticated SQL injection vulnerability, as highlighted by its ranking model's main drivers: the reporting organisation's history of exploited CVEs and the specific wording in its description.",
+"facts": "- CVE: CVE-2025-57792\n- Weakness hints: unauthenticated, SQL injection\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, weakness wording in the description"
+},
+{
+"cve_id": "CVE-2026-81433",
+"category": "'the ranking model considers ... as main drivers' / 'as high",
+"sentence": "Prioritised because it's a remote code execution vulnerability, unauthenticated, and the ranking model considers the reporting organisation's history of exploited CVEs and the specific wording of the weakness description as main drivers.",
+"facts": "- CVE: CVE-2026-81433\n- Weakness hints: remote code execution, unauthenticated\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, weakness wording in the description"
+},
+{
+"cve_id": "CVE-2026-55993",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 4%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-55993\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-46726",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 4%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-46726\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-42945",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 2%, and it involves unauthenticated memory corruption.",
+"facts": "- CVE: CVE-2026-42945\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: unauthenticated, memory corruption"
+},
+{
+"cve_id": "CVE-2026-8794",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, it is CVE-2026-8794, and it is an unauthenticated weakness.",
+"facts": "- CVE: CVE-2026-8794\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-9256",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 5%, and it's an unauthenticated memory corruption vulnerability.",
+"facts": "- CVE: CVE-2026-9256\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- Weakness hints: unauthenticated, memory corruption"
+},
+{
+"cve_id": "CVE-2026-19264",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 3%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-19264\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-46454",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 4%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-46454\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-26235",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 5%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-26235\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-58457",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 1%, and it is an unauthenticated command injection vulnerability.",
+"facts": "- CVE: CVE-2026-58457\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, command injection"
+},
+{
+"cve_id": "CVE-2026-71960",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 8%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-71960\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 8%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-42055",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 1%, and it's an unauthenticated memory corruption vulnerability.",
+"facts": "- CVE: CVE-2026-42055\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, memory corruption"
+},
+{
+"cve_id": "CVE-2026-41452",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 5%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-41452\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-49365",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 9%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-49365\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 9%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-40701",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, it's a memory corruption weakness, and it's unauthenticated.",
+"facts": "- CVE: CVE-2026-40701\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated, memory corruption"
+},
+{
+"cve_id": "CVE-2026-65321",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 2%, and it's an unauthenticated SQL injection vulnerability.",
+"facts": "- CVE: CVE-2026-65321\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: unauthenticated, SQL injection"
+},
+{
+"cve_id": "CVE-2026-89026",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 10%, and it's an unauthenticated command injection vulnerability.",
+"facts": "- CVE: CVE-2026-89026\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 10%\n- Weakness hints: unauthenticated, command injection"
+},
+{
+"cve_id": "CVE-2026-57827",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, it is a weakness that is unauthenticated, and it is identified by CVE-2026-57827.",
+"facts": "- CVE: CVE-2026-57827\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-67620",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, it is a weakness hint of unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-67620\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-66916",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a GitHub proof of concept for a proof of exploit, its EPSS percentile within its month is in the top 10%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-66916\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 10%\n- Weakness hints: unauthenticated"
+},
+{
+"cve_id": "CVE-2026-0262",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 8%, and it is unauthenticated enterprise-software related.",
+"facts": "- CVE: CVE-2026-0262\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, enterprise-software"
+},
+{
+"cve_id": "CVE-2026-0292",
+"category": "garbled or odd wording ('proof of exploit', 'weakness hint o",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 3%, and the weakness hints indicate an authentication-bypass issue in enterprise-software.",
+"facts": "- CVE: CVE-2026-0292\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: authentication-bypass, enterprise-software"
+}
+],
+"clean": [
+{
+"cve_id": "CVE-2017-20251",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 7% and its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2017-20251\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2025-34171",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, its EPSS percentile within its month is in the top 7%, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2025-34171\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2025-57795",
+"sentence": "Prioritised because it has a top 6% EPSS percentile within its month, a top 6% IBM Granite KEV-likeness in the 2026 pool, and hints of remote code execution.",
+"facts": "- CVE: CVE-2025-57795\n- EPSS percentile within its month: top 6%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%\n- Weakness hints: remote code execution",
+"problems": []
+},
+{
+"cve_id": "CVE-2025-60021",
+"sentence": "Prioritised because it has a GitHub proof of concept for a command injection weakness, its EPSS percentile within its month is in the top 6%, and it involves command injection.",
+"facts": "- CVE: CVE-2025-60021\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 6%\n- Weakness hints: command injection",
+"problems": []
+},
+{
+"cve_id": "CVE-2025-71257",
+"sentence": "Prioritised because it has public exploit code in a Nuclei template and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it is an unauthenticated, authentication-bypass vulnerability.",
+"facts": "- CVE: CVE-2025-71257\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-0264",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high, it hints at a remote code execution vulnerability, and it's unauthenticated.",
+"facts": "- CVE: CVE-2026-0264\n- Description similarity to past exploited CVEs: high\n- Weakness hints: remote code execution, unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-10702",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 4%, and it's a web-browser vulnerability.",
+"facts": "- CVE: CVE-2026-10702\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Weakness hints: web-browser",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-13016",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it involves an unauthenticated SQL injection weakness.",
+"facts": "- CVE: CVE-2026-13016\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, SQL injection",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-14382",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 7% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-14382\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-14431",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 1% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-14431\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-20079",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 2% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-20079\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-20251",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it exhibits a top 3% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-20251\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-20687",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it involves memory corruption.",
+"facts": "- CVE: CVE-2026-20687\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: memory corruption",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-20698",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-20698\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-20896",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit and its EPSS percentile within its month is in the top 1%.",
+"facts": "- CVE: CVE-2026-20896\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-20999",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its IBM Granite KEV-likeness within the 2026 pool is in the top 9% and it involves an authentication-bypass weakness.",
+"facts": "- CVE: CVE-2026-20999\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 9%\n- Weakness hints: authentication-bypass",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-21045",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it involves memory corruption.",
+"facts": "- CVE: CVE-2026-21045\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: memory corruption",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-21048",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it involves memory corruption.",
+"facts": "- CVE: CVE-2026-21048\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: memory corruption",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-22153",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 5% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-22153\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-2329",
+"sentence": "Prioritised because it has public exploit code in Metasploit, its EPSS percentile within its month is in the top 1% and it has a top 10% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-2329\n- Public exploit code: Metasploit\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 10%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-23869",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 2%, and its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-23869\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-23870",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 4%, and its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-23870\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-23918",
+"sentence": "Prioritised because it has public exploit code in Exploit-DB and GitHub, and its EPSS percentile within its month is in the top 2%.",
+"facts": "- CVE: CVE-2026-23918\n- Public exploit code: Exploit-DB, a GitHub proof of concept\n- EPSS percentile within its month: top 2%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-24017",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it hints at an unauthenticated, authentication-bypass weakness.",
+"facts": "- CVE: CVE-2026-24017\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-24301",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it exhibits a top 6% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-24301\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-26118",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its IBM Granite KEV-likeness within the 2026 pool is in the top 4%, and it is a vulnerability description.",
+"facts": "- CVE: CVE-2026-26118\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-27174",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 2%, and it exhibits a top 5% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-27174\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-28699",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, its EPSS percentile within its month is in the top 7%.",
+"facts": "- CVE: CVE-2026-28699\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-31908",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 10% and it exhibits a top 6% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-31908\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 10%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-32223",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it involves memory corruption in enterprise-software.",
+"facts": "- CVE: CVE-2026-32223\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: memory corruption, enterprise-software",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-32841",
+"sentence": "Prioritised because it has an IBM Granite KEV-likeness of top 6% within the 2026 pool, it's an unauthenticated and authentication-bypass weakness.",
+"facts": "- CVE: CVE-2026-32841\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-3469",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it involves enterprise-software weakness.",
+"facts": "- CVE: CVE-2026-3469\n- Description similarity to past exploited CVEs: high\n- Weakness hints: enterprise-software",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-3470",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it involves enterprise-software weakness.",
+"facts": "- CVE: CVE-2026-3470\n- Description similarity to past exploited CVEs: high\n- Weakness hints: enterprise-software",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-39813",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 4% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-39813\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-40369",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 5% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-40369\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-42778",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, its EPSS percentile within its month is in the top 5%, and it involves an unsafe deserialization weakness.",
+"facts": "- CVE: CVE-2026-42778\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- Weakness hints: unsafe deserialization",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-42980",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it exhibits a top 3% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-42980\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-43867",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, its EPSS percentile within its month is in the top 3%, and it involves an unsafe deserialization weakness.",
+"facts": "- CVE: CVE-2026-43867\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: unsafe deserialization",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-44825",
+"sentence": "Prioritised because it has a Nuclei template and a GitHub proof of concept as public exploit code, its EPSS percentile within its month is in the top 1%, and its IBM Granite KEV-likeness description within the 2026 pool is at the top 5%.",
+"facts": "- CVE: CVE-2026-44825\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-46457",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, it is a CVE-2026-46457, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-46457\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-46585",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, it is CVE-2026-46585, and it's an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-46585\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-46592",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its IBM Granite KEV-likeness within the 2026 pool is in the top 2% and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-46592\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-4795",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 7%, and it hints at an unauthenticated weakness.",
+"facts": "- CVE: CVE-2026-4795\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-49048",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code and its EPSS percentile within its month is in the top 9%.",
+"facts": "- CVE: CVE-2026-49048\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 9%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-49097",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, its EPSS percentile within its month is in the top 7% and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-49097\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-49975",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit and its EPSS percentile within its month is in the top 1%.",
+"facts": "- CVE: CVE-2026-49975\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-50229",
+"sentence": "Prioritised because it has a Nuclei template and a GitHub proof of concept for public exploit code, its EPSS percentile within its month is in the top 1%, and it is a cross-site scripting vulnerability.",
+"facts": "- CVE: CVE-2026-50229\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: cross-site scripting",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-50338",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its IBM Granite KEV-likeness within the 2026 pool is in the top 2%.",
+"facts": "- CVE: CVE-2026-50338\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-50507",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its EPSS percentile within its month is in the top 1%, and it's an enterprise-software vulnerability.",
+"facts": "- CVE: CVE-2026-50507\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: enterprise-software",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-50746",
+"sentence": "Prioritised because it has a GitHub proof of concept for a command injection weakness, its EPSS percentile within its month is in the top 1%, and it involves command injection.",
+"facts": "- CVE: CVE-2026-50746\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: command injection",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-54107",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 1% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-54107\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-54998",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 5%, and it exhibits a top 2% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-54998\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-56705",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 3%, and it involves a remote code execution vulnerability that is unauthenticated.",
+"facts": "- CVE: CVE-2026-56705\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%\n- Weakness hints: remote code execution, unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-56766",
+"sentence": "Prioritised because it has public exploit code in Exploit-DB, its EPSS percentile within its month is in the top 1%, and it involves remote code execution and memory corruption.",
+"facts": "- CVE: CVE-2026-56766\n- Public exploit code: Exploit-DB\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, memory corruption",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-56782",
+"sentence": "Prioritised because it has public exploit code in a Nuclei template and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it is an unauthenticated, authentication-bypass vulnerability.",
+"facts": "- CVE: CVE-2026-56782\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-57821",
+"sentence": "Prioritised because it has a GitHub proof of concept for a SQL injection weakness, its EPSS percentile within its month is in the top 3%, and it involves SQL injection.",
+"facts": "- CVE: CVE-2026-57821\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- Weakness hints: SQL injection",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-57973",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it's an enterprise-software weakness.",
+"facts": "- CVE: CVE-2026-57973\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: enterprise-software",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-58455",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1% and it has a top 9% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-58455\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 9%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-61498",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it exhibits a top 4% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-61498\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-63039",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 7% and its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-63039\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-64638",
+"sentence": "Prioritised because it has public exploit code in a Nuclei template and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it's a cross-site scripting vulnerability in a WordPress plugin.",
+"facts": "- CVE: CVE-2026-64638\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: WordPress-plugin, cross-site scripting",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-65351",
+"sentence": "Prioritised because it has a GitHub proof of concept, its description similarity to past exploited CVEs is high, and it's a web-browser vulnerability.",
+"facts": "- CVE: CVE-2026-65351\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: web-browser",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-65640",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and it's a remote code execution vulnerability in a WordPress plugin.",
+"facts": "- CVE: CVE-2026-65640\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Weakness hints: remote code execution, WordPress-plugin",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-66907",
+"sentence": "Prioritised because it has a GitHub proof of concept for a path traversal weakness, its EPSS percentile within its month is in the top 7%, and it is a path traversal flaw.",
+"facts": "- CVE: CVE-2026-66907\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- Weakness hints: path traversal",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-66908",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, it's a VPN/firewall/edge-device vulnerability, and it's CVE-2026-66908.",
+"facts": "- CVE: CVE-2026-66908\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: VPN/firewall/edge-device",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-67182",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its IBM Granite KEV-likeness within the 2026 pool is in the top 7%.",
+"facts": "- CVE: CVE-2026-67182\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-67401",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 5% and it exhibits a top 1% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-67401\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 5%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-69414",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 8% and it exhibits a top 6% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-69414\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 8%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-71362",
+"sentence": "Prioritised because it has a Nuclei template and a GitHub proof of concept for public exploit code, its EPSS percentile within its month is in the top 1%, and its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-71362\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-72550",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, it's an unauthenticated vulnerability, and it's an SQL injection flaw.",
+"facts": "- CVE: CVE-2026-72550\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: unauthenticated, SQL injection",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-73673",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 10% and it exhibits a top 1% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-73673\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 10%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-75616",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it exhibits a top 8% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-75616\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-75969",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it exhibits unauthenticated weakness hints.",
+"facts": "- CVE: CVE-2026-75969\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-76036",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 3%, and its IBM Granite KEV-likeness within the 2026 pool is in the top 7%.",
+"facts": "- CVE: CVE-2026-76036\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-78904",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 1% and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-78904\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-84568",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its IBM Granite KEV-likeness within the 2026 pool is in the top 7%, and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-84568\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%\n- Description similarity to past exploited CVEs: high",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-86859",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it exhibits unauthenticated weakness hints.",
+"facts": "- CVE: CVE-2026-86859\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-9192",
+"sentence": "Prioritised because it has a top 8% EPSS percentile within its month, it holds a top 1% IBM Granite KEV-likeness in the 2026 pool, and it's an unauthenticated, authentication-bypass vulnerability.",
+"facts": "- CVE: CVE-2026-9192\n- EPSS percentile within its month: top 8%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-93349",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it exhibits a top 8% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-93349\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%",
+"problems": []
+},
+{
+"cve_id": "CVE-2026-97160",
+"sentence": "Prioritised because it has a GitHub proof of concept for a command injection weakness, its EPSS percentile within its month is in the top 2%, and it involves command injection.",
+"facts": "- CVE: CVE-2026-97160\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- Weakness hints: command injection",
+"problems": []
+}
+],
+"allowlist_rejects": [
+{
+"cve_id": "CVE-2026-1603",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and its IBM Granite KEV-likeness within the 2026 pool is also in the top 7%.",
+"facts": "- CVE: CVE-2026-1603\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%",
+"problems": [
+"word not in the facts 'also'"
+]
+},
+{
+"cve_id": "CVE-2026-6875",
+"sentence": "Prioritised because it has a Nuclei template and a GitHub proof of concept as public exploit code, its EPSS percentile within its month is in the top 1%, and its IBM Granite KEV-likeness is among the top 7% in the 2026 pool.",
+"facts": "- CVE: CVE-2026-6875\n- Public exploit code: a Nuclei template, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%",
+"problems": [
+"word not in the facts 'among'"
+]
+},
+{
+"cve_id": "CVE-2026-82384",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 7% and it matches the top 6% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-82384\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 7%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2025-12420",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2025-12420\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-33453",
+"sentence": "Prioritised because it has a GitHub proof of concept for public exploit code, its EPSS percentile within its month is in the top 3% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 3%.",
+"facts": "- CVE: CVE-2026-33453\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-4112",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it involves SQL injection and privilege escalation.",
+"facts": "- CVE: CVE-2026-4112\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: SQL injection, privilege escalation",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-95675",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 1%.",
+"facts": "- CVE: CVE-2026-95675\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-49757",
+"sentence": "Prioritised because it has a GitHub proof of concept for a public exploit, its EPSS percentile within its month is in the top 6%, and it involves unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-49757\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 6%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-67602",
+"sentence": "Prioritised because it has a GitHub proof of concept, its IBM Granite KEV-likeness within the 2026 pool is in the top 2% and it involves unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-67602\n- Public exploit code: a GitHub proof of concept\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-0834",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-0834\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-40859",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 3% and it matches the IBM Granite KEV-likeness of the description within the 2026 pool at the top 3%.",
+"facts": "- CVE: CVE-2026-40859\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-19681",
+"sentence": "Prioritised because it has public exploit code in Metasploit and GitHub, its EPSS percentile within its month is in the top 1%, and its IBM Granite KEV-likeness is also in the top 1% of the 2026 pool.",
+"facts": "- CVE: CVE-2026-19681\n- Public exploit code: Metasploit, a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": [
+"word not in the facts 'also'"
+]
+},
+{
+"cve_id": "CVE-2026-60121",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 1%.",
+"facts": "- CVE: CVE-2026-60121\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-1340",
+"sentence": "Prioritised because it has a top 8% EPSS percentile within its month, it shares high similarity to past exploited CVEs with a top 4% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-1340\n- EPSS percentile within its month: top 8%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"blocked phrase 'shares high similarity to past exploited cves with'",
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2026-44402",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 2% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 2%.",
+"facts": "- CVE: CVE-2026-44402\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 2%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-33826",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 3% and it matches the IBM Granite KEV-likeness of the description within the 2026 pool at the top 3%.",
+"facts": "- CVE: CVE-2026-33826\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 3%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-20212",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 8% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 8%.",
+"facts": "- CVE: CVE-2026-20212\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 8%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-25555",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it involves unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-25555\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-53976",
+"sentence": "Prioritised because it has a Nuclei template for public exploit code, its EPSS percentile within its month is in the top 1%, and it involves unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-53976\n- Public exploit code: a Nuclei template\n- EPSS percentile within its month: top 1%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-40564",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-40564\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-42527",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 6% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 6%.",
+"facts": "- CVE: CVE-2026-42527\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 6%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-0542",
+"sentence": "Prioritised because it has a top 5% EPSS percentile within its month, it shares a high similarity to past exploited CVEs with a top 4% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-0542\n- EPSS percentile within its month: top 5%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"blocked phrase 'shares a high similarity to past exploited cves with'",
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2026-62737",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 1%.",
+"facts": "- CVE: CVE-2026-62737\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-44277",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-44277\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-20224",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it is an unauthenticated vulnerability.",
+"facts": "- CVE: CVE-2026-20224\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-29115",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-29115\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-59309",
+"sentence": "Prioritised because it has a top 4% EPSS percentile within its month, it shares high similarity to past exploited CVEs with a top 1% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-59309\n- EPSS percentile within its month: top 4%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"blocked phrase 'shares high similarity to past exploited cves with'",
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2026-67599",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 1%.",
+"facts": "- CVE: CVE-2026-67599\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-69098",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 4%, and it matches the top 5% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-69098\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 4%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-5788",
+"sentence": "Prioritised because it has a top 5% EPSS percentile within its month, it shares a high similarity to past exploited CVEs with a top 4% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-5788\n- EPSS percentile within its month: top 5%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"blocked phrase 'shares a high similarity to past exploited cves with'",
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2026-50656",
+"sentence": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 1% and it matches the IBM Granite KEV-likeness within the 2026 pool at the top 1%.",
+"facts": "- CVE: CVE-2026-50656\n- Public exploit code: a GitHub proof of concept\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%",
+"problems": [
+"word not in the facts 'matches'"
+]
+},
+{
+"cve_id": "CVE-2026-5173",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-5173\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-20841",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it involves a command injection weakness in enterprise-software.",
+"facts": "- CVE: CVE-2026-20841\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: command injection, enterprise-software",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-0303",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it involves remote code execution.",
+"facts": "- CVE: CVE-2026-0303\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: remote code execution",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-62144",
+"sentence": "Prioritised because it has a top 1% EPSS percentile within its month, it also holds the top 1% IBM Granite KEV-likeness in the 2026 pool, and it's an unauthenticated, authentication-bypass vulnerability.",
+"facts": "- CVE: CVE-2026-62144\n- EPSS percentile within its month: top 1%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'also'"
+]
+},
+{
+"cve_id": "CVE-2026-50416",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it's an enterprise-software vulnerability.",
+"facts": "- CVE: CVE-2026-50416\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: enterprise-software",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-3008",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation and the reporting organisation's history of exploited CVEs is a main driver in the ranking model.",
+"facts": "- CVE: CVE-2026-3008\n- Public exploit code: a GitHub proof of concept\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, public exploit code",
+"problems": [
+"word not in the facts 'exploitation'",
+"word not in the facts 'driver'"
+]
+},
+{
+"cve_id": "CVE-2026-46586",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-46586\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-29114",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-29114\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-23708",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 7%, and it hints at unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-23708\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-28323",
+"sentence": "Prioritised because it has a top 5% EPSS percentile within its month, it shares a high similarity in description to past exploited CVEs, and it holds a top 4% IBM Granite KEV-likeness within the 2026 pool.",
+"facts": "- CVE: CVE-2026-28323\n- EPSS percentile within its month: top 5%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2026-43687",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-43687\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-84543",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-84543\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-6876",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 8%, and it hints at remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-6876\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: remote code execution, unauthenticated",
+"problems": [
+"word not in the facts 'without'",
+"word not in the facts 'authentication'"
+]
+},
+{
+"cve_id": "CVE-2025-40553",
+"sentence": "Prioritised because it has a top 2% EPSS percentile within its month, its IBM Granite KEV-likeness is also in the top 2% within the 2026 pool, and its description shows high similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2025-40553\n- EPSS percentile within its month: top 2%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 2%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'also'"
+]
+},
+{
+"cve_id": "CVE-2026-28992",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-28992\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-8992",
+"sentence": "Prioritised because it has a high description similarity to past exploited CVEs, its EPSS percentile within its month is in the top 9%, and it involves remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-8992\n- EPSS percentile within its month: top 9%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: remote code execution, unauthenticated",
+"problems": [
+"word not in the facts 'without'",
+"word not in the facts 'authentication'"
+]
+},
+{
+"cve_id": "CVE-2026-86860",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it hints at unauthenticated and privilege escalation weaknesses.",
+"facts": "- CVE: CVE-2026-86860\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, privilege escalation",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-18886",
+"sentence": "Prioritised because its description similarity to past exploited CVEs is high and it hints at unauthenticated and privilege escalation weaknesses.",
+"facts": "- CVE: CVE-2026-18886\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, privilege escalation",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-0233",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 6%, and it hints at remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-0233\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: remote code execution, unauthenticated",
+"problems": [
+"word not in the facts 'without'",
+"word not in the facts 'authentication'"
+]
+},
+{
+"cve_id": "CVE-2025-57794",
+"sentence": "Prioritised because it has a top 5% EPSS percentile within its month, it also holds a top 5% IBM Granite KEV-likeness in the 2026 pool, and it involves a remote code execution weakness.",
+"facts": "- CVE: CVE-2025-57794\n- EPSS percentile within its month: top 5%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 5%\n- Weakness hints: remote code execution",
+"problems": [
+"word not in the facts 'also'"
+]
+},
+{
+"cve_id": "CVE-2026-7557",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 1%, and it hints at unauthenticated and authentication-bypass weaknesses.",
+"facts": "- CVE: CVE-2026-7557\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 1%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: unauthenticated, authentication-bypass",
+"problems": [
+"word not in the facts 'weaknesses'"
+]
+},
+{
+"cve_id": "CVE-2026-0263",
+"sentence": "Prioritised because it has a high similarity to past exploited CVEs, its IBM Granite KEV-likeness within the 2026 pool is in the top 4%, and it hints at remote code execution without authentication.",
+"facts": "- CVE: CVE-2026-0263\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 4%\n- Description similarity to past exploited CVEs: high\n- Weakness hints: remote code execution, unauthenticated",
+"problems": [
+"word not in the facts 'without'",
+"word not in the facts 'authentication'"
+]
+},
+{
+"cve_id": "CVE-2026-22719",
+"sentence": "Prioritised because it has a top 3% EPSS percentile within its month, it shares high similarity to past exploited CVEs with a top 6% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-22719\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 6%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"blocked phrase 'shares high similarity to past exploited cves with'",
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2025-57793",
+"sentence": "Prioritised because it's an unauthenticated SQL injection vulnerability, as indicated by the weakness hints, and its ranking is influenced by the reporting organisation's history of exploited CVEs and the specific wording in the description.",
+"facts": "- CVE: CVE-2025-57793\n- Weakness hints: unauthenticated, SQL injection\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, weakness wording in the description",
+"problems": [
+"word not in the facts 'indicated'",
+"word not in the facts 'influenced'",
+"word not in the facts 'specific'"
+]
+},
+{
+"cve_id": "CVE-2026-70468",
+"sentence": "Prioritised because it has a top 3% EPSS percentile within its month, it shares a high similarity in description to past exploited CVEs with a top 7% IBM Granite KEV-likeness in the 2026 pool.",
+"facts": "- CVE: CVE-2026-70468\n- EPSS percentile within its month: top 3%\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 7%\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"blocked phrase 'shares a high similarity in description to past exploited cves with'",
+"word not in the facts 'shares'"
+]
+},
+{
+"cve_id": "CVE-2026-100721",
+"sentence": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, hinting at a path traversal weakness.",
+"facts": "- CVE: CVE-2026-100721\n- Public exploit code: a GitHub proof of concept\n- Weakness hints: remote code execution, path traversal",
+"problems": [
+"word not in the facts 'hinting'"
+]
+},
+{
+"cve_id": "CVE-2026-83991",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high, and it's an enterprise-software vulnerability.",
+"facts": "- CVE: CVE-2026-83991\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high\n- Weakness hints: enterprise-software",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2026-0629",
+"sentence": "Prioritised because it has a high IBM Granite KEV-likeness of top 8% within the 2026 pool and it's an authentication-bypass weakness.",
+"facts": "- CVE: CVE-2026-0629\n- IBM Granite KEV-likeness of the description within the 2026 pool: top 8%\n- Weakness hints: authentication-bypass",
+"problems": [
+"word not in the facts 'high'"
+]
+},
+{
+"cve_id": "CVE-2026-86128",
+"sentence": "Prioritised because it's a CVE with unauthenticated weakness, and its ranking is influenced by the reporting organisation's history of exploited CVEs and description similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-86128\n- Weakness hints: unauthenticated\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, description similarity to past exploited CVEs",
+"problems": [
+"word not in the facts 'influenced'"
+]
+},
+{
+"cve_id": "CVE-2026-43813",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2026-43813\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2025-59382",
+"sentence": "Prioritised because it has a GitHub proof of concept for exploitation, its description similarity to past exploited CVEs is high.",
+"facts": "- CVE: CVE-2025-59382\n- Public exploit code: a GitHub proof of concept\n- Description similarity to past exploited CVEs: high",
+"problems": [
+"word not in the facts 'exploitation'"
+]
+},
+{
+"cve_id": "CVE-2024-39847",
+"sentence": "Prioritised because it's a CVE with unauthenticated weakness, and its ranking is influenced by the reporting organisation's history of exploited CVEs and description similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2024-39847\n- Weakness hints: unauthenticated\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, description similarity to past exploited CVEs",
+"problems": [
+"word not in the facts 'influenced'"
+]
+},
+{
+"cve_id": "CVE-2026-102143",
+"sentence": "Prioritised because it's a CVE (CVE-2026-102143) with unauthenticated weakness, and its ranking is influenced by the reporting organisation's history of exploited CVEs and description similarity to past exploited CVEs.",
+"facts": "- CVE: CVE-2026-102143\n- Weakness hints: unauthenticated\n- Main drivers in the ranking model: the reporting organisation's history of exploited CVEs, description similarity to past exploited CVEs",
+"problems": [
+"word not in the facts 'influenced'"
+]
+}
+]
+}

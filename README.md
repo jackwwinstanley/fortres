@@ -59,3 +59,9 @@ writes `outputs/b_text_report.md`.
 - `nearest_kev_sim`: max cosine similarity to KEV entries with `date_added` <= (Y-1)-12-31
   (2023-12-31 for replica 2024, 2024-12-31 for replica 2025, 2025-12-31 for the 2026 scoreboard).
 - `txt_*`: int8 regex flags on the description (RCE, unauthenticated, edge device, ...).
+
+## Explanations (Person B's file, Guardian gate)
+`python -m src.b.explain --granite` writes `outputs/explanations.csv` (columns `cve_id`, `explanation`, `source`, `guardian_verdict`, plus `reason`, a copy of `explanation` for the dashboard) and
+`outputs/explanations_summary.json`. Granite (granite-3.3-2b-instruct) rewrites facts built only from tracked columns and the v5 contribution file; local checks and then
+Granite Guardian (`ollama pull granite3-guardian:2b`, risk = groundedness) must clearly answer "No", otherwise the template sentence is used. Results are cached in `outputs/.cache/`
+and the run resumes after a crash. The sentence must restate at most three facts in the form "Prioritised because ...". Local checks: a blocked-phrase list (`BLOCKED_PHRASES` at the top of `src/b/explain.py`, including predictions, interpretation and causal links), a check that every percentage stays attached to its own fact (EPSS only to EPSS), and a glue/unknown-word detector that uses the English word list `src/b/english_words.txt.gz`. The prompt version is part of the cache key, so changing the prompt regenerates every row, and cached Granite sentences that fail the current checks are regenerated automatically. `--time-box MINUTES` stops after that long: unfinished rows keep the template and are marked `pending`; run the same command again to continue. The committed files come from a 30-minute run: rows marked `pending` in `guardian_verdict` were not processed yet and show the template. No sentence is labelled Guardian-checked unless the Guardian model returned "No" for it.
