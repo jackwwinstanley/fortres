@@ -5,6 +5,7 @@ Run (needs the separate Python 3.11 env, because ibm-watsonx-gov requires Python
     uv pip install --python .venv-gov/bin/python "ibm-watsonx-gov[metrics]" sentence-transformers bert-score
     .venv-gov/bin/python -m scripts.gov_metrics          # local metrics, no credentials
     .venv-gov/bin/python -m scripts.gov_metrics --ibm    # IBM-run metrics; needs WATSONX_APIKEY in this worktree's gitignored .env
+    .venv-gov/bin/python -m scripts.gov_metrics --ibm --all   # same on every row: run once, on the final list
 
 What it does
 1. Inventory: tries every SDK metric/method that applies to a single (input, context, output) sentence on 3 rows, with ALL
@@ -193,7 +194,7 @@ def main():
 # IBM-backed metrics (run by IBM, Granite Guardian / detectors on watsonx.ai Runtime). All on the Lite plan.
 IBM_METRICS = [("FaithfulnessMetric", "granite_guardian"), ("AnswerRelevanceMetric", "granite_guardian"),
                ("OutputHAPMetric", None), ("OutputPIIMetric", None), ("HarmMetric", "granite_guardian")]
-IBM_SAMPLE, IBM_SEED = 100, 31
+IBM_SAMPLE, IBM_SEED = 100, 31  # --all scores every row instead (save it for the final list: Lite usage is capped)
 IBM_REGION = "ca-tor"  # Toronto: where the watsonx.governance Lite instance lives
 IBM_INSTANCE_NAME = "watsonx.governance-pv"  # the Toronto instance confirmed on the Lite plan
 
@@ -239,11 +240,12 @@ def main_ibm():
     from ibm_watsonx_gov.entities.credentials import Credentials
     t0 = time.time()
     df = build_rows()
-    sample = df.sample(n=IBM_SAMPLE, random_state=IBM_SEED).reset_index(drop=True)
+    full = "--all" in sys.argv
+    sample = (df if full else df.sample(n=IBM_SAMPLE, random_state=IBM_SEED)).reset_index(drop=True)
     where = f"IBM watsonx.governance ({IBM_INSTANCE_NAME}, {os.environ['WATSONX_REGION']} Toronto, Lite plan) on IBM Cloud - IBM's servers"
     summ = dict(generated_at=None, sdk="ibm-watsonx-gov", sdk_version=md.version("ibm-watsonx-gov"), where=where,
                 claim="Computed by IBM watsonx.governance (Granite Guardian / IBM detectors) on IBM Cloud, called via the SDK.",
-                rows=dict(file="outputs/explanations.csv", which=f"fixed random sample of {IBM_SAMPLE}, seed {IBM_SEED}",
+                rows=dict(file="outputs/explanations.csv", which="all rows" if full else f"fixed random sample of {IBM_SAMPLE}, seed {IBM_SEED}",
                           by_source=sample["source"].value_counts().to_dict()),
                 sent="public CVE facts (src.b.explain.facts_prose) and our own explanation sentences only; nothing from data/",
                 usage_or_cost="not reported by the SDK or API responses; Lite plan", one_row_check=[], metrics=[], stopped=None)
