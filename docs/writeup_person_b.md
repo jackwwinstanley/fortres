@@ -14,7 +14,7 @@ For Jack to merge into the main README write-up (#23). Numbers: v6 headline mode
 - Leakage test: adding after-the-fact columns lifts the same model from 27 to **33** (21 + 12).
 - Blind spots: 44 of 75 CVEs added to KEV had no public exploit code and a low EPSS; the simple rule catches 0 of them,
   the v6 bag 5 (three of them one Ivanti EPM event).
-- Explanations: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges.
+- Explanations: 318 of 500 reasons passed a groundedness check; the other 182 use the plain template (`outputs/explanations_summary.json`).
 
 What holds up: the blind spots, the July 2026 EPSS step, and the leakage test.
 
@@ -70,8 +70,8 @@ month, public exploit sources, IBM Granite KEV-likeness and the model's stronges
 (`granite-3.3-2b-instruct`, open model run locally) rewords them. A local checker rejects any sentence that adds a
 number, product, CVE id or blocked claim ("critical", "actively exploited", …), and IBM Granite Guardian
 (`granite3-guardian:2b`, run locally via Ollama) checks that the rest is supported by the facts. Sentences that fail
-keep the plain template. Counts: TODO(#35): fill from outputs/explanations_summary.json after PR #35 merges (`passed_guardian`,
-`template_fallback`). Guardian checks support by the facts, not truth, fluency or causality ("passed a groundedness check",
+keep the plain template. Counts: 318 of 500 reasons passed the Guardian groundedness check and 182 use the template
+(`passed_guardian`, `template_fallback` in `outputs/explanations_summary.json`). Guardian checks support by the facts, not truth, fluency or causality ("passed a groundedness check",
 never "verified").
 
 ## 6. Understanding the errors

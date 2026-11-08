@@ -88,3 +88,22 @@ def test_model_card_table_errors(row, needle):
 def test_table_check_only_applies_to_the_model_card():
     row = '| Granite sentences kept | 350 | `passed_guardian` |'
     assert ns.check_text("docs/considered_not_adopted.md", row, E) == []
+
+
+def test_leftover_todo_markers_fail():
+    probs = ns.check_text("docs/judge_qa.md", "Count: TODO(#35): fill from the summary.", E)
+    assert any("leftover TODO( marker" in p for p in probs), probs
+
+
+@pytest.mark.parametrize("line,needle", [
+    ("The other 150 reasons use the plain template.", "template count 150"),
+    ("Explanations: 3 rows pending.", "pending count 3"),
+])
+def test_explanation_counts_in_prose(line, needle):
+    probs = ns.check_text(FINAL, line, E)
+    assert any(needle in p for p in probs), probs
+
+
+def test_correct_explanation_counts_pass():
+    line = "347 of 500 reasons passed a groundedness check; the other 153 use the plain template; 0 pending."
+    assert ns.check_text(FINAL, line, E) == []
