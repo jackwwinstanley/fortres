@@ -185,3 +185,7 @@ Limit: the Granite embeddings are not available locally, so `kev_text_score` and
 ## How strong is the evidence?
 
 **WEAK.** The forward direction shows 12 vs 13 (-1, event-clustered [-7, +4]); pooled it is 21 vs 19 (+2, event-clustered [-4, +8]). Single seeds range 17-25 pooled hits. v5 minus v4 is +0 pooled hits (event-clustered [-5, +2]), i.e. the drift-treatment change did not hurt in this sample. The like-for-like placebo gap is +2.43 hits (p < 0.001). With 75 positives from a few dozen KEV events, any gain over the baseline is uncertain, and the remaining PSI in the assigner-history features means the replicas are an imperfect guide to 2026.
+
+## Considered, not adopted
+
+Ideas tested around this model and left out of the final list (track-record priors, a 50/50 blend with the simple rule, two-channel allocation, logistic regression on the v5 features, Granite fact extraction as model inputs) are written up, with their numbers and the reason each was not adopted, in [`docs/considered_not_adopted.md`](../docs/considered_not_adopted.md). The v5 logistic regression (14 + 11 = 25 pooled hits vs the bag's 21) appears in the tables above as a robustness line only: the rule fixed the bag as the final model before any test result.

@@ -43,5 +43,18 @@
   "2024": 27,
   "2025": 48
  },
+ "leakage": {
+  "source": "outputs/leakage_results.csv",
+  "honest": {
+   "pooled_hits": 21,
+   "forward_train2024_test2025": 12,
+   "stability_train2025_test2024": 9
+  },
+  "leaky": {
+   "pooled_hits": 28,
+   "forward_train2024_test2025": 17,
+   "stability_train2025_test2024": 11
+  }
+ },
  "note": "LOW POWER (75 positives). Use these numbers for headlines; seed-0 rows and earlier versions are not for headline."
 }
