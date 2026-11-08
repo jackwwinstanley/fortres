@@ -18,3 +18,4 @@ venv/
 /data
 # Person B step outputs that the runbook says are not tracked (PNG previews)
 outputs/b_*.png
+outputs/b_blindspot_counts.csv
