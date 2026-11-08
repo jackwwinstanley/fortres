@@ -99,10 +99,16 @@ transcripts contain personal data (home-folder paths and e-mail-shaped strings);
 snapshot, 27 are imports of earlier history and 3 were captured live, since we enabled Entire part-way through, and it
 covers only that one laptop.
 
+## Best Use of Vultr
+The public site, https://fortres.us, runs on a Vultr server (Ubuntu 24.04) with Caddy handling HTTPS. The server was set up from the
+script in `deploy/vultr/cloud-init.yaml`, and every response carries the header `X-Served-By: Vultr`, so anyone can check where the page
+comes from. The steps are in `deploy/README.md`.
+
 ## Built with
-python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly, entire
+python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, duckdb, streamlit, plotly, entire, vultr, caddy
 
 ## Links
+- Live site: https://fortres.us
 - Code: https://github.com/jackwwinstanley/ibm-breach
 - Video: _[paste the YouTube or Drive link]_
 
