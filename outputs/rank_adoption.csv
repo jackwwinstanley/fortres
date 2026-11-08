@@ -1,0 +1,7 @@
+candidate,forward_ok,stability_ok,pooled_gain,noise_floor,gain_ok,qualifies
+H,True,True,1,4,False,False
+I,True,True,6,4,True,True
+F,True,True,2,4,False,False
+D,True,True,1,4,False,False
+E,False,False,-10,4,False,False
+J,True,True,0,4,False,False
