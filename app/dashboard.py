@@ -20,11 +20,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.b import runlog  # noqa: E402
 from src.b.charts import blind_spot_counts  # noqa: E402
-from src.b.style import ACCENT, ACCENT_LIGHT, GREYS, WARN  # noqa: E402
 from src.common import primary  # noqa: E402
 from app import style as ui  # noqa: E402
 
 OUT = ROOT / "outputs"
+# chart colours for this app: the site's tokens only (the matplotlib palette in src/b/style.py stays as it is for the report figures)
+ACCENT, ACCENT_LIGHT, WARN = ui.ACCENT, ui.ACCENT2, ui.ACCENT2
+GREYS = [ui.MUTED, "rgba(141,154,170,.65)", "rgba(141,154,170,.4)"]
 FLAG_LABELS = {
     "txt_rce": "remote code execution", "txt_unauth": "no login needed",
     "txt_auth_bypass": "authentication bypass", "txt_cmd_injection": "command injection",
