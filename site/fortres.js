@@ -158,6 +158,25 @@ function pages(PICKS) {
   }), { rootMargin: '-45% 0px -45% 0px' });
   steps.forEach(s => io.observe(s));
 
+  // arrow keys, Page Up/Down and space move one whole story step, so each press plays the full scene change and lands
+  // on the next block of text instead of nudging the page a little
+  let keyTarget = -1, keyTimer = 0;
+  const stepY = s => s.offsetTop + s.offsetHeight / 2 - innerHeight / 2;
+  addEventListener('keydown', e => {
+    const dir = { ArrowDown: 1, PageDown: 1, ' ': e.shiftKey ? -1 : 1, ArrowUp: -1, PageUp: -1 }[e.key];
+    if (!dir || e.altKey || e.ctrlKey || e.metaKey || !['', '#story'].includes(location.hash)) return;
+    if (e.target.closest && e.target.closest(e.key === ' ' ? 'input, textarea, select, button, a, [contenteditable]' : 'input, textarea, select, [contenteditable]')) return;
+    const mid = scrollY + innerHeight / 2;
+    let k = keyTarget >= 0 ? keyTarget : steps.findIndex(s => s.offsetTop + s.offsetHeight > mid);
+    if (keyTarget < 0) { if (k < 0) k = steps.length - 1; const c = stepY(steps[k]); if (dir > 0 ? scrollY < c - innerHeight * 0.2 : scrollY > c + innerHeight * 0.2) k -= dir; }
+    const next = k + dir;
+    if (next < 0 || next >= steps.length) return;
+    e.preventDefault();
+    keyTarget = next;
+    scrollTo({ top: Math.max(0, stepY(steps[next])), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    clearTimeout(keyTimer); keyTimer = setTimeout(() => { keyTarget = -1; }, 900);
+  });
+
   const canvas = document.getElementById('stage');
   if (!window.THREE || !canvas) { fallback(); return; }
   // let the words paint first, then build the scene
