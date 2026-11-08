@@ -32,7 +32,7 @@ and any 2026 KEV information.
 In today's NVD data, **100% of the exploited CVEs** in both replicas have `nvd_status = Analyzed`,
 against 42% (2024) and 50% (2025) of the rest. NVD analyses KEV-listed CVEs first, so this field is close to
 the answer itself. The leakage experiment (`python -m src.b.leakage`, `docs/figures/leakage.png`) shows the
-same model jumps from 23 to 30 pooled hits when such columns are added.
+same model jumps from 21 to 29 pooled hits when such columns are added.
 
 ## Known limits (not leaks, but worth stating in the write-up)
 
