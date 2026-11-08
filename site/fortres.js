@@ -238,7 +238,7 @@ function pages(PICKS) {
       else if (kind < 0.55 && h > 7) cityItems.push({ g: blank(new THREE.CylinderGeometry(0.05, 0.09, 3.2, 6)), m: T(x, top + 1.6, z) });
       else if (kind < 0.68) { const cg = blank(new THREE.ConeGeometry(Math.min(w, d) * 0.72, 1.4 + cr(), 4)); cg.rotateY(Math.PI / 4); addEdges(cg, x, top + 0.7, z); cityItems.push({ g: cg, m: T(x, top + 0.7, z) }); }
     };
-    const trees = [], lamps = [];
+    const trees = [];
     // blocks are the gaps between streets; each is split into lots, and a few lots stay open as small squares with a tree
     const xs = [-CITY_X, ...AVES.flatMap(([c, h]) => [c - h, c + h]).sort((a, b) => a - b), CITY_X];
     const zs = [CITY_Z0, ...STREETS.flatMap(([c, h]) => [c + h, c - h]).sort((a, b) => b - a), CITY_Z1];
@@ -333,14 +333,22 @@ function pages(PICKS) {
     const roadMat = new THREE.MeshStandardMaterial({ map: roadTex, normalMap: roadN, normalScale: new THREE.Vector2(1.6, 1.6), roughness: 0.82 });
     const road = new THREE.Mesh(merge(pieces), roadMat); road.receiveShadow = true; scene.add(road);
 
-    // kerbs along the road through the gate
-    const kerbs = [];
-    [-1, 1].forEach(sd => { kerbs.push({ g: new THREE.BoxGeometry(0.28, 0.16, 60 - CITY_Z0), m: T(sd * 6.14, -0.19, (60 + CITY_Z0) / 2) }); });
+    // kerbs: along the road through the gate, and around every city block so each street has the same stone edge
+    const kerbs = [], KW = 0.28;
+    [-1, 1].forEach(sd => { kerbs.push({ g: new THREE.BoxGeometry(KW, 0.16, 60 - CITY_Z0), m: T(sd * 6.14, -0.19, (60 + CITY_Z0) / 2) }); });
+    const kx = (x0, x1, z) => kerbs.push({ g: new THREE.BoxGeometry(x1 - x0, 0.16, KW), m: T((x0 + x1) / 2, -0.19, z) });
+    const kz = (z0, z1, x) => kerbs.push({ g: new THREE.BoxGeometry(KW, 0.16, z0 - z1), m: T(x, -0.19, (z0 + z1) / 2) });
+    [[-CITY_X, -6], [6, CITY_X]].forEach(([a, b]) => kx(a, b, zs[1] + KW / 2));          // wall side of the first street, open at the gate
+    for (let i = 0; i + 1 < xs.length; i += 2) for (let j = 2; j + 1 < zs.length; j += 2) {
+      const x0 = xs[i] - KW / 2, x1 = xs[i + 1] + KW / 2, z0 = zs[j] + KW / 2, z1 = zs[j + 1] - KW / 2;
+      kx(x0, x1, z0); if (j + 2 < zs.length) kx(x0, x1, z1);
+      if (i > 0) kz(z0, z1, x0); if (i + 2 < xs.length) kz(z0, z1, x1);
+    }
     const kerb = new THREE.Mesh(merge(kerbs), capMat); kerb.receiveShadow = true; scene.add(kerb);
 
-    // old iron street lamps along the road and at the city corners, and trees along the first street
+    // old iron street lamps behind the wall, along the road and at the city corners, and trees along the first street
     const lampAt = [];
-    [3.5, 9.5, -4.5].forEach(z => [-1, 1].forEach(sd => lampAt.push([sd * 7.2, z])));
+    [-4.5].forEach(z => [-1, 1].forEach(sd => lampAt.push([sd * 7.2, z])));
     AVES.forEach(([c, h]) => STREETS.forEach(([z, zh]) => { if (c !== 0 || z !== STREETS[0][0]) lampAt.push([c + h + 0.6, z + zh + 0.6]); }));
     for (let x = -54; x <= 54; x += 6) if (Math.abs(x) > 8) trees.push([x, CITY_Z0 + 0.2 + (Math.abs(x) % 12 ? 0 : 0), 0.9 + cr() * 0.35]);
     const pc = document.createElement('canvas'); pc.width = pc.height = 64; const px = pc.getContext('2d');
@@ -365,10 +373,7 @@ function pages(PICKS) {
       const pm = new THREE.Mesh(merge(glow), poolMat); pm.renderOrder = 1; grp.add(pm);
       scene.add(grp); return grp;
     };
-    // lamps in front of the wall step aside (sink into the ground) on the screens where bricks are laid out in front of it
-    const frontLamps = lampGroup(lampAt.filter(([, z]) => z > 0)), backLamps = lampGroup(lampAt.filter(([, z]) => z <= 0));
-    const LAMP_SCREENS = new Set(['wall', 'one', 'cost', 'cloud', 'picks', 'read', 'close']);
-    let lampK = 1;
+    lampGroup(lampAt);
     const leaf = [], wood = [];
     trees.forEach(([x, z, s]) => {
       wood.push({ g: new THREE.CylinderGeometry(0.08 * s, 0.12 * s, 1.4 * s, 6), m: T(x, 0.7 * s - 0.27, z) });
@@ -605,8 +610,6 @@ function pages(PICKS) {
       camera.lookAt(lerp(a.look[0], b.look[0]), lerp(a.look[1], b.look[1]), lerp(a.look[2], b.look[2]));
       U.uT.value = tNow - transStart;
       slabK += ((current.scl[N - 1] > 0 && current.name !== 'cloud' ? 1 : 0) - slabK) * (REDUCE ? 1 : 1 - Math.exp(-dt * 5));
-      lampK += ((LAMP_SCREENS.has(current.name) ? 1 : 0) - lampK) * (REDUCE ? 1 : 1 - Math.exp(-dt * 4));
-      frontLamps.visible = lampK > 0.01; frontLamps.position.y = -4.8 * (1 - lampK);
       slab.visible = slabK > 0.01; if (slab.visible) { slab.scale.y = Math.max(0.001, slabK); slab.position.y = -0.27 + 5.22 * slabK; }
       const inRead = current.name === 'read' && !REDUCE;
       scan.visible = inRead;
