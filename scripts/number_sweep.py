@@ -108,7 +108,7 @@ def expected(out=OUT) -> dict:
 
 
 def files(root=ROOT):
-    pats = ["docs/*.md", "site/index.html", "site/fortres.js", "app/*.py", "README.md"]
+    pats = ["docs/*.md", "site/index.html", "site/fortres.js", "site/demo.html", "site/demo.js", "site/data/demo.json", "app/*.py", "README.md"]
     for p in pats:
         yield from sorted(root.glob(p))
 
