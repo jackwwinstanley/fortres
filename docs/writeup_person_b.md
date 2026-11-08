@@ -7,8 +7,9 @@ For Jack to merge into the main README write-up (#23). Numbers: v5 headline mode
 Of the 75 CVEs added to CISA KEV in our two practice years, **44 (59%) were blind spots**: no public exploit
 code (Exploit-DB, Metasploit, Nuclei, GitHub PoC) and a within-month EPSS rank too low for a top-k EPSS list.
 The best simple rule (public exploit first, then EPSS) catches **0** of them by construction. Our v5 model catches
-**2** (two Fortinet FortiOS flaws, CVE-2024-23113 and CVE-2025-24472). That's few, but it's the only part of the problem
-where text and vendor history add signal the standard feeds don't have.
+**2** (two Fortinet FortiOS flaws, CVE-2024-23113 and CVE-2025-24472). Without the Granite text features the same v5 setup catches **0** blind spots, but three more flagged CVEs (22 vs 21
+overall, one bag each, within noise). So the text trades a few visible catches for blind spots rather than adding net
+catches, in line with Person A's ablation.
 *Figure: `docs/figures/blindspots.png`.*
 
 ## 2. IBM Granite text features

@@ -19,8 +19,8 @@ known-exploited vulnerabilities (KEV).
 - Defenders can patch 500 (the challenge rule).
 
 ## 1. Traits of CVEs that end up on KEV
-**Message:** Out of every 1,000 CVEs, about 6 are added to CISA KEV. Some kinds are associated with about a 3× higher
-rate, and some scary-sounding kinds almost never appear on the list.
+**Message:** Out of every 1,000 CVEs, about 6 are added to CISA KEV. Some kinds are associated with a 3–4.6× higher
+rate (no login 2.8×, edge devices 3.1×, browsers 3.3×, enterprise software 4.6×), and some scary-sounding kinds almost never appear on the list.
 
 | kind of CVE | added to KEV per 1,000 | added to KEV / CVEs |
 |---|---|---|
@@ -47,7 +47,8 @@ KEV in our practice years: 25%. 44 of the 75 had no public attack code and a low
 - 31 visible (had public attack code) vs 44 blind spots (Person A's `st.group_of` definition)
 - Simple rule on blind spots: 0. Our v5 model: 2, both Fortinet FortiOS (CVE-2025-24472, CVE-2024-23113)
   (`outputs/v5_blindspots.csv`, from `python -m src.b.leakage`, which reproduces the v5 headline bag: 12 + 9).
-  **Say it honestly: small.**
+  **Say it honestly: small.** Without the Granite text features the same model catches 0 blind spots but 3 more visible
+  ones (22 vs 21 overall), so the text is a trade-off, not a net gain.
 
 ## 3. What IBM Granite reads (open models, run locally)
 **Message:** Granite reads the description the way an analyst would and recognises "this sounds like a past KEV entry."

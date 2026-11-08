@@ -20,7 +20,7 @@
   const highs = D.why.traits.filter((t) => t.per_1000 > allRate * 2).map((t) => t.per_1000 / allRate);
   const K = {
     "field.scoreboard": fmt(D.field.scoreboard), "field.one_in": fmt(D.field.one_in), "field.expected_2026": fmt(D.field.expected_2026),
-    "why.base": Math.round(allRate), "why.range": `about ${Math.round(d3.median(highs))}×`,
+    "why.base": Math.round(allRate), "why.range": `${Math.round(d3.min(highs))}–${d3.max(highs).toFixed(1)}×`,
     "why.wp": fmt(T["WordPress plugin"].added_to_kev), "why.wp_n": fmt(T["WordPress plugin"].cves),
     "why.xss": fmt(T["Cross-site scripting"].added_to_kev), "why.xss_n": fmt(T["Cross-site scripting"].cves),
     "why.note": `CVEs published ${T["All holes"].period.replace(" to ", "–")}; “added to CISA KEV” = on CISA's Known Exploited Vulnerabilities list as of ${D.why.kev_as_of}. ` +

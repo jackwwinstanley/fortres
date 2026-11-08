@@ -50,7 +50,8 @@ description, the way an analyst would, can help.
 
 ## Accomplishments that we're proud of
 - **Blind spots:** 44 of the 75 KEV additions in our practice years had no public attack code and a low EPSS score.
-  The standard rule catches none of them by construction; our model caught 2 (both Fortinet FortiOS).
+  The standard rule catches none of them by construction; our model caught 2 (both Fortinet FortiOS), and without
+  the Granite text features it caught none, at the cost of a few visible catches (overall 21 with text vs 22 without).
 - **An honest result:** 21 vs 19 for the best simple rule across both years (+2, 90% range −4 to +8). On the
   strictest forward test we're one behind (12 vs 13), and we say so.
 - **Reasons people can check:** 419 of 500 Granite-written reasons passed a groundedness check; the rest use a plain

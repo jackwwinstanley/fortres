@@ -12,11 +12,12 @@ check" (not "verified").
 **Aba (the "what and why", for non-technical judges)**
 > Every year tens of thousands of software flaws are published, and only about 1 in 855 ends up on CISA's list of flaws
 > known to be exploited. Teams can only patch a few hundred, so the question is: which ones first? We looked at which
-> *kinds* of flaws end up on that list. Enterprise software, firewalls and VPNs, and flaws that need no login show up
-> about three times as often. WordPress plugins almost never do, though that partly reflects what CISA tracks. The surprise
+> *kinds* of flaws end up on that list. Flaws that need no login or sit in firewalls and VPNs show up about three times as often,
+> and enterprise software about four and a half times. WordPress plugins almost never do, though that partly reflects what CISA tracks. The surprise
 > was that 44 of the 75 flaws added to the list in our practice years had no public attack code and a low risk score, so
-> the standard rule can't see them at all. IBM Granite reads the description like an analyst would, and it spotted two of
-> those 44, both Fortinet firewall flaws. That's small, and we say so, but it's a signal the usual tools don't have.
+> the standard rule can't see them at all. Our model, which uses IBM Granite to read each description, caught two of those 44,
+> both Fortinet firewall flaws, and without the Granite features it caught none. It's a trade-off, though: without
+> them the model catches a few more of the visible ones, so overall it's about even. Small, and we say so.
 
 **Jack (the "how and how honest", for technical and IBM judges)**
 > We rebuilt 2024 and 2025 exactly the way 2026 is scored, used only information available at the time, and trained on
@@ -73,7 +74,8 @@ sentence instead. Current count: 419 of 500 reasons passed (`outputs/explanation
 
 **What's the most interesting thing you found?**
 That the standard signals can't see most of the flaws that end up on KEV. 44 of 75 had no public attack code and a low
-risk score. Also, the model and the simple rule fail in *opposite* ways. The rule catches high-EPSS flaws with public
+risk score. Our model caught 2 of them, and without the Granite text features 0; but without the text it caught three
+more of the visible ones (22 vs 21 overall), so the text trades visible catches for blind spots. Also, the model and the simple rule fail in *opposite* ways. The rule catches high-EPSS flaws with public
 code from vendors rarely on KEV; the model catches enterprise and edge products whose descriptions read like past KEV
 entries. A simple 50/50 mix looked promising, but it's not established (`outputs/b_error_analysis.md`).
 
