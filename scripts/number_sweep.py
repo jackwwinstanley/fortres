@@ -44,6 +44,9 @@ README.md. Checks:
      pair (36% to 44%, 27 to 33 of 75) from the leakage files, "about 2.5 times the work" from discovery_workload.csv, and for the
      2023 back-test (4 of 22, 5 of 22, 144 of 20,969, "about 26 times better than random") from extra_year_eval.csv; the
      "rebuild in about N minutes" claim must equal the whole minutes of the train_v6 timing in README.md;
+ 19. the "27 not 33" card of site/index.html (data-s="trust") is in percentages only: 36% and 44% are honest and leaky out of 75,
+     "35% to 37% every time" is the lowest and highest pooled hits of the four seed sets in outputs/zoo_summary.md out of 75,
+     18% and 23% are v6's and the usual rule's hits out of 22 in outputs/extra_year_eval.csv, and the raw counts are not shown;
  18. the "AI explanations need checking" band of site/index.html (id="f-ai"): its counts and percentage must be the
      explanations_summary.json values (total, template_fallback, guardian_verdicts.not_run and .Yes), the 0.80 and the "none
      flagged" must come from watsonx_gov_summary.json, and it must not say "passed watsonx", "verified", "validated" or "proves".
@@ -134,6 +137,11 @@ def expected(out=OUT) -> dict:
         e["blind_rule"] = int(b.loc[b["group"] == "blind-spot", "baseline_caught"].sum())
     if (out / "discovery_workload.csv").exists():
         e["findings"] = discovery_values(out, e)
+    zoo = out / "zoo_summary.md"
+    if zoo.exists():
+        sets = [int(x) for x in re.findall(r"^\| I \| \d+-\d+ \| \d+ \| \d+ \| (\d+) \|", zoo.read_text(), re.M)]
+        if sets:
+            e["seed_sets"] = (min(sets), max(sets))
     readme = ROOT / "README.md"
     if readme.exists():
         m = re.search(r"train_v6`? took (\d+) min", readme.read_text())
@@ -336,6 +344,7 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
     probs += check_gov_numbers(rel, text, e)
     if rel == "site/index.html":
         probs += check_ai_band(rel, text, e)
+        probs += check_fair_card(rel, text, e)
     if "findings" in e and final:
         probs += check_findings(rel, text, e)
     return probs
@@ -376,6 +385,32 @@ def check_ai_band(rel: str, text: str, e: dict) -> list[str]:
     for bad in ("passed watsonx", "verified", "validated", "proves"):
         if bad in s.lower():
             probs.append(f"{rel}: AI band uses '{bad}'")
+    return probs
+
+
+def check_fair_card(rel: str, text: str, e: dict) -> list[str]:
+    """Rule 19: the '27 not 33' card says percentages only, each one computed from its source."""
+    m = re.search(r'<section class="step" data-s="trust">.*?</section>', text, re.S)
+    if not m:
+        return []
+    s = " ".join(re.sub(r"<[^>]+>", " ", m.group(0)).split())
+    if "blind" not in e or "seed_sets" not in e or "extra_year" not in e or "simple_hits" not in e["extra_year"]:
+        return [f"{rel}: the fair card needs outputs/headline.json, the leakage files, outputs/zoo_summary.md and outputs/extra_year_eval.csv"]
+    total, ey = e["blind"][1], e["extra_year"]
+    pct = lambda n, d: int(100 * n / d + 0.5)
+    honest, leaky = pct(e["honest"], total), pct(e["leaky"], total)
+    lo, hi = pct(e["seed_sets"][0], total), pct(e["seed_sets"][1], total)
+    probs = []
+    for pat, want, what in ((r"(\d+)% not (\d+)%", (honest, leaky), "honest and leaky out of 75"),
+                            (r"claimed (\d+)%\. We claim (\d+)%", (leaky, honest), "leaky and honest out of 75"),
+                            (r"from (\d+)% to (\d+)%", (honest, leaky), "honest and leaky out of 75"),
+                            (r"(\d+)% to (\d+)% every time", (lo, hi), "the lowest and highest seed set out of 75"),
+                            (r"caught (\d+)% and the usual rule caught (\d+)%", (pct(ey["hits"], ey["positives"]), pct(ey["simple_hits"], ey["positives"])), "v6 and the usual rule out of 22")):
+        for mm in re.finditer(pat, s):
+            if (int(mm.group(1)), int(mm.group(2))) != want:
+                probs.append(f"{rel}: fair card says '{mm.group(0)}', {what} gives {want[0]}% and {want[1]}%")
+    for mm in re.finditer(r"(?<![\d.,])(27|33|26|28)(?![\d%.,])|\b[45] of 22\b", s):
+        probs.append(f"{rel}: fair card shows the raw count '{mm.group(0)}'; it is percentages only")
     return probs
 
 

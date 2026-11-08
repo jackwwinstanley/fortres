@@ -111,12 +111,11 @@
   </div></section>
 
   <section class="step" data-s="trust"><div class="card">
-    <span class="num mint">27<small>not 33</small></span>
-    <h2>We could have claimed 33. <mark>We didn't.</mark></h2>
-    <p>27 is how many holes fortres caught, out of the 75 that CISA later added to its list in our 2024 and 2025 test. Some data only shows up after an attack, like NVD marking a hole as reviewed. Using it would have taken us from 27 to 33, so we left it out. We also reran it with four sets of random seeds and got 26 to 28 every time. Trained on shuffled answers, it catches less than 1.</p>
-    <p><b>How we kept it fair.</b> We used only what was known at the end of each hole's snapshot month. Fields filled in after an attack, like NVD review status and product and reference counts, are banned. Using them would have raised our catch rate from 36% to 44% of exploited holes (27 to 33 of 75), a gain that would have been fake.</p>
-    <p>On an older year rebuilt from public data (2023), fortres caught 18% of the exploited holes (4 of 22) while flagging under 1% of all holes (144 of 20,969), about 26 times better than random. The usual rule caught 23% (5 of 22). We report it anyway.</p>
-    <p>Anyone with the data can rebuild the exact same 500, byte for byte, from a fresh copy of the code in about 6 minutes on a laptop.</p>
+    <span class="num mint">36%<small>not 44%</small></span>
+    <h2>We could have claimed 44%. <mark>We claim 36%.</mark></h2>
+    <p>Some data only appears after a hole is attacked, like NVD marking it as reviewed. Using it would have lifted our catch rate from 36% to 44%, so we left it out. Rerun with new random seeds: 35% to 37% every time. Trained on shuffled answers, it catches almost nothing.</p>
+    <p>On an older year (2023), we caught 18% and the usual rule caught 23%. We report it anyway.</p>
+    <p>Anyone can rebuild the exact same 500 from our code in about 6 minutes.</p>
   </div></section>
 
   <section class="step" data-s="close"><div class="card">
