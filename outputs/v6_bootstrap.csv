@@ -1,0 +1,7 @@
+test,v6_vs,diff,cve_level_90,event_clustered_90
+forward,best simple rule,5,"[0.0, 10.0]","[-2.0, 12.0]"
+forward,v5,6,"[2.0, 10.0]","[1.0, 12.0]"
+stability,best simple rule,3,"[0.0, 7.0]","[0.0, 7.0]"
+stability,v5,0,"[-2.0, 2.0]","[-2.0, 2.0]"
+pooled,best simple rule,8,"[2.0, 14.0]","[1.0, 15.0]"
+pooled,v5,6,"[2.0, 11.0]","[1.0, 13.0]"
