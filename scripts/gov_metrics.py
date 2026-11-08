@@ -3,7 +3,8 @@
 Run (needs the separate Python 3.11 env, because ibm-watsonx-gov requires Python >=3.11,<3.14 and the repo runs on 3.14):
     uv venv --python 3.11 .venv-gov
     uv pip install --python .venv-gov/bin/python "ibm-watsonx-gov[metrics]" sentence-transformers bert-score
-    .venv-gov/bin/python -m scripts.gov_metrics
+    .venv-gov/bin/python -m scripts.gov_metrics          # local metrics, no credentials
+    .venv-gov/bin/python -m scripts.gov_metrics --ibm    # IBM-run metrics; needs WATSONX_APIKEY in this worktree's gitignored .env
 
 What it does
 1. Inventory: tries every SDK metric/method that applies to a single (input, context, output) sentence on 3 rows, with ALL
@@ -31,7 +32,10 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-for k in list(os.environ):  # never use anyone's credentials, even if set
+IBM_MODE = "--ibm" in sys.argv
+# Never use credentials from the shell environment. --ibm mode later reads WATSONX_APIKEY from this worktree's gitignored .env
+# into this process only (never printed or written); region is Toronto (ca-tor).
+for k in list(os.environ):
     if k.startswith(("WATSONX", "WXG", "WML", "IBM_CLOUD", "IBMCLOUD")):
         os.environ.pop(k)
 
@@ -90,19 +94,28 @@ def build_rows() -> pd.DataFrame:
                          "ground_truth": [E.template(f.loc[c]) for c in ex["cve_id"]]})
 
 
-def run(cls, method, df):
+def run(cls, method, df, api_client=None):
     kw = dict(EXTRA_KW.get(cls, {}))
     if method:
         kw["method"] = method
     metric = getattr(M, cls)(**kw)
-    r = metric.evaluate(data=df[["record_id", "input_text", "context", "generated_text", "ground_truth"]], configuration=CFG)
-    if r is None:
-        raise RuntimeError("SDK returned no result")
-    return metric, {x.record_id: x.value for x in r.record_level_metrics}
+    data = df[["record_id", "input_text", "context", "generated_text", "ground_truth"]]
+    if api_client is not None:  # IBM route: the SDK only sets up its watsonx.governance context through MetricsEvaluator
+        from ibm_watsonx_gov.evaluators import MetricsEvaluator
+        res = MetricsEvaluator(configuration=CFG, api_client=api_client).evaluate(data=data, metrics=[metric])
+        recs = [x for agg in res.metrics_result for x in agg.record_level_metrics]
+    else:
+        r = metric.evaluate(data=data, configuration=CFG)
+        if r is None:
+            raise RuntimeError("SDK returned no result")
+        recs = r.record_level_metrics
+    if not recs:
+        raise RuntimeError("SDK returned no record-level values")
+    return metric, {x.record_id: x.value for x in recs}
 
 
 def colname(cls, method):
-    base = re.sub(r"(?<!^)(?=[A-Z])", "_", cls.removesuffix("Metric")).lower()
+    base = re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", cls.removesuffix("Metric")).lower()  # OutputHAP -> output_hap
     return f"{base}__{method}" if method else base
 
 
@@ -177,5 +190,104 @@ def main():
     print(json.dumps({k: summary[k] for k in ("sdk_version", "runtime_secs")}), flush=True)
 
 
+# IBM-backed metrics (run by IBM, Granite Guardian / detectors on watsonx.ai Runtime). All on the Lite plan.
+IBM_METRICS = [("FaithfulnessMetric", "granite_guardian"), ("AnswerRelevanceMetric", "granite_guardian"),
+               ("OutputHAPMetric", None), ("OutputPIIMetric", None), ("HarmMetric", "granite_guardian")]
+IBM_SAMPLE, IBM_SEED = 100, 31
+IBM_REGION = "ca-tor"  # Toronto: where the watsonx.governance Lite instance lives
+IBM_INSTANCE_NAME = "watsonx.governance-pv"  # the Toronto instance confirmed on the Lite plan
+
+
+def load_key():
+    """WATSONX_APIKEY from the worktree's gitignored .env, into this process only. Never printed or written anywhere."""
+    from dotenv import dotenv_values
+    v = dotenv_values(ROOT / ".env").get("WATSONX_APIKEY")
+    if not v:
+        sys.exit("WATSONX_APIKEY not found in .env")
+    os.environ["WATSONX_APIKEY"] = v.strip()
+    os.environ.setdefault("WATSONX_REGION", IBM_REGION)
+    # The account has several watsonx.governance instances, so the SDK cannot pick one ("instance None"). Look up the named
+    # Toronto Lite instance through IBM's resource controller and keep its id in this process only (never printed or written).
+    import requests
+    tok = requests.post("https://iam.cloud.ibm.com/identity/token", timeout=30,
+                        data={"grant_type": "urn:ibm:params:oauth:grant-type:apikey", "apikey": os.environ["WATSONX_APIKEY"]}).json()["access_token"]
+    res = requests.get("https://resource-controller.cloud.ibm.com/v2/resource_instances?limit=100", timeout=30,
+                       headers={"Authorization": "Bearer " + tok}).json().get("resources", [])
+    hit = [r for r in res if r.get("name") == IBM_INSTANCE_NAME and r.get("region_id") == IBM_REGION and r.get("state") == "active"]
+    if len(hit) != 1:
+        sys.exit(f"expected exactly one active {IBM_INSTANCE_NAME} in {IBM_REGION}, found {len(hit)}")
+    os.environ["WXG_SERVICE_INSTANCE_ID"] = hit[0]["guid"]
+
+
+def secrets_redacted(s: str) -> str:
+    v = os.environ.get("WATSONX_APIKEY")
+    if v:
+        s = s.replace(v, "<redacted>")
+    s = re.sub(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", "<redacted-id>", s)  # instance / project ids
+    s = re.sub(r"[0-9a-f]{32}", "<redacted-id>", s)
+    s = re.sub(r"crn:[^\s'\"]+", "<redacted-crn>", s)
+    return redact(s)
+
+
+def main_ibm():
+    """IBM route. Step 1: every metric on ONE row; stop at the first error. Step 2: the fixed sample of 100 rows (seed 31).
+    No retry loop of our own (the SDK has its own small internal retry on 429/5xx). Sends only public CVE facts
+    (explain.facts_prose) and our own sentences. Writes outputs/gov_metrics_ibm.csv and outputs/gov_metrics_ibm_summary.json."""
+    load_key()
+    os.environ.pop("WATSONX_SERVER", None)
+    from ibm_watsonx_gov.clients.api_client import APIClient
+    from ibm_watsonx_gov.entities.credentials import Credentials
+    t0 = time.time()
+    df = build_rows()
+    sample = df.sample(n=IBM_SAMPLE, random_state=IBM_SEED).reset_index(drop=True)
+    where = f"IBM watsonx.governance ({IBM_INSTANCE_NAME}, {os.environ['WATSONX_REGION']} Toronto, Lite plan) on IBM Cloud - IBM's servers"
+    summ = dict(generated_at=None, sdk="ibm-watsonx-gov", sdk_version=md.version("ibm-watsonx-gov"), where=where,
+                claim="Computed by IBM watsonx.governance (Granite Guardian / IBM detectors) on IBM Cloud, called via the SDK.",
+                rows=dict(file="outputs/explanations.csv", which=f"fixed random sample of {IBM_SAMPLE}, seed {IBM_SEED}",
+                          by_source=sample["source"].value_counts().to_dict()),
+                sent="public CVE facts (src.b.explain.facts_prose) and our own explanation sentences only; nothing from data/",
+                usage_or_cost="not reported by the SDK or API responses; Lite plan", one_row_check=[], metrics=[], stopped=None)
+    out = sample[["record_id", "source"]].rename(columns={"record_id": "cve_id"}).copy()
+
+    def finish():
+        summ["runtime_secs"] = round(time.time() - t0, 1)
+        summ["generated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        out.to_csv(OUT / "gov_metrics_ibm.csv", index=False)
+        (OUT / "gov_metrics_ibm_summary.json").write_text(json.dumps(summ, indent=1, default=str) + "\n")
+        print(json.dumps({k: v for k, v in summ.items() if k not in ("rows",)}, default=str, indent=1), flush=True)
+
+    try:
+        client = APIClient(credentials=Credentials.create_from_env())
+    except Exception as e:  # noqa: BLE001
+        summ["stopped"] = "login failed: " + secrets_redacted(f"{type(e).__name__}: {e}")[:1500]
+        return finish()
+    for cls, m in IBM_METRICS:  # step 1: one row each
+        ts = time.time()
+        try:
+            _, vals = run(cls, m, sample.head(1), api_client=client)
+            summ["one_row_check"].append(dict(metric=cls, method=m, value=list(vals.values()), secs=round(time.time() - ts, 1)))
+        except Exception as e:  # noqa: BLE001
+            summ["one_row_check"].append(dict(metric=cls, method=m, error=secrets_redacted(f"{type(e).__name__}: {e}")[:1500]))
+            summ["stopped"] = f"one-row check failed on {cls}/{m}; full sample not run"
+            return finish()
+    for cls, m in IBM_METRICS:  # step 2: the sample
+        ts = time.time()
+        try:
+            metric, vals = run(cls, m, sample, api_client=client)
+            col = colname(cls, m or getattr(metric, "method", None))
+            out[col] = out["cve_id"].map(vals)
+            s = out[col].astype(float)
+            summ["metrics"].append(dict(column=col, metric=cls, method=m or getattr(metric, "method", None), where=where,
+                                        n=int(s.notna().sum()), mean=round(s.mean(), 4), median=round(s.median(), 4),
+                                        min=round(s.min(), 4), max=round(s.max(), 4), n_ge_0_5=int((s >= 0.5).sum()),
+                                        mean_by_source={k: round(v, 4) for k, v in s.groupby(out["source"]).mean().items()},
+                                        secs=round(time.time() - ts, 1)))
+        except Exception as e:  # noqa: BLE001
+            summ["metrics"].append(dict(metric=cls, method=m, error=secrets_redacted(f"{type(e).__name__}: {e}")[:1500]))
+            summ["stopped"] = f"{cls}/{m} failed on the sample; later metrics not run"
+            break
+    finish()
+
+
 if __name__ == "__main__":
-    main()
+    main_ibm() if IBM_MODE else main()

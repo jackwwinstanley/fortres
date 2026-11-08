@@ -1,0 +1,148 @@
+{
+ "generated_at": "2026-11-08T05:35:25+00:00",
+ "sdk": "ibm-watsonx-gov",
+ "sdk_version": "1.5.2",
+ "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor Toronto, Lite plan) on IBM Cloud - IBM's servers",
+ "claim": "Computed by IBM watsonx.governance (Granite Guardian / IBM detectors) on IBM Cloud, called via the SDK.",
+ "rows": {
+  "file": "outputs/explanations.csv",
+  "which": "fixed random sample of 100, seed 31",
+  "by_source": {
+   "granite": 70,
+   "template": 30
+  }
+ },
+ "sent": "public CVE facts (src.b.explain.facts_prose) and our own explanation sentences only; nothing from data/",
+ "usage_or_cost": "not reported by the SDK or API responses; Lite plan",
+ "one_row_check": [
+  {
+   "metric": "FaithfulnessMetric",
+   "method": "granite_guardian",
+   "value": [
+    0.9047
+   ],
+   "secs": 1.4
+  },
+  {
+   "metric": "AnswerRelevanceMetric",
+   "method": "granite_guardian",
+   "value": [
+    0.7312
+   ],
+   "secs": 0.7
+  },
+  {
+   "metric": "OutputHAPMetric",
+   "method": null,
+   "value": [
+    0.0
+   ],
+   "secs": 0.5
+  },
+  {
+   "metric": "OutputPIIMetric",
+   "method": null,
+   "value": [
+    0.0
+   ],
+   "secs": 0.5
+  },
+  {
+   "metric": "HarmMetric",
+   "method": "granite_guardian",
+   "value": [
+    0.0
+   ],
+   "secs": 0.6
+  }
+ ],
+ "metrics": [
+  {
+   "column": "faithfulness__granite_guardian",
+   "metric": "FaithfulnessMetric",
+   "method": "granite_guardian",
+   "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor Toronto, Lite plan) on IBM Cloud - IBM's servers",
+   "n": 100,
+   "mean": 0.8079,
+   "median": 0.8312,
+   "min": 0.5622,
+   "max": 0.9242,
+   "n_ge_0_5": 100,
+   "mean_by_source": {
+    "granite": 0.8116,
+    "template": 0.7991
+   },
+   "secs": 3.1
+  },
+  {
+   "column": "answer_relevance__granite_guardian",
+   "metric": "AnswerRelevanceMetric",
+   "method": "granite_guardian",
+   "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor Toronto, Lite plan) on IBM Cloud - IBM's servers",
+   "n": 100,
+   "mean": 0.6524,
+   "median": 0.6794,
+   "min": 0.3343,
+   "max": 0.8356,
+   "n_ge_0_5": 93,
+   "mean_by_source": {
+    "granite": 0.6807,
+    "template": 0.5862
+   },
+   "secs": 2.7
+  },
+  {
+   "column": "output_hap",
+   "metric": "OutputHAPMetric",
+   "method": null,
+   "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor Toronto, Lite plan) on IBM Cloud - IBM's servers",
+   "n": 100,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "n_ge_0_5": 0,
+   "mean_by_source": {
+    "granite": 0.0,
+    "template": 0.0
+   },
+   "secs": 1.8
+  },
+  {
+   "column": "output_pii",
+   "metric": "OutputPIIMetric",
+   "method": null,
+   "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor Toronto, Lite plan) on IBM Cloud - IBM's servers",
+   "n": 100,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "n_ge_0_5": 0,
+   "mean_by_source": {
+    "granite": 0.0,
+    "template": 0.0
+   },
+   "secs": 1.3
+  },
+  {
+   "column": "harm__granite_guardian",
+   "metric": "HarmMetric",
+   "method": "granite_guardian",
+   "where": "IBM watsonx.governance (watsonx.governance-pv, ca-tor Toronto, Lite plan) on IBM Cloud - IBM's servers",
+   "n": 100,
+   "mean": 0.0,
+   "median": 0.0,
+   "min": 0.0,
+   "max": 0.0,
+   "n_ge_0_5": 0,
+   "mean_by_source": {
+    "granite": 0.0,
+    "template": 0.0
+   },
+   "secs": 2.1
+  }
+ ],
+ "stopped": null,
+ "runtime_secs": 16.0
+}
