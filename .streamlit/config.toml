@@ -2,5 +2,18 @@
 base = "dark"
 primaryColor = "#4589ff"
 backgroundColor = "#080c12"
-secondaryBackgroundColor = "#141a23"
-textColor = "#f4f4f4"
+secondaryBackgroundColor = "#0e141c"
+textColor = "#e8edf3"
+borderColor = "#1c2632"
+linkColor = "#a6c8ff"
+baseRadius = "6px"
+font = "'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+codeFont = "'IBM Plex Mono', ui-monospace, Menlo, monospace"
+headingFontWeights = [500, 500, 500, 500, 500, 500]
+showWidgetBorder = true
+dataframeBorderColor = "#1c2632"
+dataframeHeaderBackgroundColor = "#0e141c"
+dataframeHeaderTextColor = "#8d9aaa"
+
+[client]
+toolbarMode = "minimal"

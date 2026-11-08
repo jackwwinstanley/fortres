@@ -4,30 +4,20 @@ import time
 from pathlib import Path
 
 import pandas as pd
-import plotly.graph_objects as go
+import altair as alt
+import numpy as np
 import streamlit as st
 
+from app import style as ui
 from src.b import explain as ex
 from src.b.export_story import KINDS
-from src.b.score import MAX_ROWS, Scorer, UploadError, read_upload, vendors
+from src.b.score import MAX_ROWS, Scorer, UploadError, read_upload, vendors  # noqa: F401
 from src.common.paths import OUT_DIR, SCOREBOARD_CSV
 
 SAMPLES = Path(__file__).parent / "samples"
 TOP = 500
 SAMPLE_FILES = {"One month of 2026 (May)": "2026_one_month_2026-05.csv", "2,000 random 2026 CVEs": "2026_random_2000.csv"}
 MISSING_SAMPLE = "This sample isn't on this computer yet: run python scripts/make_app_samples.py first."
-BG, BLUE, GREEN, CORAL, INK, MUTED, LINE = "#080c12", "#4589ff", "#42be65", "#ff8389", "#f4f4f4", "#c6c6c6", "rgba(244,244,244,.14)"
-CSS = f"""<style>
-.fx-label {{ color: {MUTED}; font-size: 15px; margin-top: -8px; }}
-.fx-card {{ border: 1px solid {LINE}; border-radius: 8px; padding: 18px 22px; }}
-.fx-big {{ font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 40px; font-weight: 500; line-height: 1.1; }}
-.fx-cap {{ color: {MUTED}; font-size: 15px; margin-top: 6px; }}
-.fx-time {{ color: {GREEN}; font-family: ui-monospace, Menlo, monospace; font-size: 16px; }}
-.fx-badge {{ display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 14px; font-weight: 500; }}
-.fx-ok {{ background: {GREEN}; color: {BG}; }} .fx-tpl {{ background: #393939; color: {INK}; }} .fx-fact {{ border: 1px solid {LINE}; color: {MUTED}; }}
-</style>"""
-
-
 @st.cache_resource(show_spinner="Loading the saved v6 models")
 def scorer() -> Scorer:
     return Scorer()
@@ -82,94 +72,102 @@ def build_table(res: pd.DataFrame, S: Scorer, facts: pd.DataFrame, exp: pd.DataF
     return pd.DataFrame(rows, columns=["Rank here", "Rank in all 2026", "CVE", "What it lets an attacker do", "Vendor / reporter", "EPSS percentile in month", "Public exploit code", "Reason", "Reason type", "score", "in_top"])
 
 
-def card(col, big, cap):
-    col.markdown(f'<div class="fx-card"><div class="fx-big">{big}</div><div class="fx-cap">{cap}</div></div>', unsafe_allow_html=True)
+AXIS = dict(labelColor=ui.MUTED, titleColor=ui.MUTED, labelFont="IBM Plex Mono, ui-monospace, Menlo, monospace", titleFont="IBM Plex Sans, system-ui, sans-serif", titleFontWeight=400, domainColor=ui.LINE, tickColor=ui.LINE, grid=False)
 
 
-def badge(label: str) -> str:
-    cls = "fx-ok" if label.startswith("Checked") else "fx-tpl" if label.startswith("Template") else "fx-fact"
-    return f'<span class="fx-badge {cls}">{label}</span>'
+def _theme(chart):
+    return chart.configure(background=ui.BG).configure_view(strokeWidth=0).configure_axis(**AXIS)
 
 
-def signals_chart(cve: str, facts: pd.DataFrame, S: Scorer) -> go.Figure:
-    i = S.index[cve]
+def signals_chart(cve: str, facts: pd.DataFrame) -> alt.Chart:
     f = facts.loc[cve]
-    names = ["EPSS percentile in month", "IBM Granite KEV-likeness (percentile)", "Similarity to past KEV entries", "Public exploit sources (of 4)"]
-    vals = [float(f["epss_pct"] if pd.notna(f["epss_pct"]) else 0), float(f["kev_text_pct"]), float(f["nearest_kev_sim"]), len(f["exploits"]) / 4]
-    fig = go.Figure(go.Bar(x=vals, y=names, orientation="h", marker_color=BLUE, text=[f"{v:.2f}" for v in vals], textposition="outside", cliponaxis=False))
-    fig.update_layout(height=230, margin=dict(l=10, r=40, t=10, b=10), paper_bgcolor=BG, plot_bgcolor=BG, font=dict(color=INK, size=14), xaxis=dict(range=[0, 1.05], gridcolor=LINE), yaxis=dict(autorange="reversed"))
-    return fig
+    d = pd.DataFrame({"signal": ["EPSS percentile in month", "IBM Granite KEV-likeness (percentile)", "Similarity to past KEV entries", "Public exploit sources (of 4)"],
+                      "value": [float(f["epss_pct"] if pd.notna(f["epss_pct"]) else 0), float(f["kev_text_pct"]), float(f["nearest_kev_sim"]), len(f["exploits"]) / 4]})
+    y = alt.Y("signal:N", sort=None, title=None, axis=alt.Axis(labelLimit=260, labelFont="IBM Plex Sans, system-ui, sans-serif", ticks=False, domain=False))
+    bars = alt.Chart(d).mark_bar(color=ui.ACCENT, height=8).encode(x=alt.X("value:Q", scale=alt.Scale(domain=[0, 1.12]), axis=None), y=y, tooltip=[alt.Tooltip("signal:N", title="signal"), alt.Tooltip("value:Q", format=".2f", title="value")])
+    text = bars.mark_text(align="left", dx=6, color=ui.TEXT, font="IBM Plex Mono, ui-monospace, Menlo, monospace").encode(text=alt.Text("value:Q", format=".2f"))
+    return _theme(bars + text).properties(height=160)
 
 
-def dist_chart(df: pd.DataFrame, n: int) -> go.Figure:
-    cut = df["score"].nlargest(n).min()
-    fig = go.Figure(go.Histogram(x=df["score"], nbinsx=60, marker_color="#2a3442"))
-    fig.add_vline(x=cut, line_color=BLUE, line_width=3, annotation_text=f"top {n:,} cut-off", annotation_font_color=BLUE, annotation_position="top left")
-    fig.update_layout(height=260, margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor=BG, plot_bgcolor=BG, font=dict(color=INK, size=14), xaxis=dict(title="v6 score", gridcolor=LINE), yaxis=dict(title="CVEs", gridcolor=LINE), bargap=0.03)
-    return fig
+def dist_chart(df: pd.DataFrame, n: int) -> alt.Chart:
+    cut = float(df["score"].nlargest(n).min())
+    counts, edges = np.histogram(df["score"].to_numpy(), bins=60, range=(0, 1))
+    d = pd.DataFrame({"from": edges[:-1], "to": edges[1:], "CVEs": counts})
+    x = alt.X("from:Q", bin="binned", title="v6 score", scale=alt.Scale(domain=[0, 1]), axis=alt.Axis(format=".1f", values=[i / 10 for i in range(11)]))
+    bars = alt.Chart(d).mark_bar(color=ui.ACCENT, opacity=0.75).encode(x=x, x2="to:Q", y=alt.Y("CVEs:Q", title="CVEs", axis=alt.Axis(tickCount=4)), tooltip=[alt.Tooltip("from:Q", format=".2f", title="score from"), alt.Tooltip("CVEs:Q", format=",", title="CVEs")])
+    rule = alt.Chart(pd.DataFrame({"x": [cut], "t": [f"top {n:,} cut-off"]})).mark_rule(color=ui.CORAL, strokeWidth=2).encode(x="x:Q")
+    label = alt.Chart(pd.DataFrame({"x": [cut], "t": [f"top {n:,} cut-off"]})).mark_text(align="right", baseline="top", dx=-8, color=ui.CORAL, font="IBM Plex Mono, ui-monospace, Menlo, monospace", fontSize=13).encode(x="x:Q", y=alt.value(2), text="t:N")
+    return _theme(bars + rule + label).properties(height=224)
 
 
 def render():
-    st.markdown(CSS, unsafe_allow_html=True)
-    st.title("Rank a dataset")
-    st.markdown('<p class="fx-label">v6 model, trained on our 2024 and 2025 test pools, loaded from saved files. Granite text scores were computed in our earlier run.</p>', unsafe_allow_html=True)
     S, facts, exp = scorer(), facts_table(scorer()), explanations()
-    a, b, c = st.columns([2, 1, 1])
-    up = a.file_uploader(f"Upload a CSV of 2026 vulnerabilities (scoreboard columns, up to {MAX_ROWS:,} rows)", type=["csv"])
-    source = None
-    if b.button("Use the 2026 scoreboard", use_container_width=True):
+    drop, sources, go_col = st.columns([6, 3, 2], gap="medium", vertical_alignment="bottom")
+    up = drop.file_uploader("Drop a CSV of 2026 vulnerabilities", type=["csv"])
+    with sources, st.container(key="fx-sources"):
+        board = st.button("Use the 2026 scoreboard", use_container_width=True)
+        names = list(SAMPLE_FILES)
+        s1 = st.button("One month of 2026", use_container_width=True)
+        s2 = st.button("2,000 random CVEs", use_container_width=True)
+    msg = None
+    if board:
         st.session_state["src"] = ("the 2026 scoreboard", SCOREBOARD_CSV)
-    sample = c.selectbox("Sample slices", ["None", *SAMPLE_FILES])
-    if sample != "None":
-        path = SAMPLES / SAMPLE_FILES[sample]
-        if path.exists():
-            st.session_state["src"] = (sample, path)
-        else:
-            c.warning(MISSING_SAMPLE)
-    if up is not None:
-        source = (up.name, up)
-    elif "src" in st.session_state:
-        source = st.session_state["src"]
+    for clicked, name in ((s1, names[0]), (s2, names[1])):
+        if clicked:
+            path = SAMPLES / SAMPLE_FILES[name]
+            if path.exists():
+                st.session_state["src"] = (name, path)
+            else:
+                msg = MISSING_SAMPLE
+    source = (up.name, up) if up is not None else st.session_state.get("src")
+    with go_col, st.container(key="fx-run"):
+        run = st.button("Run", type="primary", disabled=source is None, use_container_width=True)
     if source:
-        st.caption(f"Ready: {source[0]}")
-    if st.button("Run", type="primary", disabled=source is None):
-        bar = st.progress(0, text="Reading the file")
+        st.markdown(f'<p class="fx-ready">Ready: {ui.esc(source[0])}</p>', unsafe_allow_html=True)
+    if msg:
+        st.markdown(ui.panel(msg, error=True), unsafe_allow_html=True)
+    if run:
+        bar = st.progress(0)
         try:
             raw = source[1]
             df = read_upload(io.BytesIO(raw.getvalue()) if hasattr(raw, "getvalue") else raw, set(S.ids))
         except UploadError as e:
             bar.empty()
-            st.error(str(e))
+            st.markdown(ui.panel(str(e), error=True), unsafe_allow_html=True)
             st.session_state.pop("res", None)
             return
-        bar.progress(25, text=f"Ranking {len(df):,} CVEs")
+        bar.progress(25)
         t = time.perf_counter()
         res = S.score(df)
         secs = time.perf_counter() - t
-        bar.progress(60, text="Writing the reasons")
+        bar.progress(60)
         tab = build_table(res, S, facts, exp, df)
-        bar.progress(100, text="Done")
+        bar.progress(100)
         bar.empty()
         st.session_state["res"] = dict(tab=tab, secs=secs, name=source[0], dropped=df.attrs.get("dropped_bad_ids", 0))
     if "res" not in st.session_state:
+        if not msg:
+            st.markdown("<div style='height:24px'></div>" + ui.panel("Choose a file or a sample, then press Run."), unsafe_allow_html=True)
+        st.caption("v6 model, trained on our 2024 and 2025 test pools, loaded from saved files. Granite text scores were computed in our earlier run.")
         return
     r = st.session_state["res"]
     tab = r["tab"]
     n_all = len(tab)
-    st.markdown(f'<p class="fx-time">Scored {n_all:,} in {r["secs"]:.2f} s on this laptop</p>', unsafe_allow_html=True)
+    st.markdown(ui.banner(f"Scored {n_all:,} in {r['secs']:.2f} s on this laptop"), unsafe_allow_html=True)
     if r["dropped"]:
-        st.warning(f"{r['dropped']:,} rows without a valid CVE id were skipped.")
-    n = st.number_input("Top N", min_value=1, max_value=n_all, value=min(TOP, n_all), step=50)
-    head = tab.head(int(n))
-    c1, c2, c3 = st.columns(3)
-    card(c1, f"{n_all:,}", "rows scored")
-    card(c2, f"{int(tab['in_top'].sum()):,}", "are in Fortres's 2026 top 500")
-    card(c3, f"{int((head['Public exploit code'] == 'yes').sum()):,} of {len(head):,}", f"of your top {len(head):,} have public exploit code")
-    st.plotly_chart(dist_chart(tab, int(n)), use_container_width=True)
-    f1, f2, f3 = st.columns([2, 2, 1])
+        st.markdown(ui.panel(f"{r['dropped']:,} rows without a valid CVE id were skipped.", error=True), unsafe_allow_html=True)
+    n = int(st.session_state.get("fx_top_n", min(TOP, n_all)))
+    n = min(n, n_all)
+    head = tab.head(n)
+    ex_n = int((head["Public exploit code"] == "yes").sum())
+    st.markdown(ui.cards([(f"{n_all:,}", "rows scored", None), (f"{int(tab['in_top'].sum()):,}", "are in Fortres's 2026 top 500", None),
+                          (f"{ex_n:,} of {len(head):,}", f"of your top {len(head):,} have public exploit code", ex_n / max(len(head), 1)), (f"{len(head):,}", "top N selected", None)]), unsafe_allow_html=True)
+    st.altair_chart(dist_chart(tab, n), use_container_width=True, theme=None)
+    f1, f2, f3, f4 = st.columns([3, 3, 2, 1.4], vertical_alignment="bottom")
     q = f1.text_input("Search by CVE id", placeholder="CVE-2026-")
     vend = f2.multiselect("Vendor / reporter", sorted(v for v in tab["Vendor / reporter"].unique() if v))
-    expl = f3.selectbox("Public exploit code", ["All", "yes", "no"])
+    expl = f3.segmented_control("Public exploit code", ["All", "yes", "no"], default="All") or "All"
+    f4.number_input("Top N", min_value=1, max_value=n_all, value=min(TOP, n_all), step=50, key="fx_top_n")
     view = tab
     if q:
         view = view[view["CVE"].str.contains(q.strip(), case=False, regex=False)]
@@ -177,20 +175,31 @@ def render():
         view = view[view["Vendor / reporter"].isin(vend)]
     if expl != "All":
         view = view[view["Public exploit code"] == expl]
-    show = view.drop(columns=["score", "in_top"]).head(5000)
-    st.caption(f"Showing {len(show):,} of {len(view):,}. Click a row to see its signals.")
-    ev = st.dataframe(show, use_container_width=True, hide_index=True, height=430, on_select="rerun", selection_mode="single-row",
-                      column_config={"Reason": st.column_config.TextColumn(width="large"), "EPSS percentile in month": st.column_config.NumberColumn(format="%.1f")})
+    st.markdown('<div class="fx-h">Ranked by Fortres</div>', unsafe_allow_html=True)
+    if view.empty:
+        st.markdown(ui.panel("No CVEs match these filters."), unsafe_allow_html=True)
+    else:
+        st.markdown(ui.table(view.head(25).to_dict("records")), unsafe_allow_html=True)
+    show = view.drop(columns=["score", "in_top"]).head(5000).copy()
+    show["Status"] = show["Reason type"].map(ui.short_label)
+    show["Public exploit code"] = show["Public exploit code"].map({"yes": "Yes", "no": "No"})
+    st.markdown(f'<div class="fx-h">All rows</div><div class="fx-sub">Showing {len(show):,} of {len(view):,}. Click a row to see its signals.</div>', unsafe_allow_html=True)
+    left, right = st.columns([3, 2], gap="medium")
+    cols = ["Rank here", "Rank in all 2026", "CVE", "Vendor / reporter", "EPSS percentile in month", "Public exploit code", "Status"]
+    ev = left.dataframe(show, use_container_width=True, hide_index=True, height=480, on_select="rerun", selection_mode="single-row", row_height=40, column_order=cols,
+                        column_config={"EPSS percentile in month": st.column_config.ProgressColumn("EPSS percentile", format="%.1f", min_value=0, max_value=100), "Public exploit code": st.column_config.TextColumn("Exploit code")})
     picked = ev.selection.rows if ev and ev.selection else []
-    if picked:
-        row = show.iloc[picked[0]]
-        st.subheader(row["CVE"])
-        st.markdown(badge(row["Reason type"]), unsafe_allow_html=True)
-        st.write(row["Reason"])
-        if row["CVE"] in S.index.index:
-            st.plotly_chart(signals_chart(row["CVE"], facts, S), use_container_width=True)
+    with right:
+        if picked:
+            row = show.iloc[picked[0]]
+            st.markdown(ui.detail(row["CVE"], int(row["Rank in all 2026"]), len(S.ids), row["Reason type"], row["Reason"]), unsafe_allow_html=True)
+            if row["CVE"] in S.index.index:
+                st.altair_chart(signals_chart(row["CVE"], facts), use_container_width=True, theme=None)
+            else:
+                st.markdown(ui.panel("This CVE is not in the 2026 scoreboard, so the Granite text score is not available."), unsafe_allow_html=True)
         else:
-            st.info("This CVE is not in the 2026 scoreboard, so the Granite text score is not available.")
-    d1, d2 = st.columns(2)
+            st.markdown(ui.panel("Select a row to see its reason and signals."), unsafe_allow_html=True)
+    d1, d2, _ = st.columns([2, 2, 4])
     d1.download_button(f"Download the top {len(head):,} (cve_id only)", head[["CVE"]].rename(columns={"CVE": "cve_id"}).to_csv(index=False), file_name=f"top{len(head)}.csv", mime="text/csv")
     d2.download_button("Download the full results", tab.drop(columns=["in_top"]).to_csv(index=False), file_name="fortres_results.csv", mime="text/csv")
+    st.caption("v6 model, trained on our 2024 and 2025 test pools, loaded from saved files. Granite text scores were computed in our earlier run.")
