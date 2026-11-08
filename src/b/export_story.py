@@ -29,9 +29,54 @@ TAG = {"txt_rce": "Remote code execution", "txt_unauth": "No login needed", "txt
        "txt_path_traversal": "Path traversal", "txt_sqli": "SQL injection", "txt_priv_esc": "Privilege escalation",
        "txt_memory": "Memory corruption", "txt_edge_device": "VPN / firewall / edge", "txt_enterprise": "Enterprise software",
        "txt_browser": "Web browser", "txt_wordpress": "WordPress plugin", "txt_xss": "Cross-site scripting"}
+# plain-English flaw families for the "our 500" poster: first match wins (txt_* flags from the description)
+KINDS = [("Takes over the machine", ["txt_rce", "txt_cmd_injection", "txt_deserialization"]),
+         ("No login needed", ["txt_unauth", "txt_auth_bypass"]),
+         ("Gets admin powers", ["txt_priv_esc"]),
+         ("Reads files it shouldn't", ["txt_path_traversal"]),
+         ("Database attack", ["txt_sqli"]),
+         ("Browser bug", ["txt_browser"]),
+         ("WordPress plugin", ["txt_wordpress"]),
+         ("Network edge device", ["txt_edge_device"])]
 # phrases highlighted in the example description, each mapped to the text tag it triggers (or a plain label)
 HIGHLIGHTS = [("Authentication Bypass", "Login bypass"), ("remote unauthenticated attacker", "No login needed"),
               ("super-admin privileges", "Takes full control"), ("FortiOS", "Widely deployed edge product")]
+
+# ---- "why do attackers pick some holes?": descriptive natural frequencies (never used by the model) ----
+TRAITS = [("All holes", None), ("Network edge device (firewall, VPN)", ["txt_edge_device"]),
+          ("No login needed", ["txt_unauth", "txt_auth_bypass"]),
+          ("Takes over the machine", ["txt_rce", "txt_cmd_injection"]),
+          ("Enterprise software", ["txt_enterprise"]), ("Web browser", ["txt_browser"]),
+          ("WordPress plugin", ["txt_wordpress"]), ("Cross-site scripting", ["txt_xss"])]
+MIN_N = 1000  # a trait needs at least this many holes to be shown
+
+
+def why_traits(P):
+    from src.b.phrases import strip_post_attack
+    v = pd.read_csv(DATA_DIR / "vulnerabilities.csv", usecols=["cve_id", "published", "description"])
+    v["published"] = pd.to_datetime(v["published"], errors="coerce")
+    v = v[(v["published"] >= "2018-01-01") & (v["published"] <= "2025-09-30")].copy()
+    kev = pd.read_csv(DATA_DIR / "known_exploited.csv", usecols=["cve_id", "date_added"])
+    v["attacked"] = v["cve_id"].isin(kev["cve_id"])
+    d = v["description"].fillna("").map(strip_post_attack).str.lower()
+    flags = {f: d.str.contains(pat, regex=True) for f, pat in FLAGS.items()}
+    rows = []
+    for name, fl in TRAITS:
+        m = pd.Series(True, index=v.index) if fl is None else np.logical_or.reduce([flags[f] for f in fl])
+        g = v[m]
+        rows.append({"trait": name, "holes": int(len(g)), "attacked": int(g["attacked"].sum()),
+                     "per_1000": round(float(g["attacked"].mean() * 1000), 2), "period": "2018-01 to 2025-09"})
+    rep = pd.concat([P[2024], P[2025]], ignore_index=True)
+    flagged = pd.concat([pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["exploitdb", "metasploit", "nuclei", "poc_github"])
+                         for y in (2024, 2025)], ignore_index=True).max(axis=1) == 1
+    g = rep[flagged.to_numpy()]
+    rows.insert(1, {"trait": "Public attack code exists", "holes": int(len(g)), "attacked": int(g["label"].sum()),
+                    "per_1000": round(float(g["label"].mean() * 1000), 2), "period": "2024-25 practice years"})
+    rows = [r for r in rows if r["holes"] >= MIN_N]
+    return {"traits": rows, "kev_as_of": str(kev["date_added"].max()), "min_n": MIN_N,
+            "note": ("Descriptive only, never a model input. Traits are regex tags on the description (post-attack "
+                     "phrases removed). 'Attacked' = on CISA's KEV list as of the date shown; older holes had more time "
+                     "to be attacked. Public attack code uses the 2024-25 practice years, attacked by 4 Nov of that year.")}
 
 
 def pools():
@@ -60,6 +105,11 @@ def main():
     rate = prac_pos / prac_n
     story["field"] = {"scoreboard": len(P[2026]), "practice_cves": prac_n, "practice_exploited": prac_pos,
                       "rate": rate, "one_in": int(round(1 / rate)), "expected_2026": int(round(rate * len(P[2026])))}
+
+    # 2b. why: natural frequencies per trait (also written as its own small auditable file)
+    story["why"] = why_traits(P)
+    SITE_DATA.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(story["why"]["traits"]).to_csv(SITE_DATA / "why_traits.csv", index=False)
 
     # 3. how defenders choose today (best simple rule), per practice year
     base = res[res["version"] == "baseline_exploit_epss"].set_index("test_year")
@@ -150,8 +200,10 @@ def main():
              "txt_deserialization", "txt_priv_esc", "txt_memory", "txt_xss", "txt_edge_device", "txt_browser",
              "txt_wordpress", "txt_enterprise"]
     t["flaw"] = [next((TAG[f] for f in order if r[f] == 1), "Other flaw") for _, r in tflags.iterrows()]
+    t["kind"] = [next((name for name, fl in KINDS if any(r[f] == 1 for f in fl)), "Other kinds of flaw")
+                 for _, r in tflags.iterrows()]
     story["top"] = {"list": name, "items": [
-        {"cve": r.cve_id, "rank": int(r["rank"]) + 1, "group": r.group, "flaw": r.flaw,
+        {"cve": r.cve_id, "rank": int(r["rank"]) + 1, "group": r.group, "flaw": r.flaw, "kind": r.kind,
          "reason": expl.get(r.cve_id, ""), "epss_pct": round(float(sb.loc[r.cve_id, "epss_rank_in_month"]), 3),
          "exploit": int(sb.loc[r.cve_id, "any_exploit"])} for _, r in t.iterrows()]}
 
