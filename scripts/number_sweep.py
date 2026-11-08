@@ -152,7 +152,7 @@ def discovery_values(out: Path, e: dict) -> dict:
         "top_failure": top_fail, "epss_jump": float(jump),
         "msf": _search_int(out / "newdata_provenance.md", r"\*\*(\d+) of the (\d+)\*\* pool CVE"),
         "vulncheck": _search_int(out / "outside_report.md", r"\*\*([\d,]+) of ([\d,]+)\*\* entries"),
-        "min_leaf": h["final_params"]["min_child_samples"],
+        "min_leaf": h["final_params"]["min_child_samples"], "trees": h["final_params"]["n_estimators"],
         "template_rows": _search_int(out / "newdata_report.md", r"only about (\d+) practice")[0],
         "analyzed_rest": _search_int(out.parent / "docs" / "column_review.md", r"against (\d+)% \(2024\) and (\d+)% \(2025\)"),
         "variants": 7 if "seven declared variants" in h["primary"] else None,
@@ -316,6 +316,10 @@ def check_findings(rel: str, text: str, e: dict) -> list[str]:
                 k = len(m.group(1).split(".")[1]) if "." in m.group(1) else 0
                 if float(m.group(1)) != round(f["epss_jump"], k):
                     probs.append(f"{where}: EPSS jump {m.group(0)}, outputs/discovery_epss_jump.csv has {f['epss_jump']}")
+    for n, line in enumerate(text.splitlines(), 1):                     # the ranking's size, wherever it is described
+        for m in re.finditer(r"\b(\d+) tree-based models\b[^.]*?\b(\d+) small trees\b", line):
+            if (int(m.group(1)), int(m.group(2))) != (f["seeds"], f["trees"]):
+                probs.append(f"{rel}:{n}: {m.group(0)}, outputs/headline.json has {f['seeds']} models of {f['trees']} trees")
     needs_definition = rel in DEFINITION_DOCS or (rel == "site/index.html" and "what we found" in text.lower())
     if needs_definition and DEFINITION.format(**f) not in " ".join(text.split()):
         probs.append(f"{rel}: the one-sentence definition of fortres is missing or has been reworded")
@@ -338,7 +342,7 @@ def findings_allowed(e: dict) -> set[float]:
                                *f["vendor_cv_2024"], f["events"], f["largest_event"], *e["pooled"], e["pooled"][0] - e["pooled"][1],
                                *f["event_range"], *f["cve_range"], f["guardian_rejected"], f["local_failed"],
                                f["guardian_rejected"] + f["local_failed"], f["top_failure"][1], *w.values(), f["epss_jump"],
-                               f["scoreboard"], f["picks"], f["seeds"], e["guardian"]["total"], 1, 0)}
+                               f["scoreboard"], f["picks"], f["seeds"], f["trees"], e["guardian"]["total"], 1, 0)}
 
 
 def check_findings_numbers(rel: str, text: str, e: dict) -> list[str]:

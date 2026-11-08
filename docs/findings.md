@@ -8,7 +8,7 @@ checked which holes CISA later added to its Known Exploited Vulnerabilities (KEV
 
 Fortres is a triage system for security holes: a statistical model ranks all 72,670 of 2026's new vulnerabilities and picks the 500 most likely to be attacked, and IBM Granite models help read the descriptions and explain every pick in plain language.
 
-- **The ranking is 20 decision-tree models that vote.** It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.
+- **The ranking is a set of 20 tree-based models that vote, each made of 150 small trees.** It is not a chatbot. It's fast, it can be tested against what really happened, and it runs on a laptop.
 - **IBM Granite does the reading and the explaining.** Granite Embedding reads each description and gives the ranking one clue. Granite 3.3 writes a one-sentence reason for each pick, and Granite Guardian checks that reason against the facts. If it fails, a plain template sentence is used instead.
 - **What it is not.** It doesn't predict who gets attacked. The language model never decides the ranking. And it still misses most holes that give no warning.
 

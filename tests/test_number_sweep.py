@@ -207,7 +207,7 @@ F = {"kev_medium": (162, 1484), "one_in": 9, "workload": {"usual": 1116, "epss":
      "events": 67, "largest_event": 3, "vendor_cv": (19, 10), "vendor_cv_2024": (7, 6), "guardian_rejected": 90, "local_failed": 92,
      "top_failure": ("word not in the facts", 91), "epss_jump": 6.37, "msf": (249, 490), "vulncheck": (5803, 5809), "min_leaf": 200,
      "template_rows": 140, "analyzed_rest": (42, 50), "variants": 7, "extra_methods": 11, "scoreboard": 72670, "picks": 500, "seeds": 20,
-     "event_range": (1, 15), "cve_range": (2, 14)}
+     "event_range": (1, 15), "cve_range": (2, 14), "trees": 150}
 EF = {**E, "pooled": (27, 19), "forward": (18, 13), "stability": (9, 6), "ranges": {(2, 14)}, "honest": 27, "leaky": 33, "leaky_split": (21, 12),
       "blind_ours": 5, "findings": F}
 GOOD_WORK = "To catch the same 27, the usual rule needs 1,116 fixes, sorting by severity needs 6,858, and EPSS alone needs 10,026."
@@ -254,3 +254,9 @@ def test_findings_page_may_only_state_sourced_numbers():
 @pytest.mark.parametrize("line", ["It detects attacks.", "This proves the point.", "It guarantees a catch."])
 def test_new_banned_words(line):
     assert any("banned wording" in p for p in ns.check_text(FINAL, line, E))
+
+
+def test_model_size_wording_is_checked():
+    assert ns.check_findings("docs/judge_qa.md", "A set of 20 tree-based models that vote, each made of 150 small trees.", EF) == []
+    probs = ns.check_findings("docs/judge_qa.md", "A set of 20 tree-based models that vote, each made of 100 small trees.", EF)
+    assert any("150 trees" in p for p in probs), probs
