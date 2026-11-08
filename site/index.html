@@ -1,260 +1,161 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fortres · Fix the few that matter first</title>
-<meta name="description" content="72,670 software security holes were published in 2026. Fortres ranks them so defenders fix the 500 most likely to be used by attackers first. Built with IBM Granite for the Sheridan Datathon 2026.">
-<meta property="og:title" content="Fortres">
-<meta property="og:description" content="Which security holes will attackers use first? A ranked top 500 for 2026, tested honestly on 2024 and 2025.">
-<meta property="og:url" content="https://fortres.us">
-<meta name="theme-color" content="#161616">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23161616'/%3E%3Cpath d='M6 26V12h4v4h4v-4h4v4h4v-4h4v14z' fill='%233ddbd9'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>fortres</title>
+<meta name="description" content="fortres ranks 2026's 72,670 new security holes and picks the 500 to fix first. Built by Yahya and Jack for IBM's Before the Breach challenge.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23080c12%22/%3E%3Csvg%20x%3D%2210%22%20y%3D%226%22%20width%3D%2244%22%20height%3D%2252%22%20viewBox%3D%22400%20180%20610%20790%22%3E%3Cpath%20d%3D%22M450%20293L528%20266L532%20330L608%20310L610%20238L703%20201L797%20238L798%20310L876%20330L880%20266L958%20293L958%20412L703%20362L452%20412Z%22%20fill%3D%22none%22%20stroke%3D%22%23e8edf3%22%20stroke-width%3D%2246%22%20stroke-linejoin%3D%22miter%22%20stroke-miterlimit%3D%228%22/%3E%3Cpath%20d%3D%22M487%20450L703%20398L919%20450L884%20492L884%20742L703%20840L522%20742L522%20492Z%22%20fill%3D%22none%22%20stroke%3D%22%23e8edf3%22%20stroke-width%3D%2246%22%20stroke-linejoin%3D%22miter%22%20stroke-miterlimit%3D%228%22/%3E%3Cpath%20d%3D%22M507%20606L425%20655L425%20798L703%20948L982%20798L982%20655L900%20606%22%20fill%3D%22none%22%20stroke%3D%22%23e8edf3%22%20stroke-width%3D%2246%22%20stroke-linejoin%3D%22miter%22%20stroke-miterlimit%3D%228%22/%3E%3C/svg%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,400..500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Mona+Sans:wdth,wght@75..125,400..500&display=swap">
 <link rel="stylesheet" href="fortres.css">
-<script src="theme.js"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-
-<header class="nav" id="top">
-  <div class="wrap nav-row">
-    <a class="brand" href="#top" aria-label="Fortres, back to top">
-      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26V12h4v4h4v-4h4v4h4v-4h4v14z"/></svg>
-      <span>Fortres</span>
-    </a>
-    <nav aria-label="Sections">
-      <ul class="nav-links">
-        <li><a href="#stakes">Why it matters</a></li>
-        <li><a href="#threads">The 44</a></li>
-        <li><a href="#how">How it works</a></li>
-        <li><a href="#results">Results</a></li>
-        <li><a href="#questions">Questions</a></li>
-      </ul>
-    </nav>
-    <div class="nav-end">
-      <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to light theme">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm0 22V6a10 10 0 0 1 0 20Z"/></svg>
-      </button>
-      <a class="btn btn-solid" href="#picks">See the 500</a>
-    </div>
-  </div>
+<header class="top">
+  <a class="brand" href="#story" aria-label="fortres home"><svg width="21" height="27" viewBox="400 180 610 790" aria-hidden="true"><path d="M450 293L528 266L532 330L608 310L610 238L703 201L797 238L798 310L876 330L880 266L958 293L958 412L703 362L452 412Z" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M487 450L703 398L919 450L884 492L884 742L703 840L522 742L522 492Z" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M507 606L425 655L425 798L703 948L982 798L982 655L900 606" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="miter" stroke-miterlimit="8"/></svg>fortres</a>
+  <nav class="tabs" aria-label="Pages"><a href="#story" id="t-story" aria-current="page">story</a><a href="#picks" id="t-picks">the 500</a><a href="#lookup" id="t-lookup">look up</a></nav>
 </header>
+<div class="prog" id="prog" aria-hidden="true"></div>
+<div class="poster" aria-hidden="true"></div>
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="vig" aria-hidden="true"></div>
+<div class="scrim" aria-hidden="true"></div>
 
-<main id="main">
+<main class="story gut">
+  <section class="step" id="s0" data-s="wall"><div class="card">
+    <h2>Your data sits behind <mark>thousands of locks</mark>.</h2>
+    <p>Every app you use is built from software, and all software has weak spots called security holes. Think of each brick in this wall as one of them.</p>
+  </div></section>
 
-  <!-- 1 · Words: the hook -->
-  <section class="sec hero" aria-labelledby="h-hero">
-    <div class="wrap split">
-      <div class="col-text">
-        <h1 id="h-hero" class="h1 masked">
-          <span class="line"><span>Your data sits behind</span></span>
-          <span class="line"><span>thousands of locks.</span></span>
-          <span class="line"><span>A few are already</span></span>
-          <span class="line"><span class="coral">being picked.</span></span>
-        </h1>
-        <p class="lead rise">Your bank, your doctor and every app on your phone run software with security holes. Almost all of those holes are never used. The few that are leak passwords, savings and health records. Fortres tells defenders which ones to fix first.</p>
-        <div class="cta rise"><a class="btn btn-solid btn-lg" href="#picks">See the 500 to fix first</a><a class="link" href="#stakes">Why it matters</a></div>
-      </div>
-      <figure class="col-visual wall-fig rise" aria-label="A wall of 855 bricks. One of them is cracked.">
-        <svg id="wall" class="wall" viewBox="0 0 450 260" role="img" aria-hidden="true"></svg>
-        <p class="wall-note"><span class="dot coral-bg"></span>In past years, about one hole in every 855 ended up being used by attackers.</p>
-      </figure>
-    </div>
-  </section>
+  <section class="step" data-s="one"><div class="card">
+    <span class="num coral">1<small>in 855</small></span>
+    <h2>Only a few are ever <mark>used by attackers</mark>.</h2>
+    <p>About one hole in 855 ends up on CISA's list of holes attackers have exploited. That's the one you need to find.</p>
+  </div></section>
 
-  <!-- 2 · Words: why it matters -->
-  <section class="sec" id="stakes" aria-labelledby="h-stakes">
-    <div class="wrap">
-      <h2 id="h-stakes" class="h2">When one gets used, people pay for it. <span class="muted">Usually people who never heard of the software.</span></h2>
-      <div class="stakes">
-        <article class="stake">
-          <h3 class="h3">Your information</h3>
-          <p>Names, card numbers, passwords and medical records are what attackers take, and they get resold or used to open accounts in your name. Think of your mom getting a call from "her bank".</p>
-        </article>
-        <article class="stake">
-          <h3 class="h3">Their money</h3>
-          <p>A single data breach costs a company <strong class="num">$4.99 million</strong> on average, according to <a href="https://www.ibm.com/reports/data-breach" rel="noopener">IBM's Cost of a Data Breach Report 2026</a>. That bill lands on customers too.</p>
-        </article>
-        <article class="stake">
-          <h3 class="h3">Everyone's time</h3>
-          <p>Security teams cannot fix every hole at once. They have to choose what to fix this week, and a wrong choice leaves the door open while the team works on something harmless.</p>
-        </article>
-      </div>
-    </div>
-  </section>
+  <section class="step" data-s="cost"><div class="card">
+    <span class="num blue">$4.99M</span>
+    <h2>Miss it, and it gets <mark>expensive</mark>.</h2>
+    <p>That's the average cost of one data breach, from IBM's 2026 report. So choosing which holes to fix first is a five-million-dollar decision. And it's ordinary people's passwords and bank details that leak, maybe your mom's.</p>
+  </div></section>
 
-  <!-- 3 · Words to numbers -->
-  <section class="sec" id="scale" aria-labelledby="h-scale">
-    <div class="wrap">
-      <h2 id="h-scale" class="h2">Too many holes, too few hands. <span class="muted">So the order matters.</span></h2>
-      <div class="scale" id="scaleRows">
-        <div class="scale-row">
-          <p class="scale-text"><span class="big num" data-key="scoreboard">72,670</span> security holes were made public in 2026.</p>
-          <div class="scale-bar" aria-hidden="true"><i style="--w:1"></i></div>
-        </div>
-        <div class="scale-row">
-          <p class="scale-text"><span class="big num">500</span> is how many IBM asked us to pick for fixing first.</p>
-          <div class="scale-bar" aria-hidden="true"><i style="--w:0.00688"></i></div>
-        </div>
-        <div class="scale-row">
-          <p class="scale-text">If 2026 is like past years, about <span class="big num coral" data-key="expected">85</span> will end up on CISA's list of holes attackers really used.</p>
-          <div class="scale-bar" aria-hidden="true"><i class="coral-bg" style="--w:0.00117"></i></div>
-        </div>
-      </div>
-      <p class="note">CISA is the US government's cyber defence agency. Its Known Exploited Vulnerabilities list is the closest thing to a public record of which holes attackers actually used. Each bar above is drawn to scale.</p>
-    </div>
-  </section>
+  <section class="step" data-s="cloud"><div class="card">
+    <span class="num blue">72,670</span>
+    <h2>New holes announced <mark>in 2026</mark>.</h2>
+    <p>No team can fix them all, and attackers are speeding up: IBM reports AI-driven attacks rose 56%, led by deepfake impersonation and AI-written malware. Most teams can fix a few hundred. So which few hundred?</p>
+  </div></section>
 
-  <!-- 4 · Numbers to picture: the threads -->
-  <section class="sec chapters" id="threads" aria-labelledby="h-threads">
-    <div class="wrap">
-      <h2 id="h-threads" class="h2">Most of them gave no warning. <span class="muted">Here are all 75 from 2024 and 2025.</span></h2>
-      <div class="chap-grid">
-        <ol class="chap-steps" id="steps">
-          <li class="chap" data-step="0"><h3 class="h3">75 holes, one thread each</h3><p>These are all the holes from 2024 and 2025 in our data that ended up on CISA's list. Each thread starts on the day the hole was made public.</p></li>
-          <li class="chap" data-step="1"><h3 class="h3"><span class="lilac">31</span> had a warning sign. <span class="coral">44</span> had none.</h3><p>A warning sign means attack code was already public, or a widely used risk score called EPSS rated the hole high. The other 44 looked like any other hole.</p></li>
-          <li class="chap" data-step="2"><h3 class="h3">The usual rule catches <span class="coral">none</span> of the 44.</h3><p>Many teams fix whatever has public attack code or a high EPSS score first. Given 500 picks, that rule caught 19 of the 31 with warning signs and 0 of the 44 without.</p></li>
-          <li class="chap" data-step="3"><h3 class="h3">Fortres found <span class="mint">5</span> of the 44.</h3><p>Three were in Ivanti software and two in Fortinet firewalls. Fortres found them because it also reads what each hole does. Five is still a small number, and we say so.</p></li>
-        </ol>
-        <figure class="chap-visual" aria-label="Thread chart">
-          <svg id="fan" class="fan" viewBox="0 0 1000 640" role="img" aria-labelledby="fanDesc"><desc id="fanDesc">75 threads, one per hole later added to CISA's list. 31 had a warning sign and 44 had none. The usual rule caught 19 and 0. Fortres caught 22 and 5.</desc></svg>
-          <div class="chap-ctrl" aria-label="Chart steps">
-            <button class="btn btn-ghost btn-sm" id="fanPrev" type="button" aria-label="Previous step">Back</button>
-            <div class="dots" id="fanDots"></div>
-            <button class="btn btn-ghost btn-sm" id="fanNext" type="button">Next</button>
-          </div>
-        </figure>
-      </div>
-    </div>
-  </section>
+  <section class="step" data-s="severity"><div class="card">
+    <span class="num amber">1<small>in 9</small></span>
+    <h2>Dangerous holes often <mark>look harmless</mark> on paper.</h2>
+    <p>Every hole gets a label: Low, Medium, High or Critical. Most teams fix Critical and High first. But of the 1,484 holes on CISA's list of ones attackers have used (2021 to 2025), 162 were labelled only "Medium". That's 1 in 9. Medium is the most common label, about a third of all holes, so a critical-first team gets to these last.</p>
+    <span class="note">labels from the US National Vulnerability Database · this describes CISA's list, not fortres</span>
+  </div></section>
 
-  <!-- 5 · Picture: why some get used -->
-  <section class="sec" id="why" aria-labelledby="h-why">
-    <div class="wrap">
-      <h2 id="h-why" class="h2">Attackers do not pick at random. <span class="muted">Some kinds of holes get used four times as often.</span></h2>
-      <div class="traits" id="traits" role="list"></div>
-      <p class="note">Out of every 1,000 holes made public from January 2018 to September 2025, how many ended up on CISA's list (public attack code: 2024 and 2025 only). Kinds come from words in each description and can overlap. CISA's list leans toward business and government software, so WordPress plugins and cross site scripting look safe here even though they are attacked often in practice.</p>
-    </div>
-  </section>
+  <section class="step" data-s="picks"><div class="card">
+    <span class="num blue">500</span>
+    <h2>Fortres picks <mark>the 500 to fix first</mark>.</h2>
+    <p>IBM Granite reads every description, a model ranks them, and each pick gets a plain reason.</p>
+    <span class="note">6 of 855 bricks: the same share as 500 of 72,670</span>
+  </div></section>
 
-  <!-- 6 · The thesis line -->
-  <section class="sec thesis-sec" aria-label="Our idea">
-    <div class="wrap">
-      <p class="thesis" id="thesis">The warning signs everyone watches miss most of the holes that get used. So Fortres also reads <strong>what each hole actually does</strong>, and learns which kinds attackers come back to.</p>
-    </div>
-  </section>
+  <section class="step" data-s="towers"><div class="card">
+    <span class="num mint">52&times;<small>better than chance</small></span>
+    <h2>We flag <mark>under 1%</mark> of holes and find over a third of the ones that matter.</h2>
+    <p>Only 1 in 855 holes ever gets added to CISA's list. 1 in 16 of fortres's picks did. In our 2024 and 2025 test, fortres flagged 441 of 64,119 holes (0.69%) and caught 27 of the 75 that landed on the list (36%). The top of the list is sharpest: of its top 100 each year, 1 in 9 got added.</p>
+    <div class="vs sm"><div><span class="num mint">27</span><span class="l">fortres</span></div><div><span class="num blue">11</span><span class="l">EPSS score alone</span></div><div><span class="num amber">5</span><span class="l">by severity</span></div></div>
+    <span class="note">5.4&times; better than patching by severity · 2.5&times; better than EPSS alone</span>
+  </div></section>
 
-  <!-- 7 · How it works -->
-  <section class="sec" id="how" aria-labelledby="h-how">
-    <div class="wrap">
-      <h2 id="h-how" class="h2">Read, rank, check. <span class="muted">Three steps, all on open IBM models.</span></h2>
-      <ol class="steps3">
-        <li class="step">
-          <span class="step-n num">1</span>
-          <h3 class="h3">Read every description</h3>
-          <p>IBM Granite, an open AI model we run on our own laptops, reads each hole's description and finds the most similar holes that attackers used before. Simple word flags tag what kind of flaw it is.</p>
-        </li>
-        <li class="step">
-          <span class="step-n num">2</span>
-          <h3 class="h3">Rank all 72,670</h3>
-          <p>A model trained on 2024 and 2025 scores every 2026 hole, using only what was known at the time. Each hole is compared with others from the same month, because risk scores jumped in July 2026.</p>
-        </li>
-        <li class="step">
-          <span class="step-n num">3</span>
-          <h3 class="h3">Explain and check</h3>
-          <p>Each pick gets a plain reason. IBM Granite Guardian then checks that the reason only says what the facts say. Reasons that fail fall back to a plain template.</p>
-          <div class="cds-notification" id="guardianNote" role="status">
-            <svg class="cds-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2Zm-2 19.59-5-5L10.59 15 14 18.41 21.41 11l1.6 1.59Z"/></svg>
-            <div><p class="cds-title">Granite Guardian check passed</p><p class="cds-sub"><span class="num" id="gPassed">318</span> of <span class="num" id="gTotal">500</span> reasons passed a groundedness check.</p></div>
-          </div>
-        </li>
-      </ol>
-    </div>
-  </section>
+  <section class="step" data-s="work"><div class="card">
+    <span class="num mint">23&times;<small>less work</small></span>
+    <h2>To catch those 27, fortres needed only <mark>441 fixes</mark>.</h2>
+    <p>The usual rule would need 1,116 fixes to catch the same 27. EPSS alone, 6,858. Sorting by severity, 10,026. Every fix costs a team time and money, so fewer, better-chosen fixes is the whole point.</p>
+    <div class="vs sm"><div><span class="num mint">441</span><span class="l">fortres</span></div><div><span class="num" style="color:var(--mute)">1,116</span><span class="l">usual rule</span></div><div><span class="num blue">6,858</span><span class="l">EPSS alone</span></div><div><span class="num amber">10,026</span><span class="l">by severity</span></div></div>
+    <span class="note">each brick is about 100 fixes · same 2024 and 2025 test as the 27</span>
+  </div></section>
 
-  <!-- 8 · Results -->
-  <section class="sec" id="results" aria-labelledby="h-res">
-    <div class="wrap split split-even">
-      <div class="col-text">
-        <h2 id="h-res" class="h2">Tested on two years it never trained on.</h2>
-        <p class="versus"><span class="count mint num" data-to="27">27</span><span class="vs-label">holes caught by Fortres</span></p>
-        <p class="versus small"><span class="count num" data-to="19">19</span><span class="vs-label muted">by the best simple rule</span></p>
-        <p>Out of the 75 holes from 2024 and 2025 that ended up on CISA's list, with every method picking the same number of holes. By year: <span class="num">18</span> to <span class="num">13</span> in 2025 and <span class="num">9</span> to <span class="num">6</span> in 2024.</p>
-        <div class="range" aria-label="90% range of Fortres's lead: from 2 to 14 more holes">
-          <p class="range-label">Our lead is <span class="num">+8</span>. Allowing for luck, the 90% range runs from <span class="num">+2</span> to <span class="num">+14</span>.</p>
-          <div class="range-track" aria-hidden="true">
-            <span class="range-zero" style="--x:0"></span>
-            <span class="range-span" style="--a:0.125;--b:0.875"></span>
-            <span class="range-pt" style="--x:0.5"></span>
-          </div>
-          <div class="range-ticks num" aria-hidden="true"><span style="--x:0">0</span><span style="--x:0.125">+2</span><span style="--x:0.5">+8</span><span style="--x:0.875">+14</span></div>
-        </div>
-      </div>
-      <figure class="col-visual methods" aria-label="Holes caught out of 75 by each method">
-        <div id="methods"></div>
-        <p class="note">Holes caught out of 75, 2024 and 2025 combined. Colours follow IBM Carbon's chart palette.</p>
-      </figure>
-    </div>
-  </section>
+  <section class="step" data-s="blindRule"><div class="card">
+    <span class="num coral">44<small>of 75</small></span>
+    <h2>Most holes that end up on CISA's list <mark>give no warning first</mark>.</h2>
+    <p>For 44 of the 75, nobody had posted code to attack them, and their warning score was low. Most teams only rush to patch holes with those signs, so all 44 would slip past.</p>
+  </div></section>
 
-  <!-- 9 · Discoveries -->
-  <section class="sec" id="found" aria-labelledby="h-found">
-    <div class="wrap">
-      <h2 id="h-found" class="h2">Three things the data told us. <span class="muted">None of them were in the brief.</span></h2>
-      <div class="finds">
-        <article class="find"><p class="find-num coral num">59%</p><h3 class="h3">Most holes that got used gave no warning</h3><p>44 of the 75 had no public attack code and a low EPSS score. Any rule built on those two signs can never see them.</p></article>
-        <article class="find"><p class="find-num num">6×</p><h3 class="h3">Risk scores jumped in July 2026</h3><p>Typical EPSS scores rose about six times from the July 2026 snapshot on, and 62% of the 2026 holes come from July to September. We don't know why, so Fortres compares each hole only with its own month.</p></article>
-        <article class="find"><p class="find-num num">27 → 33</p><h3 class="h3">A score that looked too good was a trap</h3><p>Some database fields get filled in after a hole is used. Every hole on CISA's list is marked "Analyzed", against 46% of the rest. Using those fields lifts the score from 27 to 33, so we left them out.</p></article>
-      </div>
-    </div>
-  </section>
+  <section class="step" data-s="blindOurs"><div class="card">
+    <span class="num mint">5<small>of those 44</small></span>
+    <h2>Fortres still spotted <mark>5 of the quiet ones</mark>.</h2>
+    <p>It reads what each hole lets an attacker do, so it can flag one even when nobody has posted attack code. Five is small, and three come from one Ivanti event. The usual approach catches none of them.</p>
+  </div></section>
 
-  <!-- 10 · The picks -->
-  <section class="sec" id="picks" aria-labelledby="h-picks">
-    <div class="wrap">
-      <h2 id="h-picks" class="h2">Fix these first. <span class="muted">The top of our 500 for 2026, each with its reason.</span></h2>
-      <div class="picks" id="picksList" role="table" aria-label="Top picks">
-        <div class="pick pick-head" role="row"><span role="columnheader">Rank</span><span role="columnheader">Hole</span><span role="columnheader">What it lets an attacker do</span><span role="columnheader">EPSS rank in its month</span><span role="columnheader">Reason check</span></div>
-      </div>
-      <div class="cta"><a class="btn btn-solid" href="https://github.com/jackwwinstanley/ibm-breach/blob/main/outputs/top500_v6.csv" rel="noopener">See all 500 on GitHub</a></div>
-    </div>
-  </section>
+  <section class="step" data-s="read"><div class="card">
+    <span class="num blue">178,175<small>descriptions</small></span>
+    <h2>First, <mark>IBM Granite</mark> reads every hole.</h2>
+    <p>It reads each description the way an analyst would, on our own laptop, and scores how much it sounds like holes attackers used before.</p>
+    <p class="tool"><b>IBM Granite Embedding</b>granite-embedding-30m-english · run locally</p>
+  </div></section>
 
-  <!-- 11 · Questions -->
-  <section class="sec" id="questions" aria-labelledby="h-q">
-    <div class="wrap split">
-      <h2 id="h-q" class="h2 col-text">Questions <span class="muted">judges usually ask.</span></h2>
-      <dl class="faq col-visual">
-        <div><dt>Is 27 against 19 just luck?</dt><dd>Partly, maybe. With 75 holes to test on, the 90% range for our lead runs from 2 to 14 more. Even the low end is ahead, but it is a small test and we treat it as one.</dd></div>
-        <div><dt>How do you know you didn't cheat?</dt><dd>We tested on whole years the model never saw, using only facts known at the time. We also ran a cheating test: fields filled in after an attack lift the score from 27 to 33, so we kept them out.</dd></div>
-        <div><dt>Where is IBM technology used?</dt><dd>IBM Granite reads every description and finds similar past attacks. IBM Granite Guardian checks each written reason against its facts. Both are open IBM models we ran on our own laptops. The page borrows IBM Carbon for its system parts.</dd></div>
-        <div><dt>What is EPSS?</dt><dd>A free daily score from FIRST.org that estimates how likely a hole is to be attacked in the next 30 days. Many teams decide what to fix by it.</dd></div>
-        <div><dt>Why 500?</dt><dd>It is the list size IBM's challenge asked for, and roughly what a security team can act on in a cycle.</dd></div>
-        <div><dt>What does Granite Guardian check?</dt><dd>That a reason sticks to the facts it was given. Passing that groundedness check does not mean the reason is true.</dd></div>
-      </dl>
-    </div>
-  </section>
+  <section class="step" data-s="rank"><div class="card">
+    <span class="num blue">0.59<small>seconds</small></span>
+    <h2>Then a model <mark>ranks all 72,670</mark>, on a laptop.</h2>
+    <p>It weighs public attack code, warning scores, the vendor's track record and what Granite read. Twenty models vote, and the top 500 make the list. Ten million holes would take 79 seconds. That's more than a century of holes at today's pace.</p>
+  </div></section>
 
-  <!-- 12 · Close -->
-  <section class="sec close" aria-labelledby="h-close">
-    <div class="wrap">
-      <h2 id="h-close" class="h1">A fortress can't guard every brick. <span class="muted">It can guard the ones attackers aim for.</span></h2>
-      <div class="cta"><a class="btn btn-solid btn-lg" href="#picks">See the 500 to fix first</a></div>
-    </div>
-  </section>
+  <section class="step" data-s="check"><div class="card">
+    <span class="num mint">318<small>of 500</small></span>
+    <h2>Every pick tells you <mark>why it made the list</mark>.</h2>
+    <p>IBM Granite writes one plain sentence per pick. Granite Guardian checks it only says what the facts say. The 182 that fail get a simple fill-in sentence, so nothing made up reaches you.</p>
+    <p class="eg">Pick 472: “Prioritised because it has public exploit code in Exploit-DB and GitHub, and it's an SQL injection vulnerability.”</p>
+    <p class="tool"><b>IBM Granite Guardian</b>Granite Guardian 3 (2B) · run locally · 318 of 500 passed</p>
+    <p class="tool"><b>IBM watsonx.governance</b>IBM Cloud · scored a trial of 100 sentences · 0 flagged for harm or personal data</p>
+  </div></section>
+
+  <section class="step" data-s="trust"><div class="card">
+    <span class="num mint">27<small>not 33</small></span>
+    <h2>We could have claimed 33. <mark>We didn't.</mark></h2>
+    <p>Some data only shows up after an attack. Using it would have added 6 catches, so we left it out. We also reran it with four sets of random seeds and got 26 to 28 every time. Trained on shuffled answers, it catches less than 1.</p>
+  </div></section>
+
+  <section class="step" data-s="close"><div class="card">
+    <svg class="biglogo" viewBox="400 180 610 790" aria-hidden="true"><path d="M450 293L528 266L532 330L608 310L610 238L703 201L797 238L798 310L876 330L880 266L958 293L958 412L703 362L452 412Z" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M450 293L528 266L532 330L608 310L610 238L703 201L797 238L798 310L876 330L880 266L958 293L958 412L703 362L452 412Z" fill="none" stroke="var(--bg)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M487 450L703 398L919 450L884 492L884 742L703 840L522 742L522 492Z" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M487 450L703 398L919 450L884 492L884 742L703 840L522 742L522 492Z" fill="none" stroke="var(--bg)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M507 606L425 655L425 798L703 948L982 798L982 655L900 606" fill="none" stroke="currentColor" stroke-width="30" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M507 606L425 655L425 798L703 948L982 798L982 655L900 606" fill="none" stroke="var(--bg)" stroke-width="20" stroke-linejoin="miter" stroke-miterlimit="8"/></svg>
+    <h2>A fortress can't guard every brick. It can guard <mark>the ones attackers aim for</mark>.</h2>
+    <div class="cta"><a class="btn" href="#picks">See the 500 picks <span aria-hidden="true">→</span></a><a class="btn ghost" href="https://github.com/jackwwinstanley/ibm-breach">Code on GitHub</a></div>
+    <p class="credits">fortres.us · IBM "Before the Breach" · Sheridan Datathon 2026 · Yahya and Jack<br>Data: NVD, FIRST EPSS, CISA KEV · IBM Granite and Granite Guardian, run locally<br>Design inspired by taste-skill, impeccable and Emil Kowalski, with IBM Carbon touches</p>
+  </div></section>
 </main>
 
-<footer class="foot">
-  <div class="wrap foot-grid">
-    <p><span class="brand-sm">Fortres</span> by Aba and Jack for the Sheridan Datathon 2026, IBM track "Before the Breach". Hosted on Vultr at fortres.us.</p>
-    <p>Data: NVD, FIRST EPSS and CISA's Known Exploited Vulnerabilities list. Models: IBM Granite and IBM Granite Guardian, run locally. <a href="https://github.com/jackwwinstanley/ibm-breach" rel="noopener">Code and every number on GitHub</a>.</p>
-    <p>Design follows three open design engineering playbooks: <a href="https://github.com/leonxlnx/taste-skill" rel="noopener">taste-skill</a>, <a href="https://github.com/pbakaus/impeccable" rel="noopener">impeccable</a> and Emil Kowalski's design engineering, with IBM Carbon for every system element.</p>
+<div id="look" class="gut">
+  <div class="lwrap">
+    <div class="dhead"><span class="dnum" id="lnum">72,670</span><div><h1>holes ranked. Look up any of them.</h1><p class="lead">Paste a CVE ID, or a whole advisory with one in it. fortres shows where that hole sits in its 2026 ranking, and why, if it made the top 500.</p></div></div>
+    <form class="lsearch" id="lform" role="search"><label for="lq" class="sr" style="position:absolute;left:-9999px">CVE ID</label><input id="lq" autocomplete="off" spellcheck="false" placeholder="CVE-2026-4092"><button type="submit">Look up</button></form>
+    <div class="tries">Try one: <button type="button" data-c="CVE-2026-39808">CVE-2026-39808</button><button type="button" data-c="CVE-2026-82384">CVE-2026-82384</button><button type="button" data-c="CVE-2026-76034">CVE-2026-76034</button><button type="button" data-c="CVE-2026-46014">CVE-2026-46014</button></div>
+    <div class="lres" id="lres" aria-live="polite"></div>
   </div>
-</footer>
+</div>
+<div id="data" class="gut">
+  <div class="dwrap">
+    <div class="dhead"><span class="dnum" id="dnum">500</span><div><h1>holes to fix first in 2026.</h1><p class="lead">Every pick Fortres made, in order. Each bar below is one pick. Hover to see it, click to jump to it, or search the table.</p></div></div>
+    <div class="code" id="code" role="img" aria-label="500 bars, one per pick, tallest where the warning score is highest"></div>
+    <div class="codeinfo"><span id="codeinfo">Hover a bar</span><span class="legend"><i class="lg g"></i>reason passed Granite Guardian <i class="lg"></i>plain template · taller = higher EPSS</span></div>
+    <p class="facts"><span><b>500</b> picked from 72,670</span><span><b>136</b> would let an attacker take over the machine</span><span><b>318</b> reasons passed Granite Guardian</span><span><b>~85</b> of 2026's holes expected on CISA's list</span></p>
+    <div class="tools">
+      <label class="search" for="q"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5"/></svg><input id="q" type="search" placeholder="Search a CVE, vendor or kind of flaw" autocomplete="off"></label>
+      <label class="chk" for="gonly"><input id="gonly" type="checkbox"> Guardian-passed reasons only</label>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filter by what the hole lets an attacker do"></div>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>rank</th><th>CVE</th><th>what it lets an attacker do</th><th>flaw</th><th>reported by</th><th style="text-align:right">EPSS in month</th><th>attack code</th><th>reason</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+    <button class="more" id="more" type="button">Show 25 more</button>
+  </div>
+</div>
 
+
+<script src="vendor/three.r128.min.js" defer></script>
 <script src="fortres.js" defer></script>
 </body>
 </html>

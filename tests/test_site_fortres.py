@@ -51,3 +51,20 @@ def test_page_numbers_equal_the_headline_and_blind_spot_files():
     lo, hi = h["pooled"]["diff_cve_level_90"]
     assert f"+{h['pooled_hits_bag'] - h['baseline_pooled_hits']}" in html and f"from +{lo:.0f} to +{hi:.0f}" in html
     assert f"{h['leakage']['honest']['pooled_hits']} to {h['leakage']['leaky']['pooled_hits']}" in html
+
+
+@need
+def test_full_picks_and_lookup_list_equal_the_outputs():
+    """The 500 table and the look-up list are data files now; every reason, the pass flag and the order must match outputs/."""
+    rows = json.loads((SITE / "data" / "picks500.json").read_text())
+    exp = pd.read_csv(OUT_DIR / "explanations.csv").set_index("cve_id")
+    top = pd.read_csv(primary.file("top500"))["cve_id"].tolist()
+    assert len(rows) == 500
+    for r in rows:
+        rank, cve, reason, passed = r[0], r[1], r[7], r[8]
+        assert top[rank - 1] == cve, cve
+        assert reason == exp.loc[cve, "explanation"], cve
+        assert bool(passed) == (exp.loc[cve, "guardian_verdict"] == "No"), cve
+    ranks = (SITE / "data" / "ranks.txt").read_text().strip().split(",")
+    assert len(ranks) == 72670
+    assert ["CVE-20" + x.split(".")[0] for x in ranks[:500]] == top
