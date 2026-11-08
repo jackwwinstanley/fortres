@@ -9,3 +9,4 @@ outputs/pool.csv
 .pytest_cache/
 outputs/b_texts.parquet
 outputs/.cache/
+.env
