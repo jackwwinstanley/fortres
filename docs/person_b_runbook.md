@@ -5,12 +5,12 @@ pulling Person A's final model files (`outputs/headline.json`, `outputs/runlog.c
 `outputs/features_*.parquet`).
 
 ```
-python -m src.b.refresh_all            # fast path, ~1.5 min
+python -m src.b.refresh_all            # fast path, about 1 min
 ```
 
 | flag | adds | time | when |
 |---|---|---|---|
-| (none) | drift check, leakage + v5 blind spots, error analysis, charts, story/dashboard data, tests, contract check | ~1.5 min | after any change to Person A's model or list |
+| (none) | drift check, leakage + v5 blind spots, error analysis, charts, story/dashboard data, tests, contract check, number sweep | ~1 min (56 s in a fresh clone) | after any change to Person A's model or list |
 | `--text` | descriptions → Granite embeddings → `text_features.parquet` (before everything else) | ~5 min | only if the pools or descriptions change |
 | `--priors` | #12 track-record priors and their v5 evaluation | ~15 min | optional, research only |
 | `--explanations` | Granite reasons through Person A's `explain.py` (Granite Guardian gate; needs Ollama) | ~30+ min | once, after the final top-500 list exists and PR #35 is merged |
