@@ -13,10 +13,11 @@ contradicts (e.g. 'wordpress_plugin' when WordPress is never mentioned; 'unauthe
 (replica 2024 / 2025 and the scoreboard). Time-safety: it reads only the description, with post-attack
 phrases already stripped (outputs/b_texts.parquet), exactly like the txt_* flags.
 
-Status: DESCRIPTIVE. The feature freeze has passed, so these columns are used to describe the blind spots
+Status: DESCRIPTIVE. Small local model, noisy (21% of rows corrected by the consistency guard). The feature freeze has passed, so these columns are used to describe the blind spots
 and the top 500 (dashboard and write-up), not as model inputs.
 Which CVEs: per pool, the top N by kev_text_score plus the top N by within-month EPSS rank, every CVE
-in the newest top-500 list, and every exploited replica CVE (for the descriptive blind-spot profile only). Rows are cached in outputs/b_extract_cache.parquet, so reruns resume.
+in the newest top-500 list (label-blind). `--profile` additionally labels every exploited replica CVE into the cache for
+the descriptive blind-spot profile only; extracted_features.parquet is always written from the label-blind set. Rows are cached in outputs/b_extract_cache.parquet, so reruns resume.
 """
 import argparse
 import json
@@ -103,16 +104,18 @@ def guard(row: dict, desc: str) -> tuple[dict, list[str]]:
     return out, changes
 
 
-def select(n_per_score: int = 1500) -> pd.DataFrame:
+def select(n_per_score: int = 1500, with_positives: bool = False) -> pd.DataFrame:
+    """Label-blind selection (top N by kev_text_score and by EPSS rank per pool + the newest top-500). with_positives=True
+    also adds every exploited replica CVE: ONLY for the descriptive profile, never for extracted_features.parquet."""
     tf = pd.read_parquet(OUT_DIR / "text_features.parquet", columns=["cve_id", "kev_text_score"])
     picks = []
     for f in ("features_replica_2024", "features_replica_2025", "features_scoreboard"):
         d = pd.read_parquet(OUT_DIR / f"{f}.parquet", columns=["cve_id", "epss_rank_in_month"]).merge(tf, on="cve_id")
         picks += [d.nlargest(n_per_score, "kev_text_score")["cve_id"], d.nlargest(n_per_score, "epss_rank_in_month")["cve_id"]]
-    # every exploited replica CVE too, for the DESCRIPTIVE blind-spot profile (labels never feed a model)
-    for y in (2024, 2025):
-        r = pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["cve_id", "label"])
-        picks.append(r.loc[r["label"] == 1, "cve_id"])
+    if with_positives:  # descriptive blind-spot profile only (labels never feed a model)
+        for y in (2024, 2025):
+            r = pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["cve_id", "label"])
+            picks.append(r.loc[r["label"] == 1, "cve_id"])
     tops = sorted(OUT_DIR.glob("top500_v*.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[-1]))
     if tops:
         picks.append(pd.read_csv(tops[-1])["cve_id"])
@@ -149,8 +152,12 @@ def run(rows: pd.DataFrame, batch: int = 16) -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
-def main(limit=None, n_per_score=1500):
-    rows = select(n_per_score)
+def main(limit=None, n_per_score=1500, profile=False):
+    """profile=False: label the label-blind set and write the contract file extracted_features.parquet.
+    profile=True: also label the exploited replica CVEs into the cache (for src.b.profile); the contract file is still
+    written from the label-blind set only, so its coverage can never encode the label."""
+    rows = select(n_per_score, with_positives=profile)
+    blind_rows = select(n_per_score) if profile else rows
     cache = pd.read_parquet(CACHE) if CACHE.exists() else pd.DataFrame(columns=["cve_id", *FIELDS, "guard_changes"])
     todo = rows[~rows["cve_id"].isin(cache["cve_id"])]
     if limit:
@@ -161,7 +168,7 @@ def main(limit=None, n_per_score=1500):
         new = run(todo.iloc[s:s + step])
         cache = pd.concat([cache, new], ignore_index=True).drop_duplicates("cve_id", keep="last")
         cache.to_parquet(CACHE, index=False)
-    out = cache[cache["cve_id"].isin(rows["cve_id"])].copy()
+    out = cache[cache["cve_id"].isin(blind_rows["cve_id"])].copy()
     print(f"consistency guard changed {(out['guard_changes'].fillna('') != '').mean():.0%} of rows")
     out = out.drop(columns=["guard_changes"])
     for k in FIELDS:
@@ -179,5 +186,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int)
     ap.add_argument("--n-per-score", type=int, default=1500)
+    ap.add_argument("--profile", action="store_true", help="also label exploited replica CVEs for the descriptive profile")
     a = ap.parse_args()
-    main(a.limit, a.n_per_score)
+    main(a.limit, a.n_per_score, a.profile)

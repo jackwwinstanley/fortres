@@ -22,7 +22,7 @@ NICE = {"network_edge_device": "VPN / firewall / edge", "web_application": "Web 
 
 
 def groups() -> dict:
-    ex = pd.read_parquet(OUT_DIR / "extracted_features.parquet")
+    ex = pd.read_parquet(OUT_DIR / "b_extract_cache.parquet").drop(columns=["guard_changes"], errors="ignore")  # includes the profile-only rows
     blind = set(pd.read_csv(OUT_DIR / "blindspot_positives.csv")["cve_id"])
     pos = pd.concat([pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["cve_id", "label"]) for y in (2024, 2025)])
     pos = set(pos.loc[pos["label"] == 1, "cve_id"])
@@ -48,7 +48,8 @@ def main():
     impact = pd.crosstab(d["impact_type"].fillna("unlabelled"), d["group"], normalize="columns").reindex(columns=list(gs)) * 100
 
     lines = ["# What do the blind spots look like? (DESCRIPTIVE ONLY)", "",
-             "Labels by IBM Granite (granite-3.3-2b-instruct) from descriptions, with a consistency guard. "
+             "Labels by IBM Granite (granite-3.3-2b-instruct): small local model, noisy (21% of rows corrected by the "
+             "consistency guard). Small groups. "
              "Post-hoc description of the practice years; never used to build or select a model. "
              "Small groups: read as rough shares.", "",
              "## Login and network", "", flags.round(0).astype(int).to_markdown(), "",

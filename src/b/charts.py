@@ -11,6 +11,7 @@ Each chart is drawn only if its inputs exist, so this can be rerun as files land
   leakage.png        honest vs leaky model hits (outputs/leakage_results.csv, issue #8)
 """
 import json
+import re
 
 import numpy as np
 import pandas as pd
@@ -22,6 +23,20 @@ from src.common.paths import OUT_DIR, REPO_ROOT
 FIG_DIR = REPO_ROOT / "docs" / "figures"
 BASE_NAMES = {"baseline_cvss": "Highest CVSS", "baseline_epss": "Highest EPSS",
               "baseline_exploit_epss": "Public exploit,\nthen EPSS"}
+
+
+def diff90(h: dict):
+    """Pooled 90% range of (ours - best baseline) from Person A's headline.json (v4 and v5 formats)."""
+    return h.get("pooled", {}).get("diff_cve_level_90") or h["diff_vs_baseline_cve_level_90"]
+
+
+def mechanism_file():
+    """Newest outputs/vN_mechanism.csv in the gained/lost format (no 'comparison' column)."""
+    fs = sorted(OUT_DIR.glob("v*_mechanism.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[0]), reverse=True)
+    for f in fs:
+        if "comparison" not in pd.read_csv(f, nrows=1).columns:
+            return f
+    return None
 
 
 def _save(fig, name):
@@ -71,7 +86,7 @@ def baselines(plt):
     hp = OUT_DIR / "headline.json"
     if hp.exists() and len(models):
         h = json.loads(hp.read_text())
-        lo_, hi_ = h["diff_vs_baseline_cve_level_90"]
+        lo_, hi_ = diff90(h)
         note += (f" Ours vs best rule, both years: {h['pooled_hits_bag'] - h['baseline_pooled_hits']:+d} "
                  f"(90% range {lo_:+.0f} to {hi_:+.0f}), so the gain is within the noise.")
     fig.text(0.01, -0.02, note, color=MUTED, fontsize=8.5)
@@ -129,24 +144,29 @@ def drift(plt):
     pools = {"2024": "replica_2024.parquet", "2025": "replica_2025.parquet", "2026": "scoreboard_features.parquet"}
     if not all((OUT_DIR / f).exists() for f in pools.values()):
         return
-    q = {y: pd.read_parquet(OUT_DIR / f, columns=["epss"])["epss"].dropna().quantile([0.5, 0.9]) * 100
-         for y, f in pools.items()}
-    fig, ax = plt.subplots(figsize=(7, 4))
-    x = np.arange(3)
-    med = [q[y][0.5] for y in pools]
-    p90 = [q[y][0.9] for y in pools]
-    ax.bar(x - 0.18, med, 0.34, color=GREYS[0], label="Median CVE")
-    ax.bar(x + 0.18, p90, 0.34, color=[ACCENT_LIGHT, ACCENT_LIGHT, ACCENT], label="90th-percentile CVE")
-    for xi, v in zip(x, med):
-        ax.text(xi - 0.18, v, f"{v:.2f}", ha="center", va="bottom", fontsize=8.5, color=INK)
-    for xi, v in zip(x, p90):
-        ax.text(xi + 0.18, v, f"{v:.2f}", ha="center", va="bottom", fontsize=8.5, color=INK)
-    ax.set_xticks(x, ["2024 practice", "2025 practice", "2026 scoreboard"])
-    ax.set_ylabel("EPSS (% chance of exploitation in 30 days)")
-    ratio = q["2026"][0.5] / q["2025"][0.5]
-    titles(ax, f"The typical 2026 CVE has a ~{ratio:.0f}× higher EPSS score than past years",
-           "So rank EPSS within each year; a cutoff learned on past years would not transfer")
-    ax.legend(loc="upper left")
+    fig, ax = plt.subplots(figsize=(8, 4.3))
+    med = {}
+    for (y, f), color in zip(pools.items(), (GREYS[0], GREYS[2], WARN)):
+        d = pd.read_parquet(OUT_DIR / f, columns=["snapshot_month", "epss"])
+        m = d.groupby("snapshot_month")["epss"].median() * 100
+        m.index = m.index.str[-2:].astype(int)
+        m = m.reindex(range(1, 10))  # missing months (2026-06) stay a gap, not a drawn line
+        med[y] = m
+        ax.plot(m.index, m.values, marker="o", ms=5, lw=2.2, color=color, label=y)
+        last = m.dropna()
+        ax.annotate(y, (last.index[-1], last.values[-1]), xytext=(8, 0), textcoords="offset points", color=color,
+                    fontweight="bold", va="center")
+    late = pd.read_parquet(OUT_DIR / pools["2026"], columns=["snapshot_month", "epss"])
+    past = pd.concat([pd.read_parquet(OUT_DIR / pools[y], columns=["epss"]) for y in ("2024", "2025")])["epss"].median() * 100
+    late_med = late[late["snapshot_month"] >= "2026-07"]["epss"].median() * 100
+    share = (late["snapshot_month"] >= "2026-07").mean()
+    ax.axvline(6.5, color=MUTED, lw=0.8, ls="--")
+    ax.text(6.4, ax.get_ylim()[1] * 0.92, "July 2026 →", ha="right", color=MUTED, fontsize=9)
+    ax.set_xticks(range(1, 10), ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"])
+    ax.set_xlim(0.6, 9.9)
+    ax.set_ylabel("Median EPSS of new CVEs (%)")
+    titles(ax, f"EPSS jumped ~{late_med / past:.0f}× from the July 2026 snapshot (cause unknown)",
+           f"Jul–Sep snapshots are {share:.0%} of the 2026 list (no June data). Rank EPSS within the month.")
     ax.grid(axis="x", visible=False)
     _save(fig, "drift_epss.png")
     plt.close(fig)
@@ -195,14 +215,22 @@ def blind_spot_counts():
     """Per test year: exploited CVEs split into flagged / blind-spot, and hits of the best simple rule vs our headline
     model in each group. Uses Person A's outputs/blindspot_positives.csv and the newest mechanism file
     (v4_mechanism.csv: gained/lost vs the baseline for the headline model; else v2_mechanism.csv for v1/v2 LightGBM)."""
-    bp = OUT_DIR / "blindspot_positives.csv"
     res = runlog.results()
+    v5b = OUT_DIR / "v5_blindspots.csv"  # written by src.b.leakage from the honest v5 bag (= the headline model)
+    if v5b.exists() and not res.empty:
+        d = pd.read_csv(v5b)
+        d = d[d["group"].isin(["flagged", "blind-spot"])]
+        name = runlog.model_name(runlog.latest_model(res))
+        return d.rename(columns={"baseline_caught": "Public exploit, then EPSS", "ours_caught": name})[
+            ["year", "group", "exploited", "Public exploit, then EPSS", name]].reset_index(drop=True)
+    bp = OUT_DIR / "blindspot_positives.csv"
     if not bp.exists() or res.empty:
         return None
-    if (OUT_DIR / "v4_mechanism.csv").exists():
-        m = pd.read_csv(OUT_DIR / "v4_mechanism.csv")
-        best = runlog.latest_model(res)
-        comps = {runlog.model_name(best): m}
+    mf = mechanism_file()
+    if mf is not None:
+        m = pd.read_csv(mf)
+        n = re.findall(r"\d+", mf.stem)[0]  # the model version the breakdown was measured on
+        comps = {runlog.model_name(f"v{n}_bag"): m}
     elif (OUT_DIR / "v2_mechanism.csv").exists():
         m = pd.read_csv(OUT_DIR / "v2_mechanism.csv")
         comps = {runlog.model_name(v): m[m["comparison"] == f"{v}_vs_baseline"] for v in ("v1_lgbm", "v2_lgbm")}

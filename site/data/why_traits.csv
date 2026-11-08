@@ -1,0 +1,10 @@
+trait,cves,added_to_kev,per_1000,period,few_cases
+All holes,201494,1131,5.61,2018-01 to 2025-09,False
+Public attack code exists,1393,31,22.25,2024-25 practice years,False
+"Network edge device (firewall, VPN)",5016,87,17.34,2018-01 to 2025-09,False
+No login needed,15765,247,15.67,2018-01 to 2025-09,False
+Takes over the machine,25429,404,15.89,2018-01 to 2025-09,False
+Enterprise software,11555,295,25.53,2018-01 to 2025-09,False
+Web browser,5308,97,18.27,2018-01 to 2025-09,False
+WordPress plugin,13777,3,0.22,2018-01 to 2025-09,True
+Cross-site scripting,31018,22,0.71,2018-01 to 2025-09,True

@@ -4,7 +4,7 @@ Run:  python -m src.b.leakage
 
 Question: how much better would a model LOOK if it used columns that are only filled in after the
 fact (CONTRACT.md "BANNED")? Same data, features, parameter rule and 20-seed rank-averaged bag as Person A's
-v4 headline model (src/models/train_v4.py); the only difference is the extra banned columns:
+v5 headline model (src/models/train_v5.py); the only difference is the extra banned columns:
   nvd_status (one-hot), n_affected_cpes, n_references, blank-vs-filled CVSS 3 / CVSS 4 / CWE
   indicators, NVD-sourced CVSS 3 score (cvss3_source == nvd@nist.gov), and reference-link features
   from references.csv (refs tagged "Exploit", refs to exploit hosting sites).
@@ -19,13 +19,14 @@ import numpy as np
 import pandas as pd
 
 from src.common.paths import DATA_DIR, OUT_DIR
-from src.common.schema import ALLOWED_FEATURES, PSI_REPLACED, is_banned
+from src.common.schema import ALLOWED_FEATURES, SHARE_FEATURES, is_banned
 from src.features import drift_fix as dfx
+from src.models import stress_v2 as st
 from src.models import train_v1 as v1
 from src.models.train_v2 import load_with_text
 from src.models.train_v4 import BAG_SEEDS, bag
 
-HONEST = list(ALLOWED_FEATURES)  # the v4 set: no raw EPSS, drift-prone features as within-pool ranks
+HONEST = list(ALLOWED_FEATURES)  # Person A's v5 set: no raw EPSS, PSI-chosen raw/rank/share transforms
 EXPLOIT_HOSTS = r"exploit-db\.com|packetstormsecurity|github\.com|gist\.github|seclists\.org|rapid7\.com"
 
 
@@ -66,17 +67,19 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
     for y in (2024, 2025):
         ids = data[y]["meta"]["cve_id"]
         b = banned_columns(ids, data_dir).set_index("cve_id").reindex(ids).reset_index(drop=True)
-        x4 = dfx.to_v4(data[y]["X2"], PSI_REPLACED)[HONEST].reset_index(drop=True)
+        f = pd.read_parquet(out_dir / f"features_replica_{y}.parquet").reset_index(drop=True)
+        assert f["cve_id"].tolist() == data[y]["meta"]["cve_id"].tolist()
+        x4 = dfx.to_v5(pd.concat([data[y]["X2"], f[SHARE_FEATURES]], axis=1))[HONEST].reset_index(drop=True)
         data[y]["XL"] = pd.concat([x4, b], axis=1)
     leaky = HONEST + [c for c in data[2024]["XL"].columns if c.startswith("leak_")]
     assert not any(c.startswith("leak_") for c in HONEST)
 
-    rows, imps = [], []
+    rows, imps, blind_rows = [], [], []
     for name, tr, te, note in v1.DIRECTIONS:
         Xtr, ytr, Xte = data[tr]["XL"], data[tr]["y"], data[te]["XL"]
-        # Person A's pre-set rule: params chosen by pooled leave-one-month-out AP on the TRAINING replica (v4 features),
+        # Person A's pre-set rule: params chosen by pooled leave-one-month-out AP on the TRAINING replica (v5 features),
         # reused unchanged for the leaky model so the only difference is the extra columns.
-        params, _, _ = v1.select_lgbm(Xtr[HONEST], ytr, data[tr]["groups"], HONEST, f"v4 train {tr}")
+        params, _, _ = v1.select_lgbm(Xtr[HONEST], ytr, data[tr]["groups"], HONEST, f"v5 train {tr}")
         scores = {}
         for label, feats in (("honest", HONEST), ("leaky", leaky)):
             models = [v1.lgbm_model(params, feats, seed=s).fit(Xtr[feats], ytr) for s in BAG_SEEDS]
@@ -84,6 +87,9 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
             if label == "leaky":
                 g = pd.Series(np.mean([m.booster_.feature_importance("gain") for m in models], axis=0), index=feats)
                 imps.append((g / g.sum()).rename(name))
+        # blind-spot breakdown of the HONEST bag (= Person A's v5 headline model): positives in the top k, by group
+        meta = data[te]["meta"]
+        blind_rows.extend(blind_breakdown(te, meta, scores["honest"]))
         res, _, names, k = v1.eval_frame(data[te]["meta"], scores)
         for n in names:
             r = res[n]
@@ -92,6 +98,7 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
                              ci_lo=r["ci"][0], ci_hi=r["ci"][1], ap=round(r["ap"], 4)))
     out = pd.DataFrame(rows)
     out.to_csv(out_dir / "leakage_results.csv", index=False)
+    pd.DataFrame(blind_rows).to_csv(out_dir / "v5_blindspots.csv", index=False)
     imp = pd.concat(imps, axis=1).fillna(0)
     imp["mean"] = imp.mean(axis=1)
     imp = imp.sort_values("mean", ascending=False)
@@ -101,6 +108,24 @@ def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
     return out, imp
 
 
+def blind_breakdown(year, meta, score):
+    """Exploited CVEs of one test replica split into flagged / blind-spot (Person A's st.group_of rule), with hits in the
+    top k for the exploit-then-EPSS baseline and for `score` (tie rule: score, then epss_rank_in_month, then cve_id)."""
+    from src.common.scoring import k_for_pool, rank_order
+    k = k_for_pool(len(meta))
+    d = meta.reset_index(drop=True).assign(s=score, group=st.group_of(meta.reset_index(drop=True), k))
+    top_base = set(rank_order(d, ["exploit_epss"]).head(k)["cve_id"])
+    top_ours = set(rank_order(d, ["s", "epss_rank_in_month"]).head(k)["cve_id"])
+    pos = d[d["label"] == 1]
+    rows = []
+    for g in ("flagged", "blind-spot", "unflagged, EPSS-visible"):
+        q = pos[pos["group"] == g]
+        rows.append({"year": int(year), "group": g, "exploited": int(len(q)),
+                     "baseline_caught": int(q["cve_id"].isin(top_base).sum()), "ours_caught": int(q["cve_id"].isin(top_ours).sum()),
+                     "ours_caught_cves": ";".join(sorted(q.loc[q["cve_id"].isin(top_ours), "cve_id"]))})
+    return rows
+
+
 def write_report(out, imp, out_dir):
     piv = out.pivot_table(index="model", columns="replica", values="hits").fillna(0)
     piv["pooled"] = piv.sum(axis=1)
@@ -108,7 +133,7 @@ def write_report(out, imp, out_dir):
     leak_share = imp.loc[[c for c in imp.index if c.startswith("leak_")], "mean"].sum()
     lines = [
         "# LEAKAGE EXPERIMENT (issue #8). Not a submission model.", "",
-        "Same data, v4 features, parameter rule and 20-seed bag as the v4 headline model; the leaky model also gets banned "
+        "Same data, v5 features, parameter rule and 20-seed bag as the v5 headline model; the leaky model also gets banned "
         "after-the-fact columns (NVD status, CPE/reference counts, blank-vs-filled CVSS/CWE, NVD CVSS, "
         "exploit-tagged reference links). Run: `python -m src.b.leakage`.", "",
         "## In plain words",

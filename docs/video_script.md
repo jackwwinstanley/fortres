@@ -1,20 +1,19 @@
-# 2-minute demo video: script (draft v1)
+# 2-minute demo video: script (draft v2)
 
 Target: about 290 spoken words, roughly 2:00 at a calm pace. Judges score Discovery 35%, Data use 25%,
 Communication 25% and Impact 15%, so we lead with findings, not code.
-Numbers are from the v4 headline model (`outputs/headline.json`) and Person B's reports; recheck them if the
-final list changes. **[Bracketed text] = what's on screen.**
+Numbers are from the v5 headline model (`outputs/headline.json`), `outputs/leakage_results.csv` (leaky arm 28 on v5; 29 was the earlier v4 run) and `outputs/explanations_summary.json` (Guardian count, PR #35); recheck them if the final list changes. **[Bracketed text] = what's on screen.**
 
 ---
 
 **0:00–0:15 · Hook** *(Aba)*
 [Dashboard title, then the "Blind spots" tab]
-"Every year, tens of thousands of vulnerabilities are published, and only about one in a thousand ends up being
-used by real attackers. We set out to find those few before it happens, using only what was known at the time."
+"Every year, tens of thousands of vulnerabilities are published, and only about one in 855 ends up on
+CISA's list of known-exploited vulnerabilities. We set out to find those few before it happens, using only what was known at the time."
 
 **0:15–0:35 · The surprise: blind spots** *(Aba)*
 [blindspots.png]
-"First surprise: in our 2024 and 2025 practice runs, 44 of the 75 vulnerabilities that were later exploited had
+"First surprise: in our 2024 and 2025 practice runs, 44 of the 75 vulnerabilities later added to CISA KEV had
 no public exploit code and a low EPSS score. The standard rules catch exactly zero of them. That's the gap we
 went after."
 
@@ -25,20 +24,21 @@ information available at that moment. A model is trained on one year and tested 
 
 **0:55–1:15 · IBM Granite** *(Aba)*
 [Top 500 tab: reasons column]
-"IBM Granite reads every description. It scores how much each one sounds like past known-exploited
-vulnerabilities and finds its closest match. Granite also writes a one-line reason for each pick, and a checker
-rejects any sentence that mentions a fact we didn't give it."
+"IBM Granite, IBM's open models running right on our laptop, reads every description. It scores how much each one sounds like past known-exploited
+vulnerabilities. Granite also writes a one-line reason for each pick; our checker and IBM Granite Guardian reject any
+sentence that isn't supported by the facts we gave it."
 
 **1:15–1:35 · Results, stated honestly** *(Jack)*
 [baselines.png]
-"Our model catches 21 exploited vulnerabilities across the two test years, against 19 for the best simple rule.
-That's a small edge, and we show the uncertainty range rather than overclaim."
+"Across the two test years our model catches 21 vulnerabilities that were added to KEV, against 19 for the best simple
+rule. That's a small edge and it could be luck. In the strictest test, training on 2024 and testing on 2025, we were one
+behind, 12 to 13. We show the uncertainty rather than overclaim."
 
 **1:35–1:50 · Two discoveries that protect the result** *(Aba)*
 [drift_epss.png, then leakage.png]
-"Two things we caught. One: EPSS scores in 2026 are about five times higher than in past years, so we rank within
-the year instead of trusting raw scores. Two: columns filled in after an attack would inflate our score from 21 to
-29. Every exploited vulnerability is marked 'Analyzed' in today's NVD, so we banned those columns."
+"Two things we caught. One: EPSS jumped about six times from the July 2026 snapshot, cause unknown, so we compare each
+hole only with others from the same month instead of trusting raw scores. Two: columns filled in after a CVE is added to KEV would inflate our score from 21 to
+28. Every vulnerability added to KEV is marked 'Analyzed' in today's NVD, so we banned those columns."
 
 **1:50–2:00 · Close** *(Jack)*
 [Top 500 list, scrolling]
