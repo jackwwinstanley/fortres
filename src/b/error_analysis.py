@@ -45,6 +45,12 @@ def positions(c, score):
 
 
 def main(out_dir=OUT_DIR, data_dir=DATA_DIR):
+    cache = out_dir / "b_extract_cache.parquet"
+    if not cache.exists():
+        print(f"SKIPPED error analysis: {cache.name} (the Granite fact-extraction cache, untracked; `python -m src.b.extract`, about 1 h) is "
+              f"not in {out_dir}. Without it the 'granite_facts' column would be written empty and would silently change the committed "
+              "outputs/b_error_analysis.md and .json, so they are left unchanged.")
+        return
     data, sb, sb2, ctx = st.prepare(out_dir, data_dir)
     for y in (2024, 2025):
         f = pd.read_parquet(out_dir / f"features_replica_{y}.parquet").reset_index(drop=True)
