@@ -16,9 +16,8 @@ check" (not "verified").
 > and enterprise software about four and a half times. WordPress plugins almost never do, though that partly reflects what CISA tracks. The surprise
 > was that 44 of the 75 flaws added to the list in our practice years had no public attack code and a low risk score, so
 > the standard rule can't see them at all. Our text features, simple keyword flags plus an IBM Granite score for how
-> similar a description is to past KEV entries, caught two of those 44. Without any text features, none. Two catches
-> is within noise, and when we removed only the Granite scores the keyword flags still caught three, so we can't
-> credit Granite specifically. Small, and we say so.
+> similar a description is to past KEV entries, caught two of those 44. Either part alone still catches two or three;
+> with neither, none. The exact flaws change between runs, so we treat it as noise. Small, and we say so.
 
 **Jack (the "how and how honest", for technical and IBM judges)**
 > We rebuilt 2024 and 2025 exactly the way 2026 is scored, used only information available at the time, and trained on
@@ -75,10 +74,9 @@ sentence instead. The current count is in `outputs/explanations_summary.json` (`
 
 **What's the most interesting thing you found?**
 That the standard signals can't see most of the flaws that end up on KEV. 44 of 75 had no public attack code and a low
-risk score. Our text features (keyword flags plus Granite-embedding similarity to past KEV entries) caught 2 of them;
-without any text features, 0. Two catches is within noise. Removing only the Granite scores still caught 3 through the
-keyword flags, so the flags, not Granite specifically, reach the blind spots. Without any text the model caught three
-more of the visible ones (22 vs 21 overall), so the text trades visible catches for blind spots. Also, the model and the simple rule fail in *opposite* ways. The rule catches high-EPSS flaws with public
+risk score. Our text features (keyword flags plus Granite-embedding similarity to past KEV entries) caught 2 of them:
+either part alone (keyword flags or Granite similarity scores) still catches two or three of the 44; with neither, none; the exact CVEs change between runs, so treat it as noise. Without any text the model caught three more of the visible ones (22 vs 21 overall), so the text trades
+visible catches for blind spots. Also, the model and the simple rule fail in *opposite* ways. The rule catches high-EPSS flaws with public
 code from vendors rarely on KEV; the model catches enterprise and edge products whose descriptions read like past KEV
 entries. We tried a simple 50/50 mix and did not adopt it (`docs/considered_not_adopted.md`).
 

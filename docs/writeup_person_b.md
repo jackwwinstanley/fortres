@@ -8,7 +8,7 @@ Of the 75 CVEs added to CISA KEV in our two practice years, **44 (59%) were blin
 code (Exploit-DB, Metasploit, Nuclei, GitHub PoC) and a within-month EPSS rank too low for a top-k EPSS list.
 The best simple rule (public exploit first, then EPSS) catches **0** of them by construction. Our v5 model catches
 **2** (two Fortinet FortiOS flaws, CVE-2024-23113 and CVE-2025-24472) through its text features (keyword flags plus
-Granite-embedding similarity to past KEV entries). Two catches is within noise. Same v5 setup, one 20-seed bag each:
+Granite-embedding similarity to past KEV entries). Same v5 setup, one 20-seed bag each:
 
 | text features removed | blind spots caught | flagged caught | total |
 |---|---|---|---|
@@ -17,10 +17,8 @@ Granite-embedding similarity to past KEV entries). Two catches is within noise. 
 | only the 14 keyword flags (`txt_*`) | 2 | 20 | 22 |
 | all 16 | 0 | 22 | 22 |
 
-Either text family alone reaches a few blind spots (different ones); with none, zero. Because removing the Granite
-scores still catches 3 through the keyword flags, **the keyword flags, not Granite specifically, reach the blind spots**.
-Without any text the model catches three more flagged CVEs, so the text trades visible catches for blind spots rather
-than adding net catches, in line with Person A's ablation.
+So either part alone (keyword flags or Granite similarity scores) still catches two or three of the 44; with neither, none; the exact CVEs change between runs, so treat it as noise. Without any text the model catches three more flagged CVEs, so the text trades visible catches for
+blind spots rather than adding net catches, in line with Person A's ablation.
 *Figure: `docs/figures/blindspots.png`.*
 
 ## 2. IBM Granite text features
