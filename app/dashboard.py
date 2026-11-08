@@ -36,6 +36,12 @@ FLAG_LABELS = {
 
 st.set_page_config(page_title="Before the Breach", page_icon="🛡️", layout="wide")
 
+page = st.sidebar.radio("Page", ["Team dashboard", "Rank a dataset"], index=0)
+if page == "Rank a dataset":
+    from app.rank_page import render
+    render()
+    st.stop()
+
 
 @st.cache_data
 def read(name: str):
