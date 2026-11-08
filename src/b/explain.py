@@ -82,7 +82,7 @@ BLOCKED_PHRASES = [
     r"exploit templates?",
     # predictions, interpretation and causal links: the sentence may only restate the facts
     r"likelihood", r"likely", r"indicating", r"risk of exploitation", r"potential for exploitation", r"exploitation patterns", r"mirroring",
-    r"significant risk", r"strong(?:ly|er|est)?",
+    r"significant risk", r"significant(?:ly)?", r"evidenced", r"patterns?", r"imminent", r"strong(?:ly|er|est)?",
     r"placing", r"placed", r"thereby", r"therefore", r"thus", r"hence", r"reflecting", r"suggest(?:s|ing)?", r"impl(?:y|ies|ying)",
     r"as evidenced", r"resulting", r"leading to", r"due to",
 ]
@@ -578,6 +578,9 @@ def process(items: list[dict], draft_fn, guardian=guardian_verdict, out_dir=OUT_
             if probs:
                 invalidated[it["cve_id"]] = probs
                 del recs[it["cve_id"]]
+        elif ((draft_fn or batch_draft_fn) and r and r["key"] == it["key"] and r["source"] == "template"
+              and r["guardian_verdict"] == "not_run" and r.get("draft") is None):
+            del recs[it["cve_id"]]  # cached by a run WITHOUT Granite (never drafted, never shown to Guardian): draft it now
     if invalidated:
         log(f"{len(invalidated)} cached Granite sentences fail the current local checks and will be regenerated")
     write_atomic(rows_frame(items, recs), out_dir / "explanations.csv")

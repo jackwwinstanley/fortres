@@ -203,7 +203,9 @@ PHRASE_SENTENCES = {
     "nonsense": ["Public exploit template exists.", "Two exploit templates exist."],
     "predictions and interpretation": ["Shows a strong likelihood of exploitation.", "It is likely to matter.", "Indicating a high risk.",
                                        "There is a risk of exploitation.", "It has potential for exploitation.", "It follows exploitation patterns.",
-                                       "Mirroring past CVEs.", "A significant risk exists.", "A strong signal.", "Strongly similar text.", "The strongest signal."],
+                                       "Mirroring past CVEs.", "A significant risk exists.", "A strong signal.", "Strongly similar text.", "The strongest signal.",
+                                       "A significant flaw.", "It matters significantly.", "Evidenced by the code.", "A known pattern.",
+                                       "Recurring patterns.", "Exploitation is imminent."],
     "causal links": ["Placing it in the top group.", "It is placed first.", "Thereby ranking it higher.", "Therefore it ranks high.", "Thus it ranks high.",
                      "Hence it ranks high.", "Reflecting its history.", "Suggesting a pattern.", "It implies a pattern.", "Resulting in a high rank.",
                      "Leading to a high rank.", "It matters due to its exploit code.", "As evidenced by the code."],
@@ -216,7 +218,8 @@ def test_blocked_phrases_are_one_constant_at_the_top_of_the_module():
     assert src.index("BLOCKED_PHRASES = [") < src.index("def cna_name")
     for phrase in ["high-impact", "high impact", "highly", "serious", "dangerous", "widespread", "widely", "actively", "in the wild",
                    "ransomware", "zero-day", "exploit template", "will be exploited", "is being exploited", "confirmed", "likelihood", "likely",
-                   "indicating", "risk of exploitation", "potential for exploitation", "exploitation patterns", "mirroring", "significant risk", "strong"]:
+                   "indicating", "risk of exploitation", "potential for exploitation", "exploitation patterns", "mirroring", "significant risk", "strong",
+                   "significant", "significantly", "evidenced", "pattern", "patterns", "imminent"]:
         assert any(re.search(rf"\b(?:{p})\b", phrase, re.I) for p in ex.BLOCKED_PHRASES), phrase
 
 
@@ -436,3 +439,21 @@ def test_batch_draft_function_is_asked_only_for_rows_that_still_need_a_draft(tmp
     df = ex.process(its, None, lambda f, t: "No", out_dir=tmp_path, log=lambda *_: None, batch_draft_fn=batch, batch_size=4)
     assert calls == [(0, ["CVE-2026-0", "CVE-2026-1", "CVE-2026-2", "CVE-2026-3"]), (1, ["CVE-2026-1", "CVE-2026-3"]), (2, ["CVE-2026-3"])]
     assert df["source"].tolist() == ["granite"] * 4 and df["guardian_verdict"].tolist() == ["No"] * 4
+
+
+def test_template_only_run_then_granite_run_drafts_every_item(tmp_path):
+    """Review of #35: rows cached by a run WITHOUT Granite (template, not_run, no draft) must be drafted by a later Granite run."""
+    facts = "- CVE: CVE-2026-1\n- Weakness hints: remote code execution"
+    items = [dict(cve_id=f"CVE-2026-{i}", facts=facts, prose=facts, template="Prioritised because it is a remote code execution flaw.",
+                  key=ex.cache_key(facts)) for i in range(1, 4)]
+    quiet = lambda *a, **k: None
+    d1 = ex.process(items, None, out_dir=tmp_path, log=quiet)                      # run 1: template only
+    assert (d1["source"] == "template").all() and (d1["guardian_verdict"] == "not_run").all()
+    calls = []
+
+    def draft_fn(it, attempt=0):
+        calls.append(it["cve_id"])
+        return "Prioritised because it is a remote code execution flaw."
+    d2 = ex.process(items, draft_fn, guardian=lambda f, d: "No", out_dir=tmp_path, log=quiet)   # run 2: Granite on, same out_dir
+    assert sorted(calls) == sorted(i["cve_id"] for i in items)                      # every item drafted
+    assert (d2["source"] == "granite").all() and (d2["guardian_verdict"] == "No").all()
