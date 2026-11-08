@@ -1,0 +1,156 @@
+{
+ "list": "top500_v6",
+ "rows": [
+  {
+   "rank": 1,
+   "cve": "CVE-2026-39808",
+   "kind": "Takes over the machine",
+   "flaw": "Command injection",
+   "group": "Other reporters",
+   "epss_pct": 0.999,
+   "exploit": true,
+   "reason": "Prioritised because it has a Nuclei template and a GitHub proof of concept as public exploit code, its EPSS percentile within its month is in the top 1%, and its IBM Granite KEV-likeness description within the 2026 pool is at the top 9%.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 2,
+   "cve": "CVE-2026-4092",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "Other reporters",
+   "epss_pct": 0.992,
+   "exploit": true,
+   "reason": "Prioritised because it has a GitHub proof of concept for a remote code execution vulnerability, its EPSS percentile within its month is in the top 1%, and it involves a path traversal weakness.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 3,
+   "cve": "CVE-2026-82384",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "Apache",
+   "epss_pct": 0.929,
+   "exploit": true,
+   "reason": "Prioritised because it has public exploit code (a GitHub proof of concept), its EPSS percentile within its month is in the top 7% and its IBM Granite KEV-likeness within the 2026 pool is in the top 6%.",
+   "guardian_passed": false,
+   "source": "template"
+  },
+  {
+   "rank": 4,
+   "cve": "CVE-2026-19626",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "Other reporters",
+   "epss_pct": 0.986,
+   "exploit": true,
+   "reason": "Prioritised because it has public exploit code in Metasploit and a GitHub proof of concept, its EPSS percentile within its month is in the top 1%, and its description similarity to past exploited CVEs is high.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 5,
+   "cve": "CVE-2026-6875",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "Other reporters",
+   "epss_pct": 0.999,
+   "exploit": true,
+   "reason": "Prioritised because it has a Nuclei template and a GitHub proof of concept as public exploit code, its EPSS percentile within its month is in the top 1%, and its IBM Granite KEV-likeness is within the top 7% of the 2026 pool.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 6,
+   "cve": "CVE-2026-19681",
+   "kind": "Takes over the machine",
+   "flaw": "Command injection",
+   "group": "Other reporters",
+   "epss_pct": 1.0,
+   "exploit": true,
+   "reason": "Prioritised because it has public exploit code (Metasploit and a GitHub proof of concept), its EPSS percentile within its month is in the top 1% and its IBM Granite KEV-likeness within the 2026 pool is in the top 1%.",
+   "guardian_passed": false,
+   "source": "template"
+  },
+  {
+   "rank": 7,
+   "cve": "CVE-2026-19679",
+   "kind": "Takes over the machine",
+   "flaw": "Command injection",
+   "group": "Other reporters",
+   "epss_pct": 0.979,
+   "exploit": true,
+   "reason": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 2%, and its description similarity to past exploited CVEs is high.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 8,
+   "cve": "CVE-2026-28326",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "Other reporters",
+   "epss_pct": 0.906,
+   "exploit": true,
+   "reason": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 9%, and it exhibits a top 2% IBM Granite KEV-likeness within the 2026 pool.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 9,
+   "cve": "CVE-2026-27174",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "VulnCheck",
+   "epss_pct": 0.982,
+   "exploit": true,
+   "reason": "Prioritised because it has a GitHub proof of concept, its EPSS percentile within its month is in the top 2%, and it exhibits a top 5% IBM Granite KEV-likeness in the 2026 pool.",
+   "guardian_passed": true,
+   "source": "granite"
+  },
+  {
+   "rank": 10,
+   "cve": "CVE-2026-40859",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "Apache",
+   "epss_pct": 0.97,
+   "exploit": true,
+   "reason": "Prioritised because it has public exploit code (a GitHub proof of concept), its EPSS percentile within its month is in the top 3% and its IBM Granite KEV-likeness within the 2026 pool is in the top 3%.",
+   "guardian_passed": false,
+   "source": "template"
+  },
+  {
+   "rank": 11,
+   "cve": "CVE-2026-95675",
+   "kind": "Takes over the machine",
+   "flaw": "Remote code execution",
+   "group": "VulnCheck",
+   "epss_pct": 0.992,
+   "exploit": true,
+   "reason": "Prioritised because it has public exploit code (a GitHub proof of concept), its EPSS percentile within its month is in the top 1% and its IBM Granite KEV-likeness within the 2026 pool is in the top 1%.",
+   "guardian_passed": false,
+   "source": "template"
+  },
+  {
+   "rank": 12,
+   "cve": "CVE-2026-42527",
+   "kind": "Takes over the machine",
+   "flaw": "Unsafe deserialization",
+   "group": "Apache",
+   "epss_pct": 0.945,
+   "exploit": true,
+   "reason": "Prioritised because it has public exploit code (a GitHub proof of concept), its EPSS percentile within its month is in the top 6% and its IBM Granite KEV-likeness within the 2026 pool is in the top 6%.",
+   "guardian_passed": false,
+   "source": "template"
+  }
+ ],
+ "guardian": {
+  "total": 500,
+  "passed_guardian": 318,
+  "template_fallback": 182,
+  "guardian_model": "granite3-guardian:2b",
+  "granite_model": "ibm-granite/granite-3.3-2b-instruct"
+ }
+}

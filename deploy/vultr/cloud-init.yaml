@@ -1,0 +1,49 @@
+#cloud-config
+# Paste this whole file into Vultr's "Cloud-Init User-Data" box when creating the server
+# (Ubuntu 24.04). It installs Caddy, copies the site from GitHub, serves https://fortres.us,
+# and pulls new commits from GitHub every 5 minutes. No passwords or keys are stored here.
+package_update: true
+packages: [git, debian-keyring, debian-archive-keyring, apt-transport-https, curl, gnupg, ufw]
+
+write_files:
+  - path: /etc/fortres/branch
+    content: "main\n"
+  - path: /usr/local/bin/fortres-update
+    permissions: "0755"
+    content: |
+      #!/bin/sh
+      # Pull the latest site from GitHub. Only site/ and deploy/Caddyfile are used.
+      set -e
+      BRANCH=$(cat /etc/fortres/branch)
+      cd /srv/fortres
+      git fetch --quiet --depth 1 origin "$BRANCH"
+      git checkout --quiet -B "$BRANCH" "origin/$BRANCH"
+      if ! cmp -s deploy/Caddyfile /etc/caddy/Caddyfile; then
+        cp deploy/Caddyfile /etc/caddy/Caddyfile && systemctl reload caddy
+      fi
+  - path: /etc/systemd/system/fortres-update.service
+    content: |
+      [Unit]
+      Description=Pull the Fortres site from GitHub
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/fortres-update
+  - path: /etc/systemd/system/fortres-update.timer
+    content: |
+      [Unit]
+      Description=Pull the Fortres site every 5 minutes
+      [Timer]
+      OnBootSec=1min
+      OnUnitActiveSec=5min
+      [Install]
+      WantedBy=timers.target
+
+runcmd:
+  - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' -o /etc/apt/sources.list.d/caddy-stable.list
+  - apt-get update && apt-get install -y caddy
+  - git clone --depth 1 --branch "$(cat /etc/fortres/branch)" https://github.com/jackwwinstanley/ibm-breach.git /srv/fortres
+  - cp /srv/fortres/deploy/Caddyfile /etc/caddy/Caddyfile
+  - systemctl restart caddy
+  - systemctl daemon-reload && systemctl enable --now fortres-update.timer
+  - ufw allow OpenSSH && ufw allow 80/tcp && ufw allow 443/tcp && ufw allow 443/udp && ufw --force enable

@@ -4,7 +4,7 @@ Run:  python scripts/number_sweep.py
 
 Expected values are READ from outputs/headline.json and the primary model's leakage and blind-spot files
 (src/common/primary.py: outputs/v6_leakage_results.csv, outputs/v6_blindspots.csv) and
-outputs/explanations_summary.json, never typed here. Checked files: docs/*.md, site/index.html, site/story.js, app/*.py,
+outputs/explanations_summary.json, never typed here. Checked files: docs/*.md, site/index.html, site/fortres.js, app/*.py,
 README.md. Checks:
   1. banned words: "verified", "predicts", "uses (IBM) Granite to read each description" (allowed right after "never"/"not",
      as in the wording rules themselves);
@@ -13,7 +13,7 @@ README.md. Checks:
   4. "N vs M" against the simple rule/baseline in the final documents must be a headline pair (pooled, forward or stability);
   5. 90% ranges in the final documents must be a headline range (any stored interval in headline.json, CVE-level or
      event-clustered, outside the `previous` block);
-  6. "N of M" blind-spot claims must equal the v5 blind-spot totals;
+  6. "N of M" blind-spot claims must equal the primary model's blind-spot totals;
   7. Guardian counts in prose ("N of 500 ... passed") must equal `passed_guardian` in outputs/explanations_summary.json
      (without that file, any such count is an error);
   8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it
@@ -104,7 +104,7 @@ def expected(out=OUT) -> dict:
 
 
 def files(root=ROOT):
-    pats = ["docs/*.md", "site/index.html", "site/story.js", "app/*.py", "README.md"]
+    pats = ["docs/*.md", "site/index.html", "site/fortres.js", "app/*.py", "README.md"]
     for p in pats:
         yield from sorted(root.glob(p))
 

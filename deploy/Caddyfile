@@ -1,0 +1,27 @@
+# Fortres: serves the static page in site/ with automatic HTTPS (Let's Encrypt via Caddy).
+fortres.us {
+	root * /srv/fortres/site
+	encode zstd gzip
+	file_server
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"
+		X-Served-By "Vultr"
+	}
+	@data path /data/*
+	header @data Cache-Control "public, max-age=300"
+
+	respond /healthz "ok" 200
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}
+
+www.fortres.us {
+	redir https://fortres.us{uri} permanent
+}
