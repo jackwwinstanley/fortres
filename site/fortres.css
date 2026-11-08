@@ -35,6 +35,12 @@ a{color:var(--accent)}
 .route-picks #data{display:block}
 .route-lookup #data{display:none}
 .route-found #data{display:none}
+.route-demo #data{display:none}
+#demo{display:none;padding-top:calc(env(safe-area-inset-top,0px) + 60px);min-height:100vh}
+.route-demo #demo{display:block}
+#demo .lead a{color:inherit}
+.vid{margin-top:28px;aspect-ratio:16/9;width:100%;border:1px solid var(--line);background:var(--bg)}
+.vid iframe{display:block;width:100%;height:100%;border:0}
 #found{display:none;padding-top:calc(env(safe-area-inset-top,0px) + 60px);min-height:100vh}
 .route-found #found{display:block}
 /* Findings page (#found): one finding per band. Text on the left, a chart on the right drawn from site/data/findings.json.
@@ -314,3 +320,5 @@ footer b{color:var(--fg);font-weight:500}
 .vs.sm .num{font-size:clamp(30px,2.7vw,38px)}
 .vs.sm{gap:22px}
 @media (max-width:480px){.brand{font-size:0;gap:0}.tabs{gap:0}.tabs a{padding:6px 8px;font-size:12.5px}}
+@media (max-width:400px){.tabs a{padding:6px 5px;font-size:11.5px}}
+@media (max-width:350px){.tabs a{padding:6px 3px;font-size:11px}}

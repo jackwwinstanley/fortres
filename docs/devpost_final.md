@@ -110,7 +110,7 @@ python, ibm-granite, granite-guardian, ollama, lightgbm, scikit-learn, pandas, d
 ## Links
 - Live site: https://fortres.us
 - Code: https://github.com/jackwwinstanley/ibm-breach
-- Video: _[paste the YouTube or Drive link]_
+- Video: https://youtu.be/0V3eeukbF3c
 
 ## Track
 IBM "Before the Breach" (+ any other tracks the team selected)
