@@ -109,3 +109,10 @@ writes `outputs/b_text_report.md`.
 `outputs/explanations_summary.json`. Granite (granite-3.3-2b-instruct) rewrites facts built only from tracked columns and the v5 contribution file; local checks and then
 Granite Guardian (`ollama pull granite3-guardian:2b`, risk = groundedness) must clearly answer "No", otherwise the template sentence is used. Results are cached in `outputs/.cache/`
 and the run resumes after a crash. The sentence must restate at most three facts in the form "Prioritised because ...". Local checks: a blocked-phrase list (`BLOCKED_PHRASES` at the top of `src/b/explain.py`, including predictions, interpretation and causal links), a check that every percentage stays attached to its own fact (EPSS only to EPSS), and a glue/unknown-word detector that uses the English word list `src/b/english_words.txt.gz`. The prompt version is part of the cache key, so changing the prompt regenerates every row, and cached Granite sentences that fail the current checks are regenerated automatically. `--time-box MINUTES` stops after that long: unfinished rows keep the template and are marked `pending`; run the same command again to continue. The committed files come from a 30-minute run: rows marked `pending` in `guardian_verdict` were not processed yet and show the template. No sentence is labelled Guardian-checked unless the Guardian model returned "No" for it.
+
+## Built with Entire
+We used [Entire](https://docs.entire.com/overview) to keep an audit trail of the AI-assisted work in this repository: checkpoints of Claude Code sessions, linked to commits.
+`outputs/entire_summary.json` is a counts-and-timestamps snapshot: 30 checkpoints from 2 sessions, first and last dated in it (made by `python scripts/entire_summary.py`).
+The checkpoints, prompts and transcripts stay on one laptop (`push_sessions` is false and the remote has no `refs/entire/*` ref) because transcripts contain personal data.
+What Entire shows, what it does not, and the read-only commands to check it: [docs/entire.md](docs/entire.md).
+A 25-second screen-recording plan that uses only those commands: [docs/entire_demo.md](docs/entire_demo.md).
