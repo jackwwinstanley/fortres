@@ -1,0 +1,28 @@
+# m09 attack-mechanism prototype phrases. Written 2026-11-08 ~05:10 UTC, BEFORE any zoo method was run; committed with the
+# frozen harness. One phrase per line; lines starting with # are ignored. Embedded with the same Granite model as the
+# descriptions (ibm-granite/granite-embedding-30m-english); no LLM is called over descriptions.
+unauthenticated remote attacker can execute arbitrary code on the server
+remote code execution via a crafted HTTP request without authentication
+OS command injection allows remote attackers to execute shell commands
+authentication bypass allows an unauthenticated attacker to gain administrative access
+deserialization of untrusted data leads to remote code execution
+path traversal allows remote attackers to read arbitrary files from the server
+arbitrary file upload allows an attacker to upload a web shell and execute code
+SQL injection allows a remote unauthenticated attacker to execute arbitrary SQL commands
+server-side request forgery allows attackers to reach internal services
+heap-based buffer overflow allows remote attackers to execute arbitrary code
+use-after-free in the browser allows a remote attacker to exploit heap corruption via a crafted HTML page
+type confusion in the JavaScript engine allows remote code execution via a crafted web page
+local privilege escalation allows an attacker to gain SYSTEM or root privileges
+kernel vulnerability allows a local user to escalate privileges
+security feature bypass allows attackers to evade protection mechanisms
+VPN gateway or firewall appliance vulnerability exploitable by a remote unauthenticated attacker
+vulnerability in the management interface of a network device allows remote takeover
+improper access control allows remote attackers to access sensitive information without authentication
+template injection allows remote attackers to execute arbitrary code
+code injection in a web application allows execution of arbitrary commands
+hard-coded credentials allow remote attackers to log in with administrative privileges
+missing authentication for a critical function allows remote attackers to perform privileged actions
+XML external entity injection allows attackers to read files and perform server-side requests
+memory corruption vulnerability that has been exploited in the wild
+out-of-bounds write allows remote attackers to execute code via a crafted file
