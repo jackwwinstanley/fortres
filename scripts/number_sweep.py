@@ -12,7 +12,10 @@ README.md. Checks:
   4. "N vs M" against the simple rule/baseline in the final documents must be a headline pair (pooled, forward or stability);
   5. 90% ranges in the final documents must be a headline range (pooled or forward);
   6. "N of M" blind-spot claims must equal the v5 blind-spot totals;
-  7. Guardian counts must never be typed by hand ("N of 500 ... passed" is an error until it is read from the summary).
+  7. Guardian counts in prose ("N of 500 ... passed") must equal `passed_guardian` in outputs/explanations_summary.json
+     (without that file, any such count is an error);
+  8. every row of the Guardian count table in docs/model_card.md (`| item | N | `field`, ... |`) must equal each field it
+     names in outputs/explanations_summary.json (dotted names such as `guardian_verdicts.No` are looked up inside objects).
 """
 import json
 import re
@@ -25,6 +28,7 @@ OUT = ROOT / "outputs"
 FINAL_DOCS = {"docs/writeup_person_b.md", "docs/devpost_final.md", "docs/judge_qa.md", "docs/video_script.md",
               "docs/page_content.md", "README.md", "site/index.html"}
 MINUS = "[−-]"
+MODEL_CARD = "docs/model_card.md"
 
 
 def expected(out=OUT) -> dict:
@@ -44,6 +48,9 @@ def expected(out=OUT) -> dict:
         "honest": sum(leak["honest"].values()), "leaky": sum(leak["leaky"].values()),
         "leaky_split": (leak["leaky"].get(2025), leak["leaky"].get(2024)),
     }
+    gs = out / "explanations_summary.json"
+    if gs.exists():
+        e["guardian"] = json.loads(gs.read_text())
     bs = out / "v5_blindspots.csv"
     if bs.exists():
         b = pd.read_csv(bs)
@@ -106,9 +113,48 @@ def check_text(rel: str, text: str, e: dict) -> list[str]:
                 pr = (int(m.group(1)), int(m.group(2)))
                 if pr[1] == e["blind"][1] and pr != e["blind"]:
                     probs.append(f"{where}: blind-spot claim {pr}, expected {e['blind']}")
-        # 7. Guardian counts typed by hand
-        if re.search(r"\b\d+ of 500\b[^.]{0,60}\bpass", low):
-            probs.append(f"{where}: Guardian count typed by hand (read it from outputs/explanations_summary.json)")
+        # 7. Guardian counts in prose must equal the summary
+        for m in re.finditer(r"\b(\d+) of 500\b[^.]{0,60}\bpass", low):
+            g = e.get("guardian")
+            if g is None:
+                probs.append(f"{where}: Guardian count without outputs/explanations_summary.json to check it against")
+            elif int(m.group(1)) != g.get("passed_guardian"):
+                probs.append(f"{where}: Guardian count {m.group(1)} of 500, expected passed_guardian = {g.get('passed_guardian')}")
+    if rel == MODEL_CARD:
+        probs += check_guardian_table(rel, text, e)
+    return probs
+
+
+def _field(summary: dict, name: str):
+    v = summary
+    for part in name.split("."):
+        if not isinstance(v, dict) or part not in v:
+            return None
+        v = v[part]
+    return v
+
+
+def check_guardian_table(rel: str, text: str, e: dict) -> list[str]:
+    """Rows like  | label | 347 | `passed_guardian`, `guardian_verdicts.No` |  must match every named summary field."""
+    probs = []
+    for n, line in enumerate(text.splitlines(), 1):
+        m = re.match(r"^\|[^|]*\|\s*(\d[\d,]*)\s*\|([^|]*`[^|]*)\|\s*$", line)
+        if not m:
+            continue
+        fields = re.findall(r"`([A-Za-z_][\w.]*)`", m.group(2))
+        if not fields:
+            continue
+        g = e.get("guardian")
+        if g is None:
+            probs.append(f"{rel}:{n}: Guardian table row without outputs/explanations_summary.json to check it against")
+            continue
+        val = int(m.group(1).replace(",", ""))
+        for f in fields:
+            want = _field(g, f)
+            if want is None:
+                probs.append(f"{rel}:{n}: Guardian table names `{f}`, which is not in outputs/explanations_summary.json")
+            elif val != want:
+                probs.append(f"{rel}:{n}: Guardian table says {val} for `{f}`, summary has {want}")
     return probs
 
 
@@ -117,7 +163,10 @@ def main(root=ROOT) -> int:
     probs = []
     for f in files(root):
         probs += check_text(str(f.relative_to(root)), f.read_text(errors="ignore"), e)
-    print(f"number sweep: expected {json.dumps({k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items()})}")
+    shown = {k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k != "guardian"}
+    if "guardian" in e:
+        shown["passed_guardian"] = e["guardian"].get("passed_guardian")
+    print(f"number sweep: expected {json.dumps(shown)}")
     if probs:
         print(f"{len(probs)} problem(s):")
         print("\n".join("  " + p for p in probs))
