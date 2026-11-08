@@ -1,0 +1,10 @@
+test,variant,k,hits,flagged_in_pool,diff_vs_v5_90
+forward (train 2024 -> test 2025),v5 frozen,243.0,12,1.0,
+forward (train 2024 -> test 2025),A two-tier,243.0,13,1.0,"[+0, +3]"
+forward (train 2024 -> test 2025),B v5 + flag feature,243.0,12,1.0,"[+0, +0]"
+stability (train 2025 -> test 2024),v5 frozen,198.0,9,0.0,
+stability (train 2025 -> test 2024),A two-tier,198.0,9,0.0,"[+0, +0]"
+stability (train 2025 -> test 2024),B v5 + flag feature,198.0,9,0.0,"[+0, +0]"
+pooled,v5 frozen,,21,,
+pooled,A two-tier,,22,,"[+0, +3]"
+pooled,B v5 + flag feature,,21,,"[+0, +0]"

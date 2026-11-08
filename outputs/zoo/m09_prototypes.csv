@@ -1,0 +1,7 @@
+timestamp,method,variant,seed_set,status,reason,deterministic,params,notes,forward,forward_I,forward_v5,forward_delta_I,forward_delta_I_90,forward_hits_random_ties,forward_k,stability,stability_I,stability_v5,stability_delta_I,stability_delta_I_90,stability_hits_random_ties,stability_k,pooled,pooled_I,pooled_v5,pooled_delta_I,pooled_delta_I_90,pooled_delta_I_p_le0,pooled_delta_v5,coverage_2026,runtime_s,n_new_features
+2026-11-08T05:01:24+00:00,m09_prototypes,standalone,0-19,failed,process exited with code -11 (see log),,,,,,,,,,,,,,,,,,,,,,,,,,,
+2026-11-08T05:01:24+00:00,m09_prototypes,blend_I,0-19,failed,process exited with code -11 (see log),,,,,,,,,,,,,,,,,,,,,,,,,,,
+2026-11-08T05:01:24+00:00,m09_prototypes,I_plus_feature,0-19,failed,process exited with code -11 (see log),,,,,,,,,,,,,,,,,,,,,,,,,,,
+2026-11-08T05:02:50+00:00,m09_prototypes,standalone,0-19,ok,,True,"{""n_phrases"": 25}",,1.0,18.0,12.0,-17.0,"[-24, -10]",1.0,243.0,3.0,9.0,9.0,-6.0,"[-11, -2]",3.0,198.0,4.0,27.0,21.0,-23.0,"[-32, -15]",1.0,-17.0,"{""proto_max"": 1.0, ""proto_top3"": 1.0}",10.3,
+2026-11-08T05:03:01+00:00,m09_prototypes,blend_I,0-19,ok,,True,"{""n_phrases"": 25}",,5.0,18.0,12.0,-13.0,"[-19, -7]",5.0,243.0,4.0,9.0,9.0,-5.0,"[-10, -1]",4.0,198.0,9.0,27.0,21.0,-18.0,"[-26, -11]",1.0,-12.0,,9.2,
+2026-11-08T05:03:10+00:00,m09_prototypes,I_plus_feature,0-19,ok,,True,"{""n_phrases"": 25}",,18.0,18.0,12.0,0.0,"[+0, +0]",18.0,243.0,8.0,9.0,9.0,-1.0,"[-4, +0]",8.0,198.0,26.0,27.0,21.0,-1.0,"[-4, +0]",1.0,5.0,"{""proto_max"": 1.0, ""proto_top3"": 1.0}",14.5,2.0

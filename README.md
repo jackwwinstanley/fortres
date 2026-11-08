@@ -57,12 +57,12 @@ v6 uses the 33 frozen v5 features (`ALLOWED_FEATURES` in `src/common/schema.py`)
 - any 2026 KEV information.
 
 The leakage test shows what they would add (27 → 33). An independent review (`docs/column_review.md`) found no leak.
-A feature-by-feature leak check of the v5 features ([table](https://github.com/jackwwinstanley/ibm-breach/blob/b/outside/outputs/outside_v5_leakcheck_features.csv)) found none of them coming from those sources and
+A feature-by-feature leak check of the v5 features ([table](outputs/outside_v5_leakcheck_features.csv)) found none of them coming from those sources and
 no blank-vs-filled CVSS signal.
 
 ## Outside data we checked (none adopted)
-Each source was kept only if its records are dated on or before the end of the CVE's snapshot month ([round 1](https://github.com/jackwwinstanley/ibm-breach/blob/b/outside/outputs/outside_report.md),
-[round 2](https://github.com/jackwwinstanley/ibm-breach/blob/b/outside2/outputs/outside2_report.md)).
+Each source was kept only if its records are dated on or before the end of the CVE's snapshot month ([round 1](outputs/outside_report.md),
+[round 2](outputs/outside2_report.md)).
 
 | source | link | licence / terms | date rule | result |
 |---|---|---|---|---|

@@ -23,15 +23,14 @@ pooled hits over three new seed sets, 21 to 25). Ties go to the earliest of H, I
 | J rank-average of v5, D, F and H | 12 | 9 | 21 | no gain |
 | K XGBoost rank:ndcg | | | | skipped (not installed) |
 
-Outside data, tested separately (`outputs/outside_report.md`, `outputs/outside2_report.md` on branches b/outside and
-b/outside2): VulnCheck KEV was rejected because its dates are hindsight; CISA Vulnrichment flags 1 practice CVE and none
+Outside data, tested separately (`outputs/outside_report.md`, `outputs/outside2_report.md`): VulnCheck KEV was rejected because its dates are hindsight; CISA Vulnrichment flags 1 practice CVE and none
 in 2026; GitHub PoC creation dates plus the monthly EPSS change scored 18 instead of 21 for v5. None was adopted.
 Caveats on v6 itself: on matched seeds it beats v5 by only +2 to +5 (`outputs/v6_seed_spread.csv`), and a vendor-grouped
 diagnostic on v5 halves its 2025 in-year hits (19 → 10, `outputs/rank_vendor_cv.csv`).
 
-## 0b. Eleven more methods tested against v6 (the "method zoo", branch b/zoo)
+## 0b. Eleven more methods tested against v6 (the "method zoo")
 Every method ran through one evaluation harness, frozen in its own commit before any method ran, on the frozen v5
-features ([summary](https://github.com/jackwwinstanley/ibm-breach/blob/b/zoo/outputs/zoo_summary.md)). The screening rule was fixed before any result: at least v6's forward and stability, and a
+features ([summary](../outputs/zoo_summary.md)). The screening rule was fixed before any result: at least v6's forward and stability, and a
 pooled gain of at least 2 (v6's own spread over four seed sets is 2). Each method was tried standalone, blended with v6,
 and, where it makes a feature, as an extra v6 feature. Best variant of each, forward / stability / pooled, against v6's
 18 / 9 / 27:
@@ -53,7 +52,7 @@ and, where it makes a feature, as an extra v6 feature. Best variant of each, for
 No method passed screening, so nothing was confirmed or adopted, and v6 stays.
 
 m11's +1 got a separate consistency check, with rules written down before any new result and the bar admittedly set after
-seeing the +1 ([check](https://github.com/jackwwinstanley/ibm-breach/blob/b/zoo/outputs/zoo/m11_consistency.md)). Across 10 seed sets, 6 of them fresh, the mean gain is +0.1 (90% interval −0.1 to +0.4). It
+seeing the +1 ([check](../outputs/zoo/m11_consistency.md)). Across 10 seed sets, 6 of them fresh, the mean gain is +0.1 (90% interval −0.1 to +0.4). It
 falls below v6 on 3 sets, and 4 of 5 shuffled-feature placebos gain the same +1. So it is luck, not signal.
 
 ## 1. Track-record priors (Person B, `src/b/priors.py`, `outputs/b_priors_eval.md`)
