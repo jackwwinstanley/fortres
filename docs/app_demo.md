@@ -4,6 +4,8 @@ Start it from the repository root:
 ```bash
 streamlit run app/dashboard.py
 ```
+The two sample files are not in the repository. Make them once with `python scripts/make_app_samples.py` (needs `data/scoreboard_2026.csv`).
+
 In the sidebar, choose **Rank a dataset**. The saved v6 models are in `models/v6/` (1.5 MB). `python scripts/save_v6_models.py` recreates them.
 
 ## 90-second click path for the video

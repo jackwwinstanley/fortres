@@ -90,3 +90,22 @@ def test_score_module_reads_no_banned_column():
     for bad in ("nvd_status", "n_affected_cpes", "n_references", "cvss", "references.csv", "affected_products"):
         assert bad not in src
     assert np.isfinite(sc.MAX_ROWS)
+
+
+def test_make_app_samples_writes_the_two_files(tmp_path):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("make_app_samples", REPO_ROOT / "scripts" / "make_app_samples.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    sb = pd.DataFrame({"cve_id": [f"CVE-2026-{i:05d}" for i in range(3000)], "snapshot_month": ["2026-05"] * 100 + ["2026-07"] * 2900, "epss": 0.1})
+    src = tmp_path / "scoreboard.csv"; sb.to_csv(src, index=False)
+    assert m.main(src, tmp_path / "samples") == 0
+    assert len(pd.read_csv(tmp_path / "samples" / m.ONE_MONTH)) == 100
+    a = (tmp_path / "samples" / m.RANDOM).read_bytes()
+    assert len(pd.read_csv(tmp_path / "samples" / m.RANDOM)) == 2000
+    assert m.main(src, tmp_path / "samples") == 0 and (tmp_path / "samples" / m.RANDOM).read_bytes() == a      # fixed seed
+    assert m.main(tmp_path / "absent.csv", tmp_path / "x") == 2
+
+
+def test_the_page_says_how_to_make_a_missing_sample():
+    text = (REPO_ROOT / "app" / "rank_page.py").read_text()
+    assert "run python scripts/make_app_samples.py first" in text

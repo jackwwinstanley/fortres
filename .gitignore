@@ -19,3 +19,6 @@ venv/
 # Person B step outputs that the runbook says are not tracked (PNG previews)
 outputs/b_*.png
 outputs/b_blindspot_counts.csv
+
+# sample slices of the competition scoreboard: made locally by scripts/make_app_samples.py, never committed
+app/samples/

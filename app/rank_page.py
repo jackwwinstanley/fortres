@@ -14,6 +14,8 @@ from src.common.paths import OUT_DIR, SCOREBOARD_CSV
 
 SAMPLES = Path(__file__).parent / "samples"
 TOP = 500
+SAMPLE_FILES = {"One month of 2026 (May)": "2026_one_month_2026-05.csv", "2,000 random 2026 CVEs": "2026_random_2000.csv"}
+MISSING_SAMPLE = "This sample isn't on this computer yet: run python scripts/make_app_samples.py first."
 BG, BLUE, GREEN, CORAL, INK, MUTED, LINE = "#080c12", "#4589ff", "#42be65", "#ff8389", "#f4f4f4", "#c6c6c6", "rgba(244,244,244,.14)"
 CSS = f"""<style>
 .fx-label {{ color: {MUTED}; font-size: 15px; margin-top: -8px; }}
@@ -117,9 +119,13 @@ def render():
     source = None
     if b.button("Use the 2026 scoreboard", use_container_width=True):
         st.session_state["src"] = ("the 2026 scoreboard", SCOREBOARD_CSV)
-    sample = c.selectbox("Sample slices", ["None", "One month of 2026 (May)", "2,000 random 2026 CVEs"])
+    sample = c.selectbox("Sample slices", ["None", *SAMPLE_FILES])
     if sample != "None":
-        st.session_state["src"] = (sample, SAMPLES / ("2026_one_month_2026-05.csv" if sample.startswith("One") else "2026_random_2000.csv"))
+        path = SAMPLES / SAMPLE_FILES[sample]
+        if path.exists():
+            st.session_state["src"] = (sample, path)
+        else:
+            c.warning(MISSING_SAMPLE)
     if up is not None:
         source = (up.name, up)
     elif "src" in st.session_state:
