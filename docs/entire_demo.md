@@ -20,7 +20,7 @@ checkpoints (a fresh clone has none, so the first four commands would show nothi
 | 3 | `git for-each-ref --format='%(refname)' refs/entire/checkpoints \| wc -l` | one number: the count of checkpoints on this machine (it should equal `n_checkpoints` in the JSON of step 7) | 3 s |
 | 4 | `grep push_sessions .entire/settings.local.json` | one line: `"push_sessions": false` | 3 s |
 | 5 | `git ls-remote origin 'refs/entire/*'` | nothing at all: the remote has no Entire ref | 4 s |
-| 6 | `git branch -r \| grep -i entire` | nothing at all, and the shell prompt returns | 3 s |
+| 6 | `git branch -r \| grep -i 'origin/entire/'` | nothing at all, and the shell prompt returns | 3 s |
 | 7 | `cat outputs/entire_summary.json` | the counts-and-timestamps file: no prompts, no paths, no addresses | 7 s |
 
 Narration, one short line per step: "Entire is installed with the Claude Code hooks." "This many checkpoints are on this laptop."

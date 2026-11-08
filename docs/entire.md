@@ -89,11 +89,11 @@ snapshot is current. The `grep` prints `"push_sessions": false`.
 From any clone:
 ```
 git ls-remote origin 'refs/entire/*'
-git branch -r | grep -i entire
+git branch -r | grep -i 'origin/entire/'
 cat outputs/entire_summary.json
 ```
 The first two print nothing (the `grep` also exits with status one when it finds nothing); that is the proof that no Entire data is on
-the remote. The last prints the counts above.
+the remote. The `grep` looks for Entire's own branch names (`entire/...`), so it ignores this project's branch `a/entire`. The last prints the counts above.
 
 Avoid, when recording or sharing a screen: `entire status` (it lists active sessions with the opening words of each session's latest
 prompt), and `entire checkpoint list --outgoing` (the CLI says it shows each checkpoint's first prompt).
