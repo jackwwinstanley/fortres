@@ -1,0 +1,13 @@
+timestamp,method,seed_set,variants,exit,runtime_s,failed_filled
+2026-11-08T05:01:24+00:00,m09_prototypes,0-19,"standalone,blend_I,I_plus_feature",-11,5,"standalone,blend_I,I_plus_feature"
+2026-11-08T05:01:44+00:00,m03_cox,0-19,"standalone,blend_I",0,25,
+2026-11-08T05:01:44+00:00,m06_mean_minus_sd,0-19,"standalone,blend_I",0,25,
+2026-11-08T05:01:49+00:00,m18_balanced_bag,0-19,"standalone,blend_I",0,30,
+2026-11-08T05:01:59+00:00,m02_cwe_eb,0-19,"standalone,blend_I,I_plus_feature",0,40,
+2026-11-08T05:02:19+00:00,m08_isoforest,0-19,"standalone,blend_I,I_plus_feature",0,60,
+2026-11-08T05:02:19+00:00,m11_regex,0-19,"standalone,blend_I,I_plus_feature",0,60,
+2026-11-08T05:02:19+00:00,m19_adversarial,0-19,"standalone,blend_I,I_plus_feature",0,60,
+2026-11-08T05:02:39+00:00,m12_tfidf,0-19,"standalone,blend_I,I_plus_feature",0,80,
+2026-11-08T05:02:44+00:00,m07_extratrees,0-19,"standalone,blend_I",0,85,
+2026-11-08T05:03:25+00:00,m09_prototypes,0-19,"standalone,blend_I,I_plus_feature",0,35,
+2026-11-08T05:06:30+00:00,m01_elasticnet,0-19,"standalone,blend_I",0,310,

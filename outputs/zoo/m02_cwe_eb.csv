@@ -1,0 +1,4 @@
+timestamp,method,variant,seed_set,deterministic,status,reason,params,notes,forward,forward_I,forward_v5,forward_delta_I,forward_delta_I_90,forward_hits_random_ties,forward_k,stability,stability_I,stability_v5,stability_delta_I,stability_delta_I_90,stability_hits_random_ties,stability_k,pooled,pooled_I,pooled_v5,pooled_delta_I,pooled_delta_I_90,pooled_delta_I_p_le0,pooled_delta_v5,coverage_2026,runtime_s,n_new_features
+2026-11-08T05:01:22+00:00,m02_cwe_eb,standalone,0-19,True,ok,,{},,0,18,12,-18,"[-25, -11]",0.45,243,1,9,9,-8,"[-13, -4]",1.0,198,1,27,21,-26,"[-35, -18]",1.0,-20,"{""cwe_eb_rate"": 1.0}",10.1,
+2026-11-08T05:01:32+00:00,m02_cwe_eb,blend_I,0-19,True,ok,,{},,8,18,12,-10,"[-16, -5]",8.0,243,6,9,9,-3,"[-8, +1]",6.0,198,14,27,21,-13,"[-20, -6]",1.0,-7,,10.5,
+2026-11-08T05:01:42+00:00,m02_cwe_eb,I_plus_feature,0-19,True,ok,,{},,16,18,12,-2,"[-5, +0]",16.0,243,9,9,9,0,"[-2, +1]",9.0,198,25,27,21,-2,"[-5, +0]",0.976,4,"{""cwe_eb_rate"": 1.0}",16.4,1.0
