@@ -22,7 +22,7 @@ NICE = {"network_edge_device": "VPN / firewall / edge", "web_application": "Web 
 
 
 def groups() -> dict:
-    ex = pd.read_parquet(OUT_DIR / "extracted_features.parquet")
+    ex = pd.read_parquet(OUT_DIR / "b_extract_cache.parquet").drop(columns=["guard_changes"], errors="ignore")  # includes the profile-only rows
     blind = set(pd.read_csv(OUT_DIR / "blindspot_positives.csv")["cve_id"])
     pos = pd.concat([pd.read_parquet(OUT_DIR / f"replica_{y}.parquet", columns=["cve_id", "label"]) for y in (2024, 2025)])
     pos = set(pos.loc[pos["label"] == 1, "cve_id"])
