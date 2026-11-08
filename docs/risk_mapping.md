@@ -6,12 +6,14 @@ This maps the risks of the Before the Breach ranking model to risk names in the 
 
 ## How the IBM names were obtained
 
-- **Reached:** IBM's Atlas index page, <https://www.ibm.com/docs/en/watsonx/saas?topic=ai-risk-atlas>. The risk names and category headings below are copied from it, and each name used here appears on that page.
-- **Not reached in full:** the per-risk pages (`dataplatform.cloud.ibm.com/docs/content/wsj/ai-risk-atlas/<risk>.html`) returned only their titles when I fetched them (for example "Data contamination risk for AI"), without the definition. The definitions quoted below are from IBM's AI Risk Atlas paper, <https://arxiv.org/abs/2503.05780>, and were read through an automated page reader, so **check each quote against IBM's source before reusing it**.
+- **Reached:** the index of the [IBM AI Risk Atlas](https://www.ibm.com/docs/en/watsonx/saas?topic=ai-risk-atlas). The risk names and category headings below are copied from it, and each name used here appears on that page. They were read by an automated page reader, so compare them with the live page before a submission.
+- **IBM's definitions are not quoted.** The Atlas pages for the individual risks were not readable when I fetched them, so this file does not rely on IBM's own wording. Every description of a risk below is **our own, in our words, and is not IBM's definition**. Read IBM's page for what IBM means by each name.
 - **No exact match exists for some of our risks.** No entry on the index page is named "data leakage", "drift" or "small sample". For those I chose the closest name, and the choice is our judgement, not IBM's. Where the fit is partial, the row says so.
-- **Names seen but not used.** "Overfitting" and "Temporal gap" appear on the index page, but I could not read either definition, so I do not rely on them.
+- **Names seen but not used.** "Overfitting" and "Temporal gap" appear on the index page, but I could not confirm what they cover, so I do not rely on them.
 
 ## Quick look
+
+IBM names and categories are copied from the index of the [IBM AI Risk Atlas](https://www.ibm.com/docs/en/watsonx/saas?topic=ai-risk-atlas).
 
 | our risk | IBM AI Risk Atlas name (category) | mitigation we built | main file |
 |---|---|---|---|
@@ -21,9 +23,21 @@ This maps the risks of the Before the Breach ranking model to risk names in the 
 | few positives | **Poor model accuracy** (Inference risks › Accuracy); **Unrepresentative data** (Training data risks › Accuracy) | low-power labelling; intervals; 20-seed bag; placebo; forward test first; no claim of a gain | `outputs/headline.json`, `outputs/v5_report.md` |
 | KEV coverage skew | **Unrepresentative data** (Training data risks › Accuracy) | **no correction built**; disclosure and wording only | `docs/page_content.md`, `docs/judge_qa.md` |
 
+### What each IBM name means here: our descriptions, not IBM's
+
+One line each, in our words, for how we use the name. They are not IBM's definitions; for those see the [IBM AI Risk Atlas](https://www.ibm.com/docs/en/watsonx/saas?topic=ai-risk-atlas).
+
+| IBM AI Risk Atlas name (category) | what we mean by it (our description) |
+|---|---|
+| **Data contamination** (Training data risks › Accuracy) | Information that should not be available to the model gets in, so results look better than they are; for us, after-the-fact NVD columns or KEV information from after the snapshot. |
+| **Hallucination** (Output risks › Robustness) | A generated sentence says something its source facts do not support; for us, a Granite reason that adds a claim we did not give it. |
+| **Unexplainable output** (Output risks › Explainability) | It is hard to say why the model ranked a CVE where it did; for us, a 33-feature model bag whose one-sentence reasons explain only part of the ranking. |
+| **Poor model accuracy** (Inference risks › Accuracy) | The model does not do its job well enough; for us, no clear gain over the simple rule, and inputs such as EPSS that moved in 2026. |
+| **Unrepresentative data** (Training data risks › Accuracy) | What we learn from is not a fair sample of what we are scored on; for us, two practice years, and a label list (KEV) that leans toward enterprise and government software. |
+
 ## 1. Data leakage
 
-**IBM name:** *Data contamination* (Training data risks › Accuracy). IBM's definition (paper): "Data contamination occurs when incorrect data is used for training."
+**IBM name:** *Data contamination* (Training data risks › Accuracy). Our description is in the table above.
 **Fit:** partial. The Atlas has no "data leakage" entry. Our risk is a specific kind of contamination: columns that NVD fills in *after* a CVE is attacked, or KEV information from after the snapshot, entering the features and making the model look better than it is.
 
 **Mitigations we built:**
@@ -42,8 +56,8 @@ This maps the risks of the Before the Breach ranking model to risk names in the 
 
 **IBM names:**
 
-- *Hallucination* (Output risks › Robustness). IBM's definition (paper): "Hallucinations generate factually inaccurate or untruthful content with respect to the model's training data or input." This is the closest fit for Granite writing a claim that is not in the facts we gave it.
-- *Unexplainable output* (Output risks › Explainability). IBM's definition (paper): "Explanations for model output decisions might be difficult, imprecise, or not possible to obtain." This covers the wider point that a 33-feature model bag is hard to explain, which a one-sentence reason only partly addresses.
+- *Hallucination* (Output risks › Robustness). The closest fit for Granite writing a claim that is not in the facts we gave it.
+- *Unexplainable output* (Output risks › Explainability). Covers the wider point that a 33-feature model bag is hard to explain, which a one-sentence reason only partly addresses.
 
 **Fit:** partial. Neither name says "unfaithful explanation"; these are the two nearest.
 
@@ -59,8 +73,8 @@ This maps the risks of the Before the Breach ranking model to risk names in the 
 
 ## 3. Distribution drift in 2026 EPSS
 
-**IBM name:** *Poor model accuracy* (Inference risks › Accuracy). IBM's definition (paper): "Poor model accuracy occurs when a model's performance is insufficient to the task it was designed for", with "Low accuracy might occur if the model is not correctly engineered, or there are changes to the model's expected inputs."
-**Fit:** closest available. The Atlas has no drift entry; the second sentence is the one that describes drift.
+**IBM name:** *Poor model accuracy* (Inference risks › Accuracy). Our description is in the table above.
+**Fit:** closest available. The Atlas index has no drift entry; we use this name because inputs that shift after training can lower accuracy.
 
 **The evidence:** a classifier can tell 2025 practice CVEs from 2026 scoreboard CVEs with ROC AUC 0.934, and EPSS is the main reason (`outputs/b_drift_report.md`). EPSS jumped about 6× from the July 2026 snapshot, cause unknown (`docs/writeup_person_b.md`, section 3).
 Raw EPSS has a PSI of 2.866 against the scoreboard (`outputs/v4_report.md`).
@@ -79,7 +93,7 @@ Raw EPSS has a PSI of 2.866 against the scoreboard (`outputs/v4_report.md`).
 **IBM names:**
 
 - *Poor model accuracy* (Inference risks › Accuracy), read honestly: with this little data the model's performance may not beat the simple rule.
-- *Unrepresentative data* (Training data risks › Accuracy). IBM's definition (paper, as returned by the reader, ending mid-sentence): "Unrepresentative data occurs when the training or fine-tuning data is not sufficiently representative…". Two practice years are a thin sample of what 2026 will look like.
+- *Unrepresentative data* (Training data risks › Accuracy). Two practice years are a thin sample of what 2026 will look like.
 
 **Fit:** partial. The Atlas has no small-sample entry; these are the nearest.
 
@@ -99,7 +113,7 @@ Raw EPSS has a PSI of 2.866 against the scoreboard (`outputs/v4_report.md`).
 
 ## 5. KEV coverage skew
 
-**IBM name:** *Unrepresentative data* (Training data risks › Accuracy), for the same definition as in section 4. Here the issue is the **label**: KEV lists what CISA tracks, which skews toward enterprise and government software, so a model trained on it learns "what gets added to KEV", not "what gets attacked".
+**IBM name:** *Unrepresentative data* (Training data risks › Accuracy), the same name as in section 4. Here the issue is the **label**: KEV lists what CISA tracks, which skews toward enterprise and government software, so a model trained on it learns "what gets added to KEV", not "what gets attacked".
 **Fit:** partial. The Atlas does not describe a biased label source separately.
 
 **Mitigations we built: none that changes the model.** We did not reweight, rebalance or correct for the skew. Because the target is KEV, vendor and assigner KEV-history features carry the tilt by design. What we did build is disclosure:
