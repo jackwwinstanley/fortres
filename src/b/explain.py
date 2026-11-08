@@ -1,14 +1,14 @@
 """Person B, issue #13: one plain-English reason per top-500 CVE -> outputs/explanations.csv,
 now with a Granite Guardian groundedness gate.
 
-Run:  python -m src.b.explain                          # newest outputs/top500_v*.csv, template sentences only
+Run:  python -m src.b.explain                          # outputs/top500_<PRIMARY>.csv (v6), template sentences only
       python -m src.b.explain --granite                # Granite rewrites each reason, Granite Guardian checks it
       python -m src.b.explain --granite --limit 20     # first 20 only
       python -m src.b.explain --granite --no-guardian  # NOT recommended: Guardian skipped, every row falls back to the template
 
 Facts: every sentence is built ONLY from tracked files: outputs/features_scoreboard.parquet (EPSS rank, exploit flags),
-outputs/text_features.parquet (text tags, IBM Granite KEV-likeness and similarity) and the final model's
-outputs/v5_top500_contrib.parquet (which feature groups drove the ranking). Nothing comes from the untracked data/ files or the
+outputs/text_features.parquet (text tags, IBM Granite KEV-likeness and similarity) and the primary model's
+outputs/<PRIMARY>_top500_contrib.parquet (which feature groups drove the ranking). Nothing comes from the untracked data/ files or the
 embeddings, so the file can be rebuilt from a clone. The template sentence is always produced.
 
 Pipeline per CVE (fail closed):
@@ -17,7 +17,7 @@ Pipeline per CVE (fail closed):
      or uses a blocked phrase ("will be exploited", "is being exploited", "confirmed", ...).
   3. Granite Guardian (granite3-guardian:2b via Ollama, risk = groundedness; facts as the context message, the draft as the assistant
      message) must clearly answer "No" (no risk). "Yes", empty, unparseable, timeout or any error => the template is used.
-Results are cached per cve_id (outputs/.cache/explain_cache.jsonl) and outputs/explanations.csv is rewritten after every CVE, so a
+Results are cached per cve_id, keyed by a hash of that CVE's facts + models + PROMPT_VERSION (outputs/.cache/explain_cache.jsonl) and outputs/explanations.csv is rewritten after every CVE, so a
 crash or restart resumes instead of starting over. outputs/explanations_summary.json holds the counts.
 Nothing in a file may say Guardian checked a sentence unless the Guardian model actually returned "No" for it.
 """
@@ -45,6 +45,10 @@ GUARDIAN_MODEL = "granite3-guardian:2b"
 OLLAMA_CHAT = "http://localhost:11434/api/chat"
 GUARDIAN_TIMEOUT = 60  # seconds per call (the first call also loads the model)
 PROMPT_VERSION = "2026-11-08-restate-v6"  # part of the cache key: bump it whenever the Granite prompt or the fact wording changes, and every row is regenerated
+# The model whose top-500 list is explained. The one place to change when the primary model changes (it names both input files).
+PRIMARY = "v6"
+TOP_FILE = f"top500_{PRIMARY}.csv"
+CONTRIB_FILE = f"{PRIMARY}_top500_contrib.parquet"
 EXPLANATION_COLS = ["cve_id", "explanation", "source", "guardian_verdict"]
 # `reason` repeats `explanation`: the existing dashboard reads a column called `reason`; drop it once the dashboard reads `explanation`.
 OUT_COLS = [*EXPLANATION_COLS, "reason"]
@@ -61,7 +65,7 @@ TAGS = {
 EXPLOIT_SRC = {"exploitdb": "Exploit-DB", "metasploit": "Metasploit", "nuclei": "a Nuclei template",
                "poc_github": "a GitHub proof of concept"}
 GENERIC_CNA = {"cve@mitre.org", "unknown"}
-# groups of v5 features, in words, used for "the model's main drivers" (contributions are summed per group; timing is skipped)
+# groups of the model's features (the v5 feature set, also used by v6), in words, used for "the model's main drivers" (contributions are summed per group; timing is skipped)
 DRIVER_GROUPS = {
     "public exploit code": ["exploitdb", "metasploit", "nuclei", "poc_github", "n_flags", "any_exploit"],
     "its EPSS rank within its month": ["epss_rank_in_month", "epss_missing"],
@@ -92,6 +96,8 @@ BLOCKED_PHRASES = [
     r"allow(?:s|ed|ing)?", r"affect(?:s|ed|ing)?", r"pos(?:es|ed|ing)", r"highlight(?:s|ed|ing)?", r"consider(?:s|ed|ing)?",
     r"shar(?:es|ed|ing)\b[^.;]*\bwith",                                        # 'shares X with Y' links two facts
     r"proof of exploit", r"weakness hints? of", r"related",                    # garbled wording, '-related'
+    # found auditing the v6 rows: joins the exploit fact to the model-driver list, so the proof of concept reads as being "for" the organisation's history
+    r"proof of concept (?:for|in) public exploit code and (?:the reporting|a mentioned|its EPSS rank|description similarity|weakness wording)",
 ]
 MAX_WORDS = 45
 # real tokens that contain a lowercase-then-uppercase letter pair; any other such token is treated as two words glued together
@@ -120,7 +126,7 @@ def cna_name(assigner: str) -> str | None:
             "jpcert": "JPCERT", "redhat": "Red Hat", "us": None}.get(name, name.capitalize())
 
 
-# ---- facts (tracked columns and the v5 contribution file only) ------------------------------------
+# ---- facts (tracked columns and the primary model's contribution file only) ------------------------------------
 def top_pct(rank) -> int:
     """'top X%' from a 0-1 percentile rank (1.0 = highest)."""
     return max(1, round((1 - float(rank)) * 100))
@@ -141,12 +147,13 @@ def facts_for(top: pd.DataFrame, out_dir=OUT_DIR) -> pd.DataFrame:
     f = top[["cve_id"]].merge(pool, on="cve_id", how="left")
     missing = f["epss_rank_in_month"].isna().sum() + f["kev_text_score"].isna().sum()
     assert not missing, f"{missing} top-list facts are missing from the tracked files"
-    contrib_path = out_dir / "v5_top500_contrib.parquet"
-    contrib = pd.read_parquet(contrib_path).set_index("cve_id") if contrib_path.exists() else None
+    contrib = pd.read_parquet(out_dir / CONTRIB_FILE).set_index("cve_id")
+    absent = sorted(set(f["cve_id"]) - set(contrib.index))
+    assert not absent, f"{len(absent)} top-list CVEs are not in {CONTRIB_FILE} (list and contribution file must come from the same model): {absent[:3]}"
     f["tags"] = f[list(FLAGS)].apply(lambda r: [TAGS[c] for c in FLAGS if r[c] == 1], axis=1)
     f["exploits"] = f[list(EXPLOIT_SRC)].apply(lambda r: [EXPLOIT_SRC[c] for c in EXPLOIT_SRC if r[c] == 1], axis=1)
     f["epss_pct"] = f["epss_rank_in_month"].where(f["epss"].notna())
-    f["drivers"] = [drivers_from_contrib(contrib.loc[c]) if contrib is not None and c in contrib.index else [] for c in f["cve_id"]]
+    f["drivers"] = [drivers_from_contrib(contrib.loc[c]) for c in f["cve_id"]]
     return f
 
 
@@ -518,7 +525,8 @@ def write_atomic(df: pd.DataFrame, path) -> None:
 
 AUDIT_LABELS = {r"(?:indicated|identified)\s+(?:by|as)\s+CVE-\d{4}-\d+": "claims the CVE id indicates the facts", r"shar(?:es|ed|ing)\b[^.;]*\bwith": "shares ... with (links two facts)",
                 r"allow(?:s|ed|ing)?": "allows", r"affect(?:s|ed|ing)?": "affecting / affects", r"pos(?:es|ed|ing)": "poses", r"highlight(?:s|ed|ing)?": "highlights",
-                r"consider(?:s|ed|ing)?": "considers", r"specific templates?": "specific template", r"weakness hints? of": "weakness hint of"}
+                r"consider(?:s|ed|ing)?": "considers", r"specific templates?": "specific template", r"weakness hints? of": "weakness hint of",
+                r"proof of concept (?:for|in) public exploit code and (?:the reporting|a mentioned|its EPSS rank|description similarity|weakness wording)": "proof of concept joined to the driver list"}
 
 
 def problem_class(p: str) -> str:
@@ -592,6 +600,29 @@ def run_stats(items: list[dict], recs: dict, history: list[dict]) -> dict:
             "regenerated_passed_guardian": passed, "regenerated_template_fallback": regen - passed}
 
 
+def classify(items: list[dict], recs: dict) -> dict:
+    """How the cache stands against today's list (read-only). Per CVE, in this order:
+    new        - no cached record for the cve_id at all
+    changed    - a record exists but its key differs (the CVE's facts, a model or PROMPT_VERSION changed): invalidated
+    failed     - same key, a Granite sentence that fails TODAY's local checks: invalidated
+    kept       - same key, and the sentence passes (a template row is kept as it is: it is built from the facts and asserted against them)
+    retry      - same key, template row that was never drafted (cached by a run without Granite): drafted now when Granite runs"""
+    out = {"kept": [], "changed": [], "failed": [], "new": [], "retry": []}
+    for it in items:
+        r = recs.get(it["cve_id"])
+        if r is None:
+            out["new"].append(it["cve_id"])
+        elif r["key"] != it["key"]:
+            out["changed"].append(it["cve_id"])
+        elif r["source"] == "granite" and local_problems(r.get("draft") or r["explanation"], it["facts"]):
+            out["failed"].append(it["cve_id"])
+        elif r["source"] == "template" and r["guardian_verdict"] == "not_run" and r.get("draft") is None:
+            out["retry"].append(it["cve_id"])
+        else:
+            out["kept"].append(it["cve_id"])
+    return out
+
+
 def process(items: list[dict], draft_fn, guardian=guardian_verdict, out_dir=OUT_DIR, log=print, time_box_minutes=None,
             batch_draft_fn=None, batch_size: int = 8) -> pd.DataFrame:
     """Run (or resume) the gate over `items` (dicts with cve_id, facts, prose, template, key). draft_fn(item, attempt) returns a draft;
@@ -603,6 +634,8 @@ def process(items: list[dict], draft_fn, guardian=guardian_verdict, out_dir=OUT_
     cache_dir.mkdir(exist_ok=True)
     cache_path = cache_dir / "explain_cache.jsonl"
     recs = load_cache(cache_path)
+    cls = classify(items, recs)
+    log("cache vs this list: " + ", ".join(f"{k} {len(v)}" for k, v in cls.items()))
     invalidated = {}
     for it in items:
         r = recs.get(it["cve_id"])
@@ -670,12 +703,11 @@ def process(items: list[dict], draft_fn, guardian=guardian_verdict, out_dir=OUT_
 
 
 def latest_top() -> str:
-    files = sorted(OUT_DIR.glob("top500_v*.csv"), key=lambda p: int(re.findall(r"\d+", p.stem)[-1]))
-    final = OUT_DIR / "top500_final.csv"
-    return str(final if final.exists() else files[-1])
+    """The primary model's list (PRIMARY). Not 'the newest file': the facts must come from the same model as the list."""
+    return str(OUT_DIR / TOP_FILE)
 
 
-def main(top_path=None, granite=False, limit=None, use_guardian=True, time_box=None):
+def main(top_path=None, granite=False, limit=None, use_guardian=True, time_box=None, classify_only=False):
     top_path = top_path or latest_top()
     top = pd.read_csv(top_path)
     if limit:
@@ -686,6 +718,10 @@ def main(top_path=None, granite=False, limit=None, use_guardian=True, time_box=N
         t, facts = template(r), facts_text(r)
         assert not check_reason(t, facts), f"template for {r['cve_id']} uses facts not in the input: {check_reason(t, facts)}"
         items.append(dict(cve_id=r["cve_id"], facts=facts, prose=facts_prose(r), template=t, key=cache_key(facts), row=r))
+    if classify_only:  # read-only: how many cached sentences survive this list (kept), are invalidated (changed / failed) or are new
+        c = classify(items, load_cache(OUT_DIR / ".cache" / "explain_cache.jsonl"))
+        print(f"{os.path.basename(top_path)}: " + ", ".join(f"{k} {len(v)}" for k, v in c.items()))
+        return c
     holder = {}
 
     def draft_fn(it, attempt=0):  # the model is loaded on first use, so resuming a finished run costs nothing
@@ -717,5 +753,6 @@ if __name__ == "__main__":
     ap.add_argument("--limit", type=int)
     ap.add_argument("--no-guardian", action="store_true")
     ap.add_argument("--time-box", type=float, help="stop after this many minutes; unfinished rows stay template and are marked pending")
+    ap.add_argument("--classify", action="store_true", help="read-only: print kept / changed / failed / new / retry counts against the cache and exit")
     a = ap.parse_args()
-    main(a.top, a.granite, a.limit, use_guardian=not a.no_guardian, time_box=a.time_box)
+    main(a.top, a.granite, a.limit, use_guardian=not a.no_guardian, time_box=a.time_box, classify_only=a.classify)
