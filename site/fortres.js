@@ -34,9 +34,10 @@ function countUp(el, delay) {
   };
   Frame.add(n.__task);
 }
-const routeNow = () => ({ '#picks': 'picks', '#lookup': 'lookup', '#found': 'found' }[location.hash] || 'story');
+const routeNow = () => ({ '#picks': 'picks', '#lookup': 'lookup', '#found': 'found', '#demo': 'demo' }[location.hash] || 'story');
 document.documentElement.classList.toggle('route-picks', routeNow() !== 'story');
 document.documentElement.classList.toggle('route-lookup', routeNow() === 'lookup');
+document.documentElement.classList.toggle('route-demo', routeNow() === 'demo');
 
 
 let ROUTE = 'story';
@@ -122,10 +123,14 @@ function pages(PICKS) {
   lq.addEventListener('paste', () => setTimeout(() => lookup(lq.value), 0));
   document.querySelector('.tries').addEventListener('click', e => { const b = e.target.closest('button'); if (b) lookup(b.dataset.c); });
   function route() {
-    ROUTE = location.hash === '#picks' ? 'picks' : location.hash === '#lookup' ? 'lookup' : location.hash === '#found' ? 'found' : 'story';
+    ROUTE = location.hash === '#picks' ? 'picks' : location.hash === '#lookup' ? 'lookup' : location.hash === '#found' ? 'found' : location.hash === '#demo' ? 'demo' : 'story';
     document.documentElement.classList.toggle('route-picks', ROUTE !== 'story');
     document.documentElement.classList.toggle('route-lookup', ROUTE === 'lookup');
     document.documentElement.classList.toggle('route-found', ROUTE === 'found');
+    document.documentElement.classList.toggle('route-demo', ROUTE === 'demo');
+    document.getElementById('t-demo').setAttribute('aria-current', ROUTE === 'demo' ? 'page' : 'false');
+    const vid = document.getElementById('vid'), vidUrl = 'https://www.youtube-nocookie.com/embed/0V3eeukbF3c';   /* loaded only on this tab; cleared on leaving so it stops playing */
+    if (ROUTE === 'demo') { if (vid.src !== vidUrl) vid.src = vidUrl; } else if (vid.src && vid.src !== 'about:blank') vid.src = 'about:blank';
     document.getElementById('t-found').setAttribute('aria-current', ROUTE === 'found' ? 'page' : 'false');
     document.getElementById('t-lookup').setAttribute('aria-current', ROUTE === 'lookup' ? 'page' : 'false');
     if (ROUTE === 'lookup') { needRanks().catch(() => {}); countUp(document.getElementById('lnum')); setTimeout(() => lq.focus({ preventScroll: true }), 50); }
