@@ -30,6 +30,10 @@ Both were checked in a fresh clone on 2026-11-09 (Python 3.14.5, macOS arm64): t
 starts and renders with no errors. To put the site back online on your own server, follow [deploy/README.md](deploy/README.md): a small
 Ubuntu server running Caddy, plus a domain pointed at it.
 
+## License
+MIT applies to the code. Competition data is not included; derived tables keep their sources' licences.
+See [LICENSE](LICENSE).
+
 ## What we found
 All four are from files in this repository; the full list of ten, with sources, is in [docs/findings.md](docs/findings.md).
 1. **Most holes on CISA's list gave no warning.** In our 2024 and 2025 test, 44 of the 75 had no public attack code and a low EPSS score. The usual rule catches 0 of them, and fortres caught 5, three of which come from one Ivanti event.
