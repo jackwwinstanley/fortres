@@ -7,9 +7,28 @@ Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and s
 `top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
 CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
 
-The project is live at https://fortres.us. If that doesn't load, the full project (code, site and rebuild steps) is on GitHub: https://github.com/jackwwinstanley/fortres
+The project is live at https://fortres.us. During the datathon the site was served from a Vultr server; it now runs on GitHub Pages at the same address. 
+If it doesn't load, the full project (code, site and rebuild steps) is here on GitHub, and you can run it locally (below). 
+The exact state submitted to the datathon is the git tag `datathon-final`.
 
 **Demo video:** https://youtu.be/0V3eeukbF3c
+
+## Run it locally
+Neither of these needs the competition `data/` folder.
+```
+git clone https://github.com/jackwwinstanley/ibm-breach.git && cd ibm-breach
+
+# The story site (what fortres.us served): plain HTML/JS, no install.
+python3 -m http.server -d site 8765                     # then open http://localhost:8765
+
+# The Streamlit dashboard
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt                         # includes torch, so the first install is large
+streamlit run app/dashboard.py
+```
+Both were checked in a fresh clone on 2026-11-09 (Python 3.14.5, macOS arm64): the site's pages and data files load, and the dashboard
+starts and renders with no errors. To put the site back online on your own server, follow [deploy/README.md](deploy/README.md): a small
+Ubuntu server running Caddy, plus a domain pointed at it.
 
 ## What we found
 All four are from files in this repository; the full list of ten, with sources, is in [docs/findings.md](docs/findings.md).
