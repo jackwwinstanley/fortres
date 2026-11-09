@@ -7,7 +7,9 @@ Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and s
 `top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
 CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
 
-**Site offline.** The live site, fortres.us, was served from a Vultr server during the datathon (every response carried `X-Served-By: Vultr`) and has been taken down. Everything it showed is still here: run it locally (below) or redeploy it with the steps in [deploy/README.md](deploy/README.md). The exact state submitted to the datathon is the git tag `datathon-final`.
+The project is live at https://fortres.us. During the datathon the site was served from a Vultr server; it now runs on GitHub Pages at the same address. 
+If it doesn't load, the full project (code, site and rebuild steps) is here on GitHub, and you can run it locally (below). 
+The exact state submitted to the datathon is the git tag `datathon-final`.
 
 **Demo video:** https://youtu.be/0V3eeukbF3c
 
