@@ -7,9 +7,7 @@ Sheridan Datathon 2026. Rank the 72,670 CVEs in `data/scoreboard_2026.csv` and s
 `top500.csv` (one column `cve_id`, 500 unique IDs). Judges count how many were added to
 CISA KEV by 2026-11-04. Only information known at the snapshot may be used; see `CONTRACT.md`.
 
-**Live site:** https://jackwwinstanley.github.io/fortres/
-
-fortres.us, the address used during the datathon, is retired. [deploy/README.md](deploy/README.md) can still rebuild that Vultr version.
+The project is live at https://fortres.us. If that doesn't load, the full project (code, site and rebuild steps) is on GitHub: https://github.com/jackwwinstanley/fortres
 
 **Demo video:** https://youtu.be/0V3eeukbF3c
 
